@@ -15,9 +15,9 @@ import java.time.Instant;
 @Table(name = "agence_zone")
 public class AgenceZone {
     @Id
-    @Size(max = 50)
-    @Column(name = "ID_AGENCE", nullable = false, length = 50)
-    private String idAgence;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "ID_AGENCE", nullable = false)
+    private Integer idAgence;
 
     @Size(max = 50)
     @NotNull

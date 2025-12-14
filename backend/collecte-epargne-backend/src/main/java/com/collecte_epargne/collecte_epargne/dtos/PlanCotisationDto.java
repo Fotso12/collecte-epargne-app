@@ -4,16 +4,16 @@ import com.collecte_epargne.collecte_epargne.utils.FrequenceCotisation;
 import com.collecte_epargne.collecte_epargne.utils.StatutPlanCotisation;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.Value;
+import lombok.*;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-/**
- * DTO pour PlanCotisation
- */
-@Value
+@Setter
+@Getter
+@AllArgsConstructor
+@NoArgsConstructor
 public class PlanCotisationDto implements Serializable {
     @Size(max = 50)
     String idPlan;

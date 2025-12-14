@@ -22,7 +22,7 @@ public interface ClientMapper {
         return utilisateur != null ? utilisateur.getLogin() : null;
     }
 
-    default String employeToCode(Employe employe) {
+    default Integer employeToCode(Employe employe) {
         return employe != null ? employe.getIdEmploye() : null;
     }
 

@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 public interface EmployeMapper {
 
     @Mapping(source = "utilisateur", target = "loginUtilisateur")
-    @Mapping(source = "agenceZone", target = "idAgenceZone")
+    @Mapping(source = "agenceZone.idAgence", target = "idAgence")
     @Mapping(source = "superviseur", target = "idSuperviseur")
     EmployeDto toDto(Employe employe);
 
@@ -23,11 +23,11 @@ public interface EmployeMapper {
         return utilisateur != null ? utilisateur.getLogin() : null;
     }
 
-    default String agenceZoneToId(AgenceZone agenceZone) {
+    /*default String agenceZoneToId(AgenceZone agenceZone) {
         return agenceZone != null ? agenceZone.getIdAgence() : null;
-    }
+    }*/
 
-    default String employeToId(Employe superviseur) {
+    default Integer employeToId(Employe superviseur) {
         return superviseur != null ? superviseur.getIdEmploye() : null;
     }
 

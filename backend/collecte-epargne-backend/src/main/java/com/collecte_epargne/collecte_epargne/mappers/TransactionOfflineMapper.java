@@ -22,7 +22,7 @@ public interface TransactionOfflineMapper {
     TransactionOfflineDto toDto(TransactionOffline transactionOffline);
 
     // --- Conversion Helper (Entité -> ID)
-    default String employeToId(Employe employe) {
+    default Integer employeToId(Employe employe) {
         return employe != null ? employe.getIdEmploye() : null;
     }
 

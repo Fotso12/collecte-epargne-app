@@ -1,6 +1,7 @@
 package com.collecte_epargne.collecte_epargne.entities;
 
 
+
 import com.collecte_epargne.collecte_epargne.utils.TypeEmploye;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -18,9 +19,10 @@ import java.util.Set;
 @Table(name = "employe")
 public class Employe {
     @Id
-    @Size(max = 50)
-    @Column(name = "ID_EMPLOYE", nullable = false, length = 50)
-    private String idEmploye;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "ID_EMPLOYE", nullable = false)
+    private Integer idEmploye;
+
 
     @Size(max = 50)
     @NotNull
@@ -34,6 +36,7 @@ public class Employe {
     @NotNull
     @Lob
     @Column(name = "TYPE_EMPLOYE", nullable = false)
+    @Enumerated(EnumType.STRING)
     private TypeEmploye typeEmploye;
 
     @Column(name = "COMMISSION_TAUX", precision = 5, scale = 2)

@@ -3,18 +3,17 @@ package com.collecte_epargne.collecte_epargne.dtos;
 import com.collecte_epargne.collecte_epargne.utils.StatutGenerique;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.Value;
+import lombok.*;
 
 import java.io.Serializable;
 import java.time.Instant;
 
-/**
- * DTO pour AgenceZone
- */
-@Value
+@Setter
+@Getter
+@AllArgsConstructor
+@NoArgsConstructor
 public class AgenceZoneDto implements Serializable {
-    @Size(max = 50)
-    String idAgence;
+    Integer idAgence;
 
     @Size(max = 50)
     @NotNull

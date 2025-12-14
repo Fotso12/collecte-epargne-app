@@ -4,15 +4,15 @@ import com.collecte_epargne.collecte_epargne.utils.CategorieNotification;
 import com.collecte_epargne.collecte_epargne.utils.TypeNotification;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.Value;
+import lombok.*;
 
 import java.io.Serializable;
 import java.time.Instant;
 
-/**
- * DTO pour Notification
- */
-@Value
+@Setter
+@Getter
+@AllArgsConstructor
+@NoArgsConstructor
 public class NotificationDto implements Serializable {
     @Size(max = 50)
     String idNotification;

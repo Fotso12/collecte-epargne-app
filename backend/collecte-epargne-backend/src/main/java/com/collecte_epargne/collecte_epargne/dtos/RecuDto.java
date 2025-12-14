@@ -3,15 +3,15 @@ package com.collecte_epargne.collecte_epargne.dtos;
 import com.collecte_epargne.collecte_epargne.utils.FormatRecu;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.Value;
+import lombok.*;
 
 import java.io.Serializable;
 import java.time.Instant;
 
-/**
- * DTO pour Recu
- */
-@Value
+@Setter
+@Getter
+@AllArgsConstructor
+@NoArgsConstructor
 public class RecuDto implements Serializable {
     @Size(max = 50)
     String idRecu;

@@ -3,17 +3,17 @@ package com.collecte_epargne.collecte_epargne.dtos;
 import com.collecte_epargne.collecte_epargne.utils.StatutCompte;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.Value;
+import lombok.*;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
 
-/**
- * DTO pour Compte
- */
-@Value
+@Setter
+@Getter
+@AllArgsConstructor
+@NoArgsConstructor
 public class CompteDto implements Serializable {
     @Size(max = 50)
     String idCompte;

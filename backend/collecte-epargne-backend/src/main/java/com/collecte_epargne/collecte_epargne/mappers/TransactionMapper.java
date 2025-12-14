@@ -24,7 +24,7 @@ public interface TransactionMapper {
         return compte != null ? compte.getIdCompte() : null;
     }
 
-    default String employeToId(Employe employe) {
+    default Integer employeToId(Employe employe) {
         return employe != null ? employe.getIdEmploye() : null;
     }
 

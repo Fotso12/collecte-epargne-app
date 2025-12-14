@@ -2,15 +2,15 @@ package com.collecte_epargne.collecte_epargne.dtos;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.Value;
+import lombok.*;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
 
-/**
- * DTO pour TypeCompte
- */
-@Value
+@Setter
+@Getter
+@AllArgsConstructor
+@NoArgsConstructor
 public class TypeCompteDto implements Serializable {
     Integer id;
 

@@ -60,6 +60,7 @@ public class Utilisateur {
 
     @Lob
     @Column(name = "STATUT")
+    @Enumerated(EnumType.STRING)
     private StatutGenerique statut;
 
     @Column(name = "DATE_CREATION")

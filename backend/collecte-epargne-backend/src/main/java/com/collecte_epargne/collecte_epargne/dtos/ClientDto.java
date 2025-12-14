@@ -3,15 +3,15 @@ package com.collecte_epargne.collecte_epargne.dtos;
 import com.collecte_epargne.collecte_epargne.utils.TypeCNI;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.Value;
+import lombok.*;
 
 import java.io.Serializable;
 import java.time.LocalDate;
 
-/**
- * DTO pour Client
- */
-@Value
+@Setter
+@Getter
+@AllArgsConstructor
+@NoArgsConstructor
 public class ClientDto implements Serializable {
     @Size(max = 50)
     String codeClient;

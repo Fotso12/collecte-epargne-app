@@ -3,27 +3,21 @@ package com.collecte_epargne.collecte_epargne.dtos;
 import com.collecte_epargne.collecte_epargne.utils.StatutGenerique;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-import java.io.Serializable;
-import java.time.Instant;
-
-@Setter
 @Getter
-@AllArgsConstructor
+@Setter
 @NoArgsConstructor
-public class UtilisateurDto implements Serializable {
+public class UtilisateurCreationRequestDto {
+
     @Size(max = 50)
     @NotNull
     private String login;
 
     @NotNull
     private Integer idRole;
-
-    // --- Champs Relationnels (ajoutés pour le DTO complet) ---
-    private String idEmploye;
-    private String codeClient;
-    // --------------------------------------------------------
 
     @Size(max = 50)
     @NotNull
@@ -41,9 +35,9 @@ public class UtilisateurDto implements Serializable {
     @NotNull
     private String email;
 
-    // Le champ 'password' est EXCLU de ce DTO de sortie/mise à jour
+    @Size(min = 6, max = 255) // Ajout d'une contrainte de taille pour le password
+    @NotNull
+    private String password; // Le mot de passe en clair (non haché)
 
     private StatutGenerique statut;
-
-    private Instant dateCreation;
 }

@@ -48,8 +48,8 @@ public class Notification {
     @Column(name = "MESSAGE", nullable = false)
     private String message;
 
-    @Lob
-    @Column(name = "STATUT")
+    @Size(max = 20) // Valide la longueur en Java
+    @Column(name = "STATUT", length = 20) // Fixe la taille de la colonne à VARCHAR(20) dans la DB
     private String statut;
 
     @Column(name = "DATE_CREATION")

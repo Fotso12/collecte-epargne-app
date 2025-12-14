@@ -3,19 +3,19 @@ package com.collecte_epargne.collecte_epargne.dtos;
 import com.collecte_epargne.collecte_epargne.utils.TypeEmploye;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.Value;
+import lombok.*;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-/**
- * DTO pour Employe
- */
-@Value
+@Setter
+@Getter
+@AllArgsConstructor
+@NoArgsConstructor
 public class EmployeDto implements Serializable {
-    @Size(max = 50)
-    String idEmploye;
+
+    Integer idEmploye;
 
     @Size(max = 50)
     @NotNull
@@ -25,7 +25,7 @@ public class EmployeDto implements Serializable {
     LocalDate dateEmbauche;
 
     @NotNull
-    TypeEmploye typeEmploye;
+    private TypeEmploye typeEmploye;
 
     BigDecimal commissionTaux;
 
@@ -34,10 +34,9 @@ public class EmployeDto implements Serializable {
     String loginUtilisateur;
 
     // Remplacer AgenceZone par son ID
-    String idAgenceZone;
+    private Integer idAgence;
 
     // Remplacer Superviseur par son ID_EMPLOYE
     String idSuperviseur;
 
-    // Équipe supervisée et clients assignés omis
 }
