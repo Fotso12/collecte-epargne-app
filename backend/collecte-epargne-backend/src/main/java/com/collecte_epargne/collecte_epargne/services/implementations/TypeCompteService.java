@@ -1,0 +1,89 @@
+package com.collecte_epargne.collecte_epargne.services.implementations;
+
+import com.collecte_epargne.collecte_epargne.dtos.TypeCompteDto;
+import com.collecte_epargne.collecte_epargne.entities.TypeCompte;
+import com.collecte_epargne.collecte_epargne.mappers.TypeCompteMapper;
+import com.collecte_epargne.collecte_epargne.repositories.TypeCompteRepository;
+import com.collecte_epargne.collecte_epargne.services.interfaces.TypeCompteInterface;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+@Setter
+@Getter
+@Service
+@AllArgsConstructor
+public class TypeCompteService implements TypeCompteInterface {
+
+    private final TypeCompteRepository typeCompteRepository;
+    private final TypeCompteMapper typeCompteMapper;
+
+    @Override
+    public TypeCompteDto save(TypeCompteDto typeCompteDto) {
+        if (typeCompteDto.getCode() == null || typeCompteDto.getCode().isEmpty()) {
+            throw new IllegalArgumentException("Le code du type de compte est obligatoire.");
+        }
+
+        // Vérification de l'unicité du code
+        if (typeCompteRepository.findByCode(typeCompteDto.getCode()).isPresent()) {
+            throw new RuntimeException("Un type de compte avec ce code existe déjà.");
+        }
+
+        TypeCompte typeCompteToSave = typeCompteMapper.toEntity(typeCompteDto);
+        TypeCompte savedTypeCompte = typeCompteRepository.save(typeCompteToSave);
+        return typeCompteMapper.toDto(savedTypeCompte);
+    }
+
+    @Override
+    public List<TypeCompteDto> getAll() {
+        return typeCompteRepository.findAll().stream()
+                .map(typeCompteMapper::toDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public TypeCompteDto getById(Integer id) {
+        TypeCompte typeCompte = typeCompteRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Type de compte non trouvé avec l'ID : " + id));
+        return typeCompteMapper.toDto(typeCompte);
+    }
+
+    @Override
+    public TypeCompteDto update(Integer id, TypeCompteDto typeCompteDto) {
+        TypeCompte existingTypeCompte = typeCompteRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Type de compte non trouvé pour la mise à jour : " + id));
+
+        // Mettre à jour les champs
+        existingTypeCompte.setCode(typeCompteDto.getCode());
+        existingTypeCompte.setNom(typeCompteDto.getNom());
+        existingTypeCompte.setDescription(typeCompteDto.getDescription());
+        existingTypeCompte.setTauxInteret(typeCompteDto.getTauxInteret());
+        existingTypeCompte.setSoldeMinimum(typeCompteDto.getSoldeMinimum());
+        existingTypeCompte.setFraisOuverture(typeCompteDto.getFraisOuverture());
+        existingTypeCompte.setFraisCloture(typeCompteDto.getFraisCloture());
+        existingTypeCompte.setAutoriserRetrait(typeCompteDto.getAutoriserRetrait());
+        existingTypeCompte.setDureeBlocageJours(typeCompteDto.getDureeBlocageJours());
+
+        TypeCompte updatedTypeCompte = typeCompteRepository.save(existingTypeCompte);
+        return typeCompteMapper.toDto(updatedTypeCompte);
+    }
+
+    @Override
+    public void delete(Integer id) {
+        if (!typeCompteRepository.existsById(id)) {
+            throw new RuntimeException("Type de compte inexistant : " + id);
+        }
+        typeCompteRepository.deleteById(id);
+    }
+
+    @Override
+    public TypeCompteDto getByCode(String code) {
+        TypeCompte typeCompte = typeCompteRepository.findByCode(code)
+                .orElseThrow(() -> new RuntimeException("Type de compte non trouvé avec le code : " + code));
+        return typeCompteMapper.toDto(typeCompte);
+    }
+}
