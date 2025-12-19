@@ -5,14 +5,11 @@ import com.collecte_epargne.collecte_epargne.utils.TypeTransaction;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.Getter;
-import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.Instant;
 
-@Getter
-@Setter
+
 @Entity
 @Table(name = "transaction_offline")
 public class TransactionOffline {
@@ -79,4 +76,141 @@ public class TransactionOffline {
     @JoinColumn(name = "ID_TRANSACTION_FINALE")
     private Transaction transactionFinale;
 
+    public String getIdOffline() {
+        return idOffline;
+    }
+
+    public void setIdOffline(String idOffline) {
+        this.idOffline = idOffline;
+    }
+
+    public BigDecimal getMontant() {
+        return montant;
+    }
+
+    public void setMontant(BigDecimal montant) {
+        this.montant = montant;
+    }
+
+    public TypeTransaction getTypeTransaction() {
+        return typeTransaction;
+    }
+
+    public void setTypeTransaction(TypeTransaction typeTransaction) {
+        this.typeTransaction = typeTransaction;
+    }
+
+    public Instant getDateTransaction() {
+        return dateTransaction;
+    }
+
+    public void setDateTransaction(Instant dateTransaction) {
+        this.dateTransaction = dateTransaction;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getSignatureClient() {
+        return signatureClient;
+    }
+
+    public void setSignatureClient(String signatureClient) {
+        this.signatureClient = signatureClient;
+    }
+
+    public BigDecimal getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(BigDecimal latitude) {
+        this.latitude = latitude;
+    }
+
+    public BigDecimal getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(BigDecimal longitude) {
+        this.longitude = longitude;
+    }
+
+    public StatutSynchroOffline getStatutSynchro() {
+        return statutSynchro;
+    }
+
+    public void setStatutSynchro(StatutSynchroOffline statutSynchro) {
+        this.statutSynchro = statutSynchro;
+    }
+
+    public Instant getDateSynchro() {
+        return dateSynchro;
+    }
+
+    public void setDateSynchro(Instant dateSynchro) {
+        this.dateSynchro = dateSynchro;
+    }
+
+    public String getErreurSynchro() {
+        return erreurSynchro;
+    }
+
+    public void setErreurSynchro(String erreurSynchro) {
+        this.erreurSynchro = erreurSynchro;
+    }
+
+    public Employe getEmploye() {
+        return employe;
+    }
+
+    public void setEmploye(Employe employe) {
+        this.employe = employe;
+    }
+
+    public Client getClient() {
+        return client;
+    }
+
+    public void setClient(Client client) {
+        this.client = client;
+    }
+
+    public Compte getCompte() {
+        return compte;
+    }
+
+    public void setCompte(Compte compte) {
+        this.compte = compte;
+    }
+
+    public Transaction getTransactionFinale() {
+        return transactionFinale;
+    }
+
+    public void setTransactionFinale(Transaction transactionFinale) {
+        this.transactionFinale = transactionFinale;
+    }
+
+    public TransactionOffline(String idOffline, BigDecimal montant, TypeTransaction typeTransaction, Instant dateTransaction, String description, String signatureClient, BigDecimal latitude, BigDecimal longitude, StatutSynchroOffline statutSynchro, Instant dateSynchro, String erreurSynchro, Employe employe, Client client, Compte compte, Transaction transactionFinale) {
+        this.idOffline = idOffline;
+        this.montant = montant;
+        this.typeTransaction = typeTransaction;
+        this.dateTransaction = dateTransaction;
+        this.description = description;
+        this.signatureClient = signatureClient;
+        this.latitude = latitude;
+        this.longitude = longitude;
+        this.statutSynchro = statutSynchro;
+        this.dateSynchro = dateSynchro;
+        this.erreurSynchro = erreurSynchro;
+        this.employe = employe;
+        this.client = client;
+        this.compte = compte;
+        this.transactionFinale = transactionFinale;
+    }
 }

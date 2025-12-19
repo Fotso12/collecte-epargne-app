@@ -4,15 +4,13 @@ import com.collecte_epargne.collecte_epargne.utils.TypeCNI;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.Getter;
-import lombok.Setter;
 
 import java.time.LocalDate;
 import java.util.Set;
 
-@Getter
-@Setter
+
 @Entity
+
 @Table(name = "client")
 public class Client {
     @Id
@@ -79,4 +77,141 @@ public class Client {
     @OneToMany(mappedBy = "client")
     private Set<Compte> comptes;
 
+    public String getCodeClient() {
+        return codeClient;
+    }
+
+    public void setCodeClient(String codeClient) {
+        this.codeClient = codeClient;
+    }
+
+    public String getNumeroClient() {
+        return numeroClient;
+    }
+
+    public void setNumeroClient(String numeroClient) {
+        this.numeroClient = numeroClient;
+    }
+
+    public String getAdresse() {
+        return adresse;
+    }
+
+    public void setAdresse(String adresse) {
+        this.adresse = adresse;
+    }
+
+    public TypeCNI getTypeCni() {
+        return typeCni;
+    }
+
+    public void setTypeCni(TypeCNI typeCni) {
+        this.typeCni = typeCni;
+    }
+
+    public String getNumCni() {
+        return numCni;
+    }
+
+    public void setNumCni(String numCni) {
+        this.numCni = numCni;
+    }
+
+    public String getPhotoPath() {
+        return photoPath;
+    }
+
+    public void setPhotoPath(String photoPath) {
+        this.photoPath = photoPath;
+    }
+
+    public String getCniRectoPath() {
+        return cniRectoPath;
+    }
+
+    public void setCniRectoPath(String cniRectoPath) {
+        this.cniRectoPath = cniRectoPath;
+    }
+
+    public String getCniVersoPath() {
+        return cniVersoPath;
+    }
+
+    public void setCniVersoPath(String cniVersoPath) {
+        this.cniVersoPath = cniVersoPath;
+    }
+
+    public LocalDate getDateNaissance() {
+        return dateNaissance;
+    }
+
+    public void setDateNaissance(LocalDate dateNaissance) {
+        this.dateNaissance = dateNaissance;
+    }
+
+    public String getLieuNaissance() {
+        return lieuNaissance;
+    }
+
+    public void setLieuNaissance(String lieuNaissance) {
+        this.lieuNaissance = lieuNaissance;
+    }
+
+    public String getProfession() {
+        return profession;
+    }
+
+    public void setProfession(String profession) {
+        this.profession = profession;
+    }
+
+    public Integer getScoreEpargne() {
+        return scoreEpargne;
+    }
+
+    public void setScoreEpargne(Integer scoreEpargne) {
+        this.scoreEpargne = scoreEpargne;
+    }
+
+    public Utilisateur getUtilisateur() {
+        return utilisateur;
+    }
+
+    public void setUtilisateur(Utilisateur utilisateur) {
+        this.utilisateur = utilisateur;
+    }
+
+    public Employe getCollecteurAssigne() {
+        return collecteurAssigne;
+    }
+
+    public void setCollecteurAssigne(Employe collecteurAssigne) {
+        this.collecteurAssigne = collecteurAssigne;
+    }
+
+    public Set<Compte> getComptes() {
+        return comptes;
+    }
+
+    public void setComptes(Set<Compte> comptes) {
+        this.comptes = comptes;
+    }
+
+    public Client(String codeClient, String numeroClient, String adresse, TypeCNI typeCni, String numCni, String photoPath, String cniRectoPath, String cniVersoPath, LocalDate dateNaissance, String lieuNaissance, String profession, Integer scoreEpargne, Utilisateur utilisateur, Employe collecteurAssigne, Set<Compte> comptes) {
+        this.codeClient = codeClient;
+        this.numeroClient = numeroClient;
+        this.adresse = adresse;
+        this.typeCni = typeCni;
+        this.numCni = numCni;
+        this.photoPath = photoPath;
+        this.cniRectoPath = cniRectoPath;
+        this.cniVersoPath = cniVersoPath;
+        this.dateNaissance = dateNaissance;
+        this.lieuNaissance = lieuNaissance;
+        this.profession = profession;
+        this.scoreEpargne = scoreEpargne;
+        this.utilisateur = utilisateur;
+        this.collecteurAssigne = collecteurAssigne;
+        this.comptes = comptes;
+    }
 }
