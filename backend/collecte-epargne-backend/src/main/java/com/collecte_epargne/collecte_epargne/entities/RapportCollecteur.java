@@ -166,4 +166,7 @@ public class RapportCollecteur {
         this.dateValidation = dateValidation;
         this.commentaireSuperviseur = commentaireSuperviseur;
     }
+
+    public RapportCollecteur() {
+    }
 }

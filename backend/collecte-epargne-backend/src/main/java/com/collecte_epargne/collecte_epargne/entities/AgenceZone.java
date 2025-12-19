@@ -145,4 +145,7 @@ public class AgenceZone {
         this.statut = statut;
         this.dateCreation = dateCreation;
     }
+
+    public AgenceZone() {
+    }
 }

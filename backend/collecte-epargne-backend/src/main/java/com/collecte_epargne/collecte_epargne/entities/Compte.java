@@ -208,4 +208,7 @@ public class Compte {
         this.transactions = transactions;
         this.plansDeCotisation = plansDeCotisation;
     }
+
+    public Compte() {
+    }
 }

@@ -86,4 +86,5 @@ public class Role {
         this.description = description;
         this.utilisateurs = utilisateurs;
     }
+
 }

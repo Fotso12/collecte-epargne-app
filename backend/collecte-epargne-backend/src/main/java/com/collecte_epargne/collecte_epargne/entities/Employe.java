@@ -156,4 +156,7 @@ public class Employe {
         this.equipeSupervisee = equipeSupervisee;
         this.clientsAssignes = clientsAssignes;
     }
+
+    public Employe() {
+    }
 }

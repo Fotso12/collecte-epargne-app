@@ -131,4 +131,7 @@ public class PlanCotisation {
         this.tauxPenaliteRetard = tauxPenaliteRetard;
         this.statut = statut;
     }
+
+    public PlanCotisation() {
+    }
 }

@@ -214,4 +214,7 @@ public class Client {
         this.collecteurAssigne = collecteurAssigne;
         this.comptes = comptes;
     }
+
+    public Client() {
+    }
 }

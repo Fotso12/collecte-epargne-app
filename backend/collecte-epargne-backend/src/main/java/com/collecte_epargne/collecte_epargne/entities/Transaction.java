@@ -291,4 +291,7 @@ public class Transaction {
         this.signatureClient = signatureClient;
         this.hashTransaction = hashTransaction;
     }
+
+    public Transaction() {
+    }
 }

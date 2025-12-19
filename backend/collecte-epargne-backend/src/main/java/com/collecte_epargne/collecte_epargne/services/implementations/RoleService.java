@@ -5,22 +5,22 @@ import com.collecte_epargne.collecte_epargne.entities.Role;
 import com.collecte_epargne.collecte_epargne.mappers.RoleMapper;
 import com.collecte_epargne.collecte_epargne.repositories.RoleRepository;
 import com.collecte_epargne.collecte_epargne.services.interfaces.RoleInterface;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Setter
-@Getter
+
 @Service
-@AllArgsConstructor
 public class RoleService implements RoleInterface {
 
     private final RoleRepository roleRepository;
     private final RoleMapper roleMapper;
+
+    public RoleService(RoleRepository roleRepository, RoleMapper roleMapper) {
+        this.roleRepository = roleRepository;
+        this.roleMapper = roleMapper;
+    }
 
     @Override
     public RoleDto save(RoleDto roleDto) {

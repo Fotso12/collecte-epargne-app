@@ -10,24 +10,26 @@ import com.collecte_epargne.collecte_epargne.repositories.EmployeRepository;
 import com.collecte_epargne.collecte_epargne.repositories.UtilisateurRepository;
 import com.collecte_epargne.collecte_epargne.services.interfaces.ClientInterface;
 import com.collecte_epargne.collecte_epargne.utils.TypeEmploye;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Setter
-@Getter
+
 @Service
-@AllArgsConstructor
 public class ClientService implements ClientInterface {
 
     private final ClientRepository clientRepository;
     private final ClientMapper clientMapper;
     private final UtilisateurRepository utilisateurRepository; // Pour la relation Utilisateur
     private final EmployeRepository employeRepository; // Pour la relation CollecteurAssigne
+
+    public ClientService(ClientRepository clientRepository, ClientMapper clientMapper, UtilisateurRepository utilisateurRepository, EmployeRepository employeRepository) {
+        this.clientRepository = clientRepository;
+        this.clientMapper = clientMapper;
+        this.utilisateurRepository = utilisateurRepository;
+        this.employeRepository = employeRepository;
+    }
 
     // Méthode utilitaire pour attacher les entités relationnelles
     private void assignerRelations(Client client, ClientDto dto) {

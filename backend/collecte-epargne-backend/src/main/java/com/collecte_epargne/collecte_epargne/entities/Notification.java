@@ -172,4 +172,7 @@ public class Notification {
     public void setErreurEnvoi(String erreurEnvoi) {
         this.erreurEnvoi = erreurEnvoi;
     }
+
+    public Notification() {
+    }
 }
