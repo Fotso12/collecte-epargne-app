@@ -11,6 +11,7 @@ import lombok.Setter;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Setter
@@ -23,7 +24,9 @@ public class RoleService implements RoleInterface {
     private final RoleMapper roleMapper;
 
     @Override
+    @SuppressWarnings("null")
     public RoleDto save(RoleDto roleDto) {
+        Objects.requireNonNull(roleDto, "roleDto ne doit pas être null");
         if (roleDto.getNom() == null || roleDto.getNom().isEmpty() || roleDto.getCode() == null || roleDto.getCode().isEmpty()) {
             throw new IllegalArgumentException("Le nom et le code du rôle sont obligatoires.");
         }
@@ -52,6 +55,7 @@ public class RoleService implements RoleInterface {
 
     @Override
     public RoleDto getById(Integer id) {
+        Objects.requireNonNull(id, "id ne doit pas être null");
         Role role = roleRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Rôle non trouvé avec l'ID : " + id));
         return roleMapper.toDto(role);
@@ -59,6 +63,8 @@ public class RoleService implements RoleInterface {
 
     @Override
     public RoleDto update(Integer id, RoleDto roleDto) {
+        Objects.requireNonNull(id, "id ne doit pas être null");
+        Objects.requireNonNull(roleDto, "roleDto ne doit pas être null");
         Role existingRole = roleRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Rôle non trouvé pour la mise à jour : " + id));
 
@@ -86,6 +92,7 @@ public class RoleService implements RoleInterface {
 
     @Override
     public void delete(Integer id) {
+        Objects.requireNonNull(id, "id ne doit pas être null");
         if (!roleRepository.existsById(id)) {
             throw new RuntimeException("Rôle inexistant : " + id);
         }

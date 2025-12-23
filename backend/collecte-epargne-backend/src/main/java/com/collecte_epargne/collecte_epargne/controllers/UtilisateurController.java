@@ -3,8 +3,6 @@ package com.collecte_epargne.collecte_epargne.controllers;
 import com.collecte_epargne.collecte_epargne.dtos.UtilisateurCreationRequestDto;
 import com.collecte_epargne.collecte_epargne.dtos.UtilisateurDto;
 import com.collecte_epargne.collecte_epargne.services.implementations.UtilisateurService;
-import com.collecte_epargne.collecte_epargne.services.interfaces.UtilisateurInterface;
-import com.collecte_epargne.collecte_epargne.utils.StatutGenerique;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

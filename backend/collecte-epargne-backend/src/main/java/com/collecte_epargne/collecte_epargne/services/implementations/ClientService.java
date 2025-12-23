@@ -16,6 +16,7 @@ import lombok.Setter;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Setter
@@ -33,7 +34,8 @@ public class ClientService implements ClientInterface {
     private void assignerRelations(Client client, ClientDto dto) {
         // 1. Utilisateur (LOGIN)
         if (dto.getLoginUtilisateur() != null) {
-            Utilisateur utilisateur = utilisateurRepository.findById(dto.getLoginUtilisateur())
+            String login = Objects.requireNonNull(dto.getLoginUtilisateur());
+            Utilisateur utilisateur = utilisateurRepository.findById(login)
                     .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé avec le login : " + dto.getLoginUtilisateur()));
             client.setUtilisateur(utilisateur);
         }
@@ -56,7 +58,9 @@ public class ClientService implements ClientInterface {
     }
 
     @Override
+    @SuppressWarnings("null")
     public ClientDto save(ClientDto clientDto) {
+        Objects.requireNonNull(clientDto, "clientDto ne doit pas être null");
         if (clientDto.getNumeroClient() == null || clientDto.getNumeroClient().isEmpty()) {
             throw new IllegalArgumentException("Le numéro client est obligatoire.");
         }
@@ -82,6 +86,7 @@ public class ClientService implements ClientInterface {
 
     @Override
     public ClientDto getById(String codeClient) {
+        Objects.requireNonNull(codeClient, "codeClient ne doit pas être null");
         Client client = clientRepository.findById(codeClient)
                 .orElseThrow(() -> new RuntimeException("Client non trouvé avec le code : " + codeClient));
         return clientMapper.toDto(client);
@@ -89,6 +94,8 @@ public class ClientService implements ClientInterface {
 
     @Override
     public ClientDto update(String codeClient, ClientDto clientDto) {
+        Objects.requireNonNull(codeClient, "codeClient ne doit pas être null");
+        Objects.requireNonNull(clientDto, "clientDto ne doit pas être null");
         Client existingClient = clientRepository.findById(codeClient)
                 .orElseThrow(() -> new RuntimeException("Client non trouvé pour la mise à jour : " + codeClient));
 
@@ -116,6 +123,7 @@ public class ClientService implements ClientInterface {
 
     @Override
     public void delete(String codeClient) {
+        Objects.requireNonNull(codeClient, "codeClient ne doit pas être null");
         if (!clientRepository.existsById(codeClient)) {
             throw new RuntimeException("Client inexistant : " + codeClient);
         }
@@ -124,6 +132,7 @@ public class ClientService implements ClientInterface {
 
     @Override
     public ClientDto getByNumeroClient(String numeroClient) {
+        Objects.requireNonNull(numeroClient, "numeroClient ne doit pas être null");
         Client client = clientRepository.findByNumeroClient(numeroClient)
                 .orElseThrow(() -> new RuntimeException("Client non trouvé avec le numéro : " + numeroClient));
         return clientMapper.toDto(client);

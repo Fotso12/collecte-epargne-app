@@ -13,6 +13,7 @@ import lombok.Setter;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.util.Objects;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -29,7 +30,8 @@ public class UtilisateurService implements UtilisateurInterface {
     // Méthode utilitaire pour attacher l'entité Role (inchangée)
     private void assignerRelations(Utilisateur utilisateur, UtilisateurDto dto) {
         if (dto.getIdRole() != null) {
-            Role role = roleRepository.findById(dto.getIdRole())
+            Integer idRole = Objects.requireNonNull(dto.getIdRole());
+            Role role = roleRepository.findById(idRole)
                     .orElseThrow(() -> new RuntimeException("Rôle non trouvé avec l'ID : " + dto.getIdRole()));
             utilisateur.setRole(role);
         }
@@ -39,7 +41,9 @@ public class UtilisateurService implements UtilisateurInterface {
      * Cette méthode est modifiée pour prendre un DTO standard et le mot de passe en clair.
      */
     @Override
+    @SuppressWarnings("null")
     public UtilisateurDto save(UtilisateurDto utilisateurDto, String password) {
+        Objects.requireNonNull(utilisateurDto, "utilisateurDto ne doit pas être null");
         if (utilisateurDto.getLogin() == null || utilisateurDto.getLogin().isEmpty() || password == null) {
             throw new IllegalArgumentException("Le login et le mot de passe sont obligatoires.");
         }
@@ -71,6 +75,7 @@ public class UtilisateurService implements UtilisateurInterface {
 
     @Override
     public UtilisateurDto getByLogin(String login) {
+        Objects.requireNonNull(login, "login ne doit pas être null");
         Utilisateur utilisateur = utilisateurRepository.findById(login)
                 .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé avec le login : " + login));
         return utilisateurMapper.toDto(utilisateur);
@@ -78,6 +83,7 @@ public class UtilisateurService implements UtilisateurInterface {
 
     @Override
     public UtilisateurDto getByEmail(String email) {
+        Objects.requireNonNull(email, "email ne doit pas être null");
         Utilisateur utilisateur = utilisateurRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé avec l'email : " + email));
         return utilisateurMapper.toDto(utilisateur);
@@ -85,6 +91,8 @@ public class UtilisateurService implements UtilisateurInterface {
 
     @Override
     public UtilisateurDto update(String login, UtilisateurDto utilisateurDto) {
+        Objects.requireNonNull(login, "login ne doit pas être null");
+        Objects.requireNonNull(utilisateurDto, "utilisateurDto ne doit pas être null");
         Utilisateur existingUtilisateur = utilisateurRepository.findById(login)
                 .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé pour la mise à jour : " + login));
 
@@ -103,6 +111,7 @@ public class UtilisateurService implements UtilisateurInterface {
 
     @Override
     public void updatePassword(String login, String newPassword) {
+        Objects.requireNonNull(login, "login ne doit pas être null");
         Utilisateur existingUtilisateur = utilisateurRepository.findById(login)
                 .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé : " + login));
 
@@ -119,6 +128,7 @@ public class UtilisateurService implements UtilisateurInterface {
 
     @Override
     public void delete(String login) {
+        Objects.requireNonNull(login, "login ne doit pas être null");
         if (!utilisateurRepository.existsById(login)) {
             throw new RuntimeException("Utilisateur inexistant : " + login);
         }

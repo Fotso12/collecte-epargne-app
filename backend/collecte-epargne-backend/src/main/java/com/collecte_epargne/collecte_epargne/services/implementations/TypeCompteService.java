@@ -11,6 +11,7 @@ import lombok.Setter;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Setter
@@ -23,7 +24,9 @@ public class TypeCompteService implements TypeCompteInterface {
     private final TypeCompteMapper typeCompteMapper;
 
     @Override
+    @SuppressWarnings("null")
     public TypeCompteDto save(TypeCompteDto typeCompteDto) {
+        Objects.requireNonNull(typeCompteDto, "typeCompteDto ne doit pas être null");
         if (typeCompteDto.getCode() == null || typeCompteDto.getCode().isEmpty()) {
             throw new IllegalArgumentException("Le code du type de compte est obligatoire.");
         }
@@ -47,6 +50,7 @@ public class TypeCompteService implements TypeCompteInterface {
 
     @Override
     public TypeCompteDto getById(Integer id) {
+        Objects.requireNonNull(id, "id ne doit pas être null");
         TypeCompte typeCompte = typeCompteRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Type de compte non trouvé avec l'ID : " + id));
         return typeCompteMapper.toDto(typeCompte);
@@ -54,6 +58,8 @@ public class TypeCompteService implements TypeCompteInterface {
 
     @Override
     public TypeCompteDto update(Integer id, TypeCompteDto typeCompteDto) {
+        Objects.requireNonNull(id, "id ne doit pas être null");
+        Objects.requireNonNull(typeCompteDto, "typeCompteDto ne doit pas être null");
         TypeCompte existingTypeCompte = typeCompteRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Type de compte non trouvé pour la mise à jour : " + id));
 
@@ -74,6 +80,7 @@ public class TypeCompteService implements TypeCompteInterface {
 
     @Override
     public void delete(Integer id) {
+        Objects.requireNonNull(id, "id ne doit pas être null");
         if (!typeCompteRepository.existsById(id)) {
             throw new RuntimeException("Type de compte inexistant : " + id);
         }
@@ -82,6 +89,7 @@ public class TypeCompteService implements TypeCompteInterface {
 
     @Override
     public TypeCompteDto getByCode(String code) {
+        Objects.requireNonNull(code, "code ne doit pas être null");
         TypeCompte typeCompte = typeCompteRepository.findByCode(code)
                 .orElseThrow(() -> new RuntimeException("Type de compte non trouvé avec le code : " + code));
         return typeCompteMapper.toDto(typeCompte);
