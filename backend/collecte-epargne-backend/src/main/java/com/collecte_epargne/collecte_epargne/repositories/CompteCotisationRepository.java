@@ -12,5 +12,7 @@ public interface CompteCotisationRepository extends JpaRepository<CompteCotisati
     List<CompteCotisation> findByCompteIdCompte(String idCompte);
 
     List<CompteCotisation> findByPlanCotisationIdPlan(String idPlanCotisation);
+
+    boolean existsByPlanCotisationIdPlan(String idPlanCotisation);
 }
 
