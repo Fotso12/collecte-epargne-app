@@ -37,6 +37,9 @@ public class Recu {
     @Column(name = "DATE_GENERATION")
     private Instant dateGeneration;
 
+    public Recu() {
+    }
+
     public String getIdRecu() {
         return idRecu;
     }

@@ -44,6 +44,7 @@ public class PlanCotisation {
     @Column(name = "TAUX_PENALITE_RETARD", precision = 5, scale = 2)
     private BigDecimal tauxPenaliteRetard;
 
+    @NotNull
     @Lob
     @Column(name = "STATUT")
     private StatutPlanCotisation statut;

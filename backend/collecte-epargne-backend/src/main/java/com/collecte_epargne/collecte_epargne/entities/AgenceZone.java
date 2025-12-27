@@ -26,10 +26,12 @@ public class AgenceZone {
     @Column(name = "NOM", nullable = false, length = 100)
     private String nom;
 
+    @NotNull
     @Size(max = 50)
     @Column(name = "VILLE", length = 50)
     private String ville;
 
+    @NotNull
     @Size(max = 50)
     @Column(name = "QUARTIER", length = 50)
     private String quartier;
@@ -38,6 +40,7 @@ public class AgenceZone {
     @Column(name = "ADRESSE")
     private String adresse;
 
+    @NotNull
     @Size(max = 20)
     @Column(name = "TELEPHONE", length = 20)
     private String telephone;
@@ -46,10 +49,12 @@ public class AgenceZone {
     @Column(name = "DESCRIPTION")
     private String description;
 
+    @NotNull
     @Lob
     @Column(name = "STATUT")
     private StatutGenerique statut;
 
+    @NotNull
     @Column(name = "DATE_CREATION")
     private Instant dateCreation;
 
@@ -144,5 +149,8 @@ public class AgenceZone {
         this.description = description;
         this.statut = statut;
         this.dateCreation = dateCreation;
+    }
+
+    public AgenceZone() {
     }
 }

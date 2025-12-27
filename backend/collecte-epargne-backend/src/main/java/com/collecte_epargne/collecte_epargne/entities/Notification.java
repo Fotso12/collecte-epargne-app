@@ -45,6 +45,7 @@ public class Notification {
     @Column(name = "MESSAGE", nullable = false)
     private String message;
 
+    @NotNull
     @Size(max = 20) // Valide la longueur en Java
     @Column(name = "STATUT", length = 20) // Fixe la taille de la colonne à VARCHAR(20) dans la DB
     private String statut;
@@ -61,6 +62,9 @@ public class Notification {
     @Lob
     @Column(name = "ERREUR_ENVOI")
     private String erreurEnvoi;
+
+    public Notification() {
+    }
 
     public Notification(String idNotification, String codeClient, Transaction transaction, TypeNotification type, CategorieNotification categorie, String titre, String message, String statut, Instant dateCreation, Instant dateEnvoi, Instant dateLecture, String erreurEnvoi) {
         this.idNotification = idNotification;

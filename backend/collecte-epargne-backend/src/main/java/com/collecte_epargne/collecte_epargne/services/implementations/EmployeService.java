@@ -15,18 +15,13 @@ import com.collecte_epargne.collecte_epargne.repositories.ClientRepository;
 import com.collecte_epargne.collecte_epargne.services.interfaces.EmployeInterface;
 import com.collecte_epargne.collecte_epargne.utils.CodeGenerator;
 import com.collecte_epargne.collecte_epargne.utils.TypeEmploye;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Setter
-@Getter
+
 @Service
-@AllArgsConstructor
 public class EmployeService implements EmployeInterface {
 
     private final EmployeRepository employeRepository;
@@ -36,6 +31,16 @@ public class EmployeService implements EmployeInterface {
     private final ClientRepository clientRepository;
     private final ClientMapper clientMapper;
     private final CodeGenerator codeGenerator;
+
+    public EmployeService(EmployeRepository employeRepository, EmployeMapper employeMapper, UtilisateurRepository utilisateurRepository, AgenceZoneRepository agenceZoneRepository, ClientRepository clientRepository, ClientMapper clientMapper, CodeGenerator codeGenerator) {
+        this.employeRepository = employeRepository;
+        this.employeMapper = employeMapper;
+        this.utilisateurRepository = utilisateurRepository;
+        this.agenceZoneRepository = agenceZoneRepository;
+        this.clientRepository = clientRepository;
+        this.clientMapper = clientMapper;
+        this.codeGenerator = codeGenerator;
+    }
 
     // --- CRUD Générique ---
 

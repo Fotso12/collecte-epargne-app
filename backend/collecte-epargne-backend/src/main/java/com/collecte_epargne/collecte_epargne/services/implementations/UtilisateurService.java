@@ -7,24 +7,25 @@ import com.collecte_epargne.collecte_epargne.mappers.UtilisateurMapper;
 import com.collecte_epargne.collecte_epargne.repositories.RoleRepository;
 import com.collecte_epargne.collecte_epargne.repositories.UtilisateurRepository;
 import com.collecte_epargne.collecte_epargne.services.interfaces.UtilisateurInterface;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Setter
-@Getter
+
 @Service
-@AllArgsConstructor
 public class UtilisateurService implements UtilisateurInterface {
 
     private final UtilisateurRepository utilisateurRepository;
     private final UtilisateurMapper utilisateurMapper;
     private final RoleRepository roleRepository; // Pour la relation Role
+
+    public UtilisateurService(UtilisateurRepository utilisateurRepository, UtilisateurMapper utilisateurMapper, RoleRepository roleRepository) {
+        this.utilisateurRepository = utilisateurRepository;
+        this.utilisateurMapper = utilisateurMapper;
+        this.roleRepository = roleRepository;
+    }
 
     // Méthode utilitaire pour attacher l'entité Role (inchangée)
     private void assignerRelations(Utilisateur utilisateur, UtilisateurDto dto) {

@@ -20,4 +20,7 @@ public interface ClientRepository extends JpaRepository<Client, String> {
 
     // Trouver tous les clients assignés à un collecteur spécifique (nécessaire pour la recherche des employés)
     List<Client> findByCollecteurAssigneIdEmploye(Integer idEmploye);
+
+    //Trouver les clients en fonction de leur code
+    Optional<Client> findByCodeClient(String codeClient);
 }

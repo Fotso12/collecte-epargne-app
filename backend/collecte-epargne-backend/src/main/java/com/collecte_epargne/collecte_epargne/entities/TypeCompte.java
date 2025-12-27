@@ -139,4 +139,7 @@ public class TypeCompte {
         this.autoriserRetrait = autoriserRetrait;
         this.dureeBlocageJours = dureeBlocageJours;
     }
+
+    public TypeCompte() {
+    }
 }

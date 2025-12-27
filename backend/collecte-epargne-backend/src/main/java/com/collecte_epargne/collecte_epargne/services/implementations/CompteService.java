@@ -9,9 +9,6 @@ import com.collecte_epargne.collecte_epargne.repositories.ClientRepository;
 import com.collecte_epargne.collecte_epargne.repositories.CompteRepository;
 import com.collecte_epargne.collecte_epargne.repositories.TypeCompteRepository;
 import com.collecte_epargne.collecte_epargne.services.interfaces.CompteInterface;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -19,16 +16,22 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Setter
-@Getter
+
 @Service
-@AllArgsConstructor
 public class CompteService implements CompteInterface {
 
     private final CompteRepository compteRepository;
     private final CompteMapper compteMapper;
     private final ClientRepository clientRepository; // Pour vérifier l'existence du client
     private final TypeCompteRepository typeCompteRepository; // Pour vérifier l'existence du type de compte
+
+
+    public CompteService(CompteRepository compteRepository, CompteMapper compteMapper, ClientRepository clientRepository, TypeCompteRepository typeCompteRepository) {
+        this.compteRepository = compteRepository;
+        this.compteMapper = compteMapper;
+        this.clientRepository = clientRepository;
+        this.typeCompteRepository = typeCompteRepository;
+    }
 
     // Méthode utilitaire pour attacher les entités relationnelles
     private void assignerRelations(Compte compte, CompteDto dto) {

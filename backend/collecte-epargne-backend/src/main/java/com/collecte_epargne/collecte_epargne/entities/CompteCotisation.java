@@ -46,6 +46,9 @@ public class CompteCotisation {
     @JoinColumn(name = "ID_PLAN", nullable = false)
     private PlanCotisation planCotisation;
 
+    public CompteCotisation() {
+    }
+
     public String getId() {
         return id;
     }

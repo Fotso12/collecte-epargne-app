@@ -23,6 +23,7 @@ public class Client {
     @Column(name = "NUMERO_CLIENT", nullable = false, length = 50)
     private String numeroClient;
 
+    @NotNull
     @Size(max = 255)
     @Column(name = "ADRESSE")
     private String adresse;
@@ -37,25 +38,31 @@ public class Client {
     @Column(name = "NUM_CNI", nullable = false, length = 50)
     private String numCni;
 
+    @NotNull
     @Size(max = 255)
     @Column(name = "PHOTO_PATH")
     private String photoPath;
 
+    @NotNull
     @Size(max = 255)
     @Column(name = "CNI_RECTO_PATH")
     private String cniRectoPath;
 
+    @NotNull
     @Size(max = 255)
     @Column(name = "CNI_VERSO_PATH")
     private String cniVersoPath;
 
+    @NotNull
     @Column(name = "DATE_NAISSANCE")
     private LocalDate dateNaissance;
 
+    @NotNull
     @Size(max = 100)
     @Column(name = "LIEU_NAISSANCE", length = 100)
     private String lieuNaissance;
 
+    @NotNull
     @Size(max = 100)
     @Column(name = "PROFESSION", length = 100)
     private String profession;
@@ -68,6 +75,7 @@ public class Client {
     @JoinColumn(name = "LOGIN", nullable = false, unique = true) // LOGIN est FK
     private Utilisateur utilisateur;
 
+    @NotNull
     // Remplacer COLLECTEUR_ASSIGNE par la relation ManyToOne vers Employe
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "COLLECTEUR_ASSIGNE")

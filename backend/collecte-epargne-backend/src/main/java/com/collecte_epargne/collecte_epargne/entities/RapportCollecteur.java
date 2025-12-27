@@ -56,6 +56,9 @@ public class RapportCollecteur {
     @Column(name = "COMMENTAIRE_SUPERVISEUR")
     private String commentaireSuperviseur;
 
+    public RapportCollecteur() {
+    }
+
     public String getIdRapport() {
         return idRapport;
     }

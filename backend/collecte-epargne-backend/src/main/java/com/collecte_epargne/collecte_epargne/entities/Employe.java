@@ -46,11 +46,13 @@ public class Employe {
     @JoinColumn(name = "LOGIN", nullable = false, unique = true) // LOGIN est PK/FK
     private Utilisateur utilisateur;
 
+    @NotNull
     // Remplacer ID_AGENCE par la relation ManyToOne vers AgenceZone
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ID_AGENCE")
     private AgenceZone agenceZone;
 
+    @NotNull
     // Relation récursive (SUPERVISEUR_ID)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "SUPERVISEUR_ID")

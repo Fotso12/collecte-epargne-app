@@ -55,6 +55,7 @@ public class Utilisateur {
     @Column(name = "PASSWORD", nullable = false)
     private String password;
 
+    @NotNull
     @Lob
     @Column(name = "STATUT")
     @Enumerated(EnumType.STRING)
