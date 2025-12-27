@@ -1,4 +1,4 @@
-package com.collecte_epargne.collecte_epargne.services.implementations;
+package com.collecte_epargne.collecte_epargne.service_test;
 
 import com.collecte_epargne.collecte_epargne.dtos.CompteCotisationDto;
 import com.collecte_epargne.collecte_epargne.entities.Compte;
@@ -8,6 +8,7 @@ import com.collecte_epargne.collecte_epargne.mappers.CompteCotisationMapper;
 import com.collecte_epargne.collecte_epargne.repositories.CompteCotisationRepository;
 import com.collecte_epargne.collecte_epargne.repositories.CompteRepository;
 import com.collecte_epargne.collecte_epargne.repositories.PlanCotisationRepository;
+import com.collecte_epargne.collecte_epargne.services.implementations.CompteCotisationService;
 import com.collecte_epargne.collecte_epargne.utils.StatutPlanCotisation;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

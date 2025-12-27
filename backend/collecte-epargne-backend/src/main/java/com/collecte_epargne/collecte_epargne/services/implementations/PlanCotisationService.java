@@ -7,9 +7,6 @@ import com.collecte_epargne.collecte_epargne.repositories.CompteCotisationReposi
 import com.collecte_epargne.collecte_epargne.repositories.PlanCotisationRepository;
 import com.collecte_epargne.collecte_epargne.services.interfaces.PlanCotisationInterface;
 import com.collecte_epargne.collecte_epargne.utils.StatutPlanCotisation;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,15 +14,18 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-@Setter
-@Getter
 @Service
-@AllArgsConstructor
 public class PlanCotisationService implements PlanCotisationInterface {
 
     private final PlanCotisationRepository planCotisationRepository;
     private final PlanCotisationMapper planCotisationMapper;
     private final CompteCotisationRepository compteCotisationRepository;
+
+    public PlanCotisationService(PlanCotisationRepository planCotisationRepository, PlanCotisationMapper planCotisationMapper, CompteCotisationRepository compteCotisationRepository) {
+        this.planCotisationRepository = planCotisationRepository;
+        this.planCotisationMapper = planCotisationMapper;
+        this.compteCotisationRepository = compteCotisationRepository;
+    }
 
     private void appliquerValeursParDefaut(PlanCotisation entity) {
         if (entity.getIdPlan() == null || entity.getIdPlan().isEmpty()) {

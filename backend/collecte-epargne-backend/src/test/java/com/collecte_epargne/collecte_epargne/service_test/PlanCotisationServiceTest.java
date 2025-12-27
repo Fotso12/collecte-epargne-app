@@ -1,10 +1,11 @@
-package com.collecte_epargne.collecte_epargne.services.implementations;
+package com.collecte_epargne.collecte_epargne.service_test;
 
 import com.collecte_epargne.collecte_epargne.dtos.PlanCotisationDto;
 import com.collecte_epargne.collecte_epargne.entities.PlanCotisation;
 import com.collecte_epargne.collecte_epargne.mappers.PlanCotisationMapper;
 import com.collecte_epargne.collecte_epargne.repositories.CompteCotisationRepository;
 import com.collecte_epargne.collecte_epargne.repositories.PlanCotisationRepository;
+import com.collecte_epargne.collecte_epargne.services.implementations.PlanCotisationService;
 import com.collecte_epargne.collecte_epargne.utils.FrequenceCotisation;
 import com.collecte_epargne.collecte_epargne.utils.StatutPlanCotisation;
 import org.junit.jupiter.api.BeforeEach;

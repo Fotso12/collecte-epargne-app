@@ -10,9 +10,6 @@ import com.collecte_epargne.collecte_epargne.repositories.CompteRepository;
 import com.collecte_epargne.collecte_epargne.repositories.PlanCotisationRepository;
 import com.collecte_epargne.collecte_epargne.services.interfaces.CompteCotisationInterface;
 import com.collecte_epargne.collecte_epargne.utils.StatutPlanCotisation;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -22,16 +19,20 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-@Setter
-@Getter
 @Service
-@AllArgsConstructor
 public class CompteCotisationService implements CompteCotisationInterface {
 
     private final CompteCotisationRepository compteCotisationRepository;
     private final CompteCotisationMapper compteCotisationMapper;
     private final CompteRepository compteRepository;
     private final PlanCotisationRepository planCotisationRepository;
+
+    public CompteCotisationService(CompteCotisationRepository compteCotisationRepository, CompteCotisationMapper compteCotisationMapper, CompteRepository compteRepository, PlanCotisationRepository planCotisationRepository) {
+        this.compteCotisationRepository = compteCotisationRepository;
+        this.compteCotisationMapper = compteCotisationMapper;
+        this.compteRepository = compteRepository;
+        this.planCotisationRepository = planCotisationRepository;
+    }
 
     private void assignerRelations(CompteCotisation entity, CompteCotisationDto dto) {
         if (dto.getIdCompte() != null) {
