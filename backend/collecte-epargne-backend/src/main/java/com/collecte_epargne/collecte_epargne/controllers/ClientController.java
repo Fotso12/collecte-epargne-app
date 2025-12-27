@@ -37,17 +37,17 @@ public class ClientController {
         }
     }
 
-    @GetMapping("/{codeClient}")
-    public ResponseEntity<?> getById(@PathVariable String codeClient) {
+    @GetMapping("/{numeroClient}")
+    public ResponseEntity<?> getById(@PathVariable Long numeroClient) {
         try {
-            return new ResponseEntity<>(clientService.getById(codeClient), HttpStatus.OK);
+            return new ResponseEntity<>(clientService.getById(numeroClient), HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
         }
     }
 
     @GetMapping("/numero/{numeroClient}")
-    public ResponseEntity<?> getByNumeroClient(@PathVariable String numeroClient) {
+    public ResponseEntity<?> getByNumeroClient(@PathVariable Long numeroClient) {
         try {
             return new ResponseEntity<>(clientService.getByNumeroClient(numeroClient), HttpStatus.OK);
         } catch (Exception e) {
@@ -55,20 +55,49 @@ public class ClientController {
         }
     }
 
-    @PutMapping("/{codeClient}")
-    public ResponseEntity<?> update(@PathVariable String codeClient, @RequestBody ClientDto clientDto) {
+    @GetMapping("/code/{codeClient}")
+    public ResponseEntity<?> getByCodeClient(@PathVariable String codeClient) {
         try {
-            return new ResponseEntity<>(clientService.update(codeClient, clientDto), HttpStatus.OK);
+            return new ResponseEntity<>(clientService.getByCodeClient(codeClient), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @PutMapping("/{numeroClient}")
+    public ResponseEntity<?> update(@PathVariable Long numeroClient, @RequestBody ClientDto clientDto) {
+        try {
+            return new ResponseEntity<>(clientService.update(numeroClient, clientDto), HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
 
-    @DeleteMapping("/{codeClient}")
-    public ResponseEntity<?> delete(@PathVariable String codeClient) {
+    @PutMapping("/code/{codeClient}")
+    public ResponseEntity<?> updateByCodeClient(@PathVariable String codeClient, @RequestBody ClientDto clientDto) {
         try {
-            clientService.delete(codeClient);
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+            // Appel de votre nouvelle méthode service
+            return new ResponseEntity<>(clientService.updateByCodeClient(codeClient, clientDto),  HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @DeleteMapping("/code/{codeClient}")
+    public ResponseEntity<?> deleteByCodeClient(@PathVariable String codeClient) {
+        try {
+            clientService.deleteByCodeClient(codeClient);
+            return new ResponseEntity<>("Client supprimé avec succès", HttpStatus.NO_CONTENT);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @DeleteMapping("/{numeroClient}")
+    public ResponseEntity<?> delete(@PathVariable Long numeroClient) {
+        try {
+            clientService.delete(numeroClient);
+            return new ResponseEntity<>("Client supprimé avec succès", HttpStatus.NO_CONTENT);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
         }

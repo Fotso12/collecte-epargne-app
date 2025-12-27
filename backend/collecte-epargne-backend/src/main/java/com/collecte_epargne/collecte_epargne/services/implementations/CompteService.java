@@ -9,9 +9,6 @@ import com.collecte_epargne.collecte_epargne.repositories.ClientRepository;
 import com.collecte_epargne.collecte_epargne.repositories.CompteRepository;
 import com.collecte_epargne.collecte_epargne.repositories.TypeCompteRepository;
 import com.collecte_epargne.collecte_epargne.services.interfaces.CompteInterface;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -20,10 +17,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-@Setter
-@Getter
 @Service
-@AllArgsConstructor
 public class CompteService implements CompteInterface {
 
     private final CompteRepository compteRepository;
@@ -31,12 +25,24 @@ public class CompteService implements CompteInterface {
     private final ClientRepository clientRepository; // Pour vérifier l'existence du client
     private final TypeCompteRepository typeCompteRepository; // Pour vérifier l'existence du type de compte
 
+
+    public CompteService(CompteRepository compteRepository, CompteMapper compteMapper, ClientRepository clientRepository, TypeCompteRepository typeCompteRepository) {
+        this.compteRepository = compteRepository;
+        this.compteMapper = compteMapper;
+        this.clientRepository = clientRepository;
+        this.typeCompteRepository = typeCompteRepository;
+    }
+
     // Méthode utilitaire pour attacher les entités relationnelles
     private void assignerRelations(Compte compte, CompteDto dto) {
         // 1. Client (CODE_CLIENT)
         if (dto.getCodeClient() != null) {
+<<<<<<< HEAD
             String codeClient = Objects.requireNonNull(dto.getCodeClient());
             Client client = clientRepository.findById(codeClient)
+=======
+            Client client = clientRepository.findByCodeClient(dto.getCodeClient())
+>>>>>>> e7d8b8a8ef19a82cdbc5dd8aa8c4525106492910
                     .orElseThrow(() -> new RuntimeException("Client non trouvé avec le code : " + dto.getCodeClient()));
             compte.setClient(client);
         }
@@ -64,7 +70,7 @@ public class CompteService implements CompteInterface {
         }
 
         // Vérifier que le client existe avant de créer le compte
-        if (compteDto.getCodeClient() == null || !clientRepository.existsById(compteDto.getCodeClient())) {
+        if (compteDto.getCodeClient() == null || !clientRepository.existsByCodeClient(compteDto.getCodeClient())) {
             throw new RuntimeException("Le client doit exister avant de créer un compte. Code client : " + compteDto.getCodeClient());
         }
 

@@ -5,23 +5,21 @@ import com.collecte_epargne.collecte_epargne.entities.TypeCompte;
 import com.collecte_epargne.collecte_epargne.mappers.TypeCompteMapper;
 import com.collecte_epargne.collecte_epargne.repositories.TypeCompteRepository;
 import com.collecte_epargne.collecte_epargne.services.interfaces.TypeCompteInterface;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
-
-@Setter
-@Getter
 @Service
-@AllArgsConstructor
 public class TypeCompteService implements TypeCompteInterface {
 
     private final TypeCompteRepository typeCompteRepository;
     private final TypeCompteMapper typeCompteMapper;
+
+    public TypeCompteService(TypeCompteRepository typeCompteRepository, TypeCompteMapper typeCompteMapper) {
+        this.typeCompteRepository = typeCompteRepository;
+        this.typeCompteMapper = typeCompteMapper;
+    }
 
     @Override
     @SuppressWarnings("null")

@@ -6,24 +6,24 @@ import com.collecte_epargne.collecte_epargne.entities.AgenceZone;
 import com.collecte_epargne.collecte_epargne.mappers.AgenceZoneMapper;
 import com.collecte_epargne.collecte_epargne.repositories.AgenceZoneRepository;
 import com.collecte_epargne.collecte_epargne.services.interfaces.AgenceZoneInterface;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-@Setter
-@Getter
 @Service
-@AllArgsConstructor
 public class AgenceZoneService implements AgenceZoneInterface {
 
 
     private AgenceZoneRepository agenceZoneRepository;
     private AgenceZoneMapper agenceZoneMapper;
+
+    public AgenceZoneService(AgenceZoneRepository agenceZoneRepository, AgenceZoneMapper agenceZoneMapper) {
+        this.agenceZoneRepository = agenceZoneRepository;
+        this.agenceZoneMapper = agenceZoneMapper;
+    }
+
     @Override
     @SuppressWarnings("null")
     public AgenceZoneDto save(AgenceZoneDto agenceZoneDto) {
