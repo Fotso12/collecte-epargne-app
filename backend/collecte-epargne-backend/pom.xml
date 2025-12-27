@@ -130,7 +130,6 @@
 <!--							<artifactId>lombok</artifactId>-->
 <!--							<version>${lombok.version}</version>-->
 <!--						</path>-->
-<<<<<<< HEAD
 						<path>
 							<groupId>org.projectlombok</groupId>
 							<artifactId>lombok-mapstruct-binding</artifactId>
@@ -158,24 +157,18 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
-<<<<<<< HEAD
 <!--				<configuration>-->
 <!--					<excludes>-->
-=======
 				<configuration>
 					<excludes>
->>>>>>> feature/backend-création-des-entities-et-enum
 <!--						<exclude>-->
 <!--							<groupId>org.projectlombok</groupId>-->
 <!--							<artifactId>lombok</artifactId>-->
 <!--						</exclude>-->
-<<<<<<< HEAD
 <!--					</excludes>-->
 <!--				</configuration>-->
-=======
 					</excludes>
 				</configuration>
->>>>>>> feature/backend-création-des-entities-et-enum
 			</plugin>
 		</plugins>
 	</build>

@@ -52,7 +52,6 @@ public class Employe {
     @JoinColumn(name = "ID_AGENCE")
     private AgenceZone agenceZone;
 
-    @NotNull
     // Relation récursive (SUPERVISEUR_ID)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "SUPERVISEUR_ID")

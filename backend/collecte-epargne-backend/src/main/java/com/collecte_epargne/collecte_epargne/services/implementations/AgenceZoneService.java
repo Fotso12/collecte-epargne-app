@@ -11,10 +11,6 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.stream.Collectors;
 
-<<<<<<< HEAD
-=======
-
->>>>>>> feature/backend-création-des-entities-et-enum
 @Service
 public class AgenceZoneService implements AgenceZoneInterface {
 

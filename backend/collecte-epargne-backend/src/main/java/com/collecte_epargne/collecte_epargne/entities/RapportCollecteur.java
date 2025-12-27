@@ -170,6 +170,4 @@ public class RapportCollecteur {
         this.commentaireSuperviseur = commentaireSuperviseur;
     }
 
-    public RapportCollecteur() {
-    }
 }

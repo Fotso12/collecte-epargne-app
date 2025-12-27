@@ -21,13 +21,6 @@ public class UtilisateurService implements UtilisateurInterface {
     private final UtilisateurMapper utilisateurMapper;
     private final RoleRepository roleRepository;
 
-    public UtilisateurService(UtilisateurRepository utilisateurRepository, UtilisateurMapper utilisateurMapper, RoleRepository roleRepository) {
-        this.utilisateurRepository = utilisateurRepository;
-        this.utilisateurMapper = utilisateurMapper;
-        this.roleRepository = roleRepository;
-    }
-
-
     // Pour la relation Role
 
     public UtilisateurService(UtilisateurRepository utilisateurRepository, UtilisateurMapper utilisateurMapper, RoleRepository roleRepository) {

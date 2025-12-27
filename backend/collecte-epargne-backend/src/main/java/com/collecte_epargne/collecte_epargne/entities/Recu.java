@@ -97,6 +97,4 @@ public class Recu {
         this.dateGeneration = dateGeneration;
     }
 
-    public Recu() {
-    }
 }

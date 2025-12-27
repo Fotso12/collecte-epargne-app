@@ -177,6 +177,5 @@ public class Notification {
         this.erreurEnvoi = erreurEnvoi;
     }
 
-    public Notification() {
-    }
+
 }
