@@ -71,6 +71,10 @@ public class Compte {
     @OneToMany(mappedBy = "compte")
     private Set<CompteCotisation> plansDeCotisation;
 
+    public Compte() {
+
+    }
+
     public String getIdCompte() {
         return idCompte;
     }
