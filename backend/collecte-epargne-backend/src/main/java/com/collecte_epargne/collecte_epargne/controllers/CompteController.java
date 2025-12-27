@@ -2,7 +2,6 @@ package com.collecte_epargne.collecte_epargne.controllers;
 
 import com.collecte_epargne.collecte_epargne.dtos.CompteDto;
 import com.collecte_epargne.collecte_epargne.services.implementations.CompteService;
-import com.collecte_epargne.collecte_epargne.services.interfaces.CompteInterface;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,7 +24,7 @@ public class CompteController {
         try {
             return new ResponseEntity<>(compteService.save(compteDto), HttpStatus.CREATED);
         } catch (Exception e) {
-            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
     }
 
@@ -43,7 +42,7 @@ public class CompteController {
         try {
             return new ResponseEntity<>(compteService.getById(idCompte), HttpStatus.OK);
         } catch (Exception e) {
-            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }
 
@@ -52,7 +51,7 @@ public class CompteController {
         try {
             return new ResponseEntity<>(compteService.getByNumCompte(numCompte), HttpStatus.OK);
         } catch (Exception e) {
-            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }
 
@@ -61,7 +60,7 @@ public class CompteController {
         try {
             return new ResponseEntity<>(compteService.getByClient(codeClient), HttpStatus.OK);
         } catch (Exception e) {
-            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }
 
@@ -70,7 +69,7 @@ public class CompteController {
         try {
             return new ResponseEntity<>(compteService.update(idCompte, compteDto), HttpStatus.OK);
         } catch (Exception e) {
-            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
     }
 
@@ -80,7 +79,7 @@ public class CompteController {
             compteService.delete(idCompte);
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }
 }

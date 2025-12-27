@@ -1,0 +1,174 @@
+{
+  "info": {
+    "_postman_id": "c7e4c4c3-1234-4b8a-9f10-000000000001",
+    "name": "Collecte Epargne API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "base_url", "value": "http://localhost:8082" },
+    { "key": "id_compte", "value": "CP001" },
+    { "key": "code_client", "value": "CL001" },
+    { "key": "id_type_compte", "value": "1" },
+    { "key": "id_plan_cotisation", "value": "PLAN001" },
+    { "key": "id_role", "value": "1" },
+    { "key": "login_user", "value": "user1" },
+    { "key": "id_ccotisation", "value": "CCOT001" },
+    { "key": "matricule", "value": "MAT001" }
+  ],
+  "item": [
+    {
+      "name": "Clients",
+      "item": [
+        {
+          "name": "Créer client",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{base_url}}/api/clients",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"codeClient\": \"{{code_client}}\",\n  \"numeroClient\": \"NUM001\",\n  \"typeCni\": \"CNI\",\n  \"numCni\": \"CNI123\",\n  \"loginUtilisateur\": \"{{login_user}}\"\n}"
+            }
+          }
+        },
+        { "name": "Lister clients", "request": { "method": "GET", "url": "{{base_url}}/api/clients" } },
+        { "name": "Client par code", "request": { "method": "GET", "url": "{{base_url}}/api/clients/{{code_client}}" } },
+        {
+          "name": "MAJ client",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{base_url}}/api/clients/{{code_client}}",
+            "body": { "mode": "raw", "raw": "{\n  \"numeroClient\": \"NUM001\",\n  \"typeCni\": \"CNI\",\n  \"numCni\": \"CNI1234\"\n}" }
+          }
+        },
+        { "name": "Supprimer client", "request": { "method": "DELETE", "url": "{{base_url}}/api/clients/{{code_client}}" } }
+      ]
+    },
+    {
+      "name": "Comptes",
+      "item": [
+        {
+          "name": "Créer compte",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{base_url}}/api/comptes",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"idCompte\": \"{{id_compte}}\",\n  \"numCompte\": \"NUMCPT001\",\n  \"codeClient\": \"{{code_client}}\",\n  \"idTypeCompte\": {{id_type_compte}},\n  \"dateOuverture\": \"2025-01-01\"\n}"
+            }
+          }
+        },
+        { "name": "Lister comptes", "request": { "method": "GET", "url": "{{base_url}}/api/comptes" } },
+        { "name": "Compte par id", "request": { "method": "GET", "url": "{{base_url}}/api/comptes/{{id_compte}}" } },
+        { "name": "Compte par numéro", "request": { "method": "GET", "url": "{{base_url}}/api/comptes/numero/NUMCPT001" } },
+        { "name": "Comptes par client", "request": { "method": "GET", "url": "{{base_url}}/api/comptes/client/{{code_client}}" } },
+        {
+          "name": "MAJ compte",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{base_url}}/api/comptes/{{id_compte}}",
+            "body": { "mode": "raw", "raw": "{\n  \"numCompte\": \"NUMCPT001\",\n  \"codeClient\": \"{{code_client}}\",\n  \"idTypeCompte\": {{id_type_compte}},\n  \"solde\": 1000.00,\n  \"dateOuverture\": \"2025-01-01\"\n}" }
+          }
+        },
+        { "name": "Supprimer compte", "request": { "method": "DELETE", "url": "{{base_url}}/api/comptes/{{id_compte}}" } }
+      ]
+    },
+    {
+      "name": "Type Comptes",
+      "item": [
+        {
+          "name": "Créer type compte",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{base_url}}/api/type-comptes",
+            "body": { "mode": "raw", "raw": "{\n  \"code\": \"EPNR\",\n  \"nom\": \"Epargne normale\",\n  \"description\": \"Compte épargne standard\"\n}" }
+          }
+        },
+        { "name": "Lister types", "request": { "method": "GET", "url": "{{base_url}}/api/type-comptes" } },
+        { "name": "Type par id", "request": { "method": "GET", "url": "{{base_url}}/api/type-comptes/{{id_type_compte}}" } },
+        { "name": "Type par code", "request": { "method": "GET", "url": "{{base_url}}/api/type-comptes/code/EPNR" } }
+      ]
+    },
+    {
+      "name": "Compte Cotisation",
+      "item": [
+        {
+          "name": "Créer compte cotisation",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{base_url}}/api/compte-cotisations",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"idCompte\": \"{{id_compte}}\",\n  \"idPlanCotisation\": \"{{id_plan_cotisation}}\",\n  \"dateAdhesion\": \"2025-01-10\",\n  \"montantTotalVerse\": 0,\n  \"nombreVersements\": 0,\n  \"statut\": \"ACTIF\"\n}"
+            }
+          }
+        },
+        { "name": "Lister compte cotisations", "request": { "method": "GET", "url": "{{base_url}}/api/compte-cotisations" } },
+        { "name": "Par id", "request": { "method": "GET", "url": "{{base_url}}/api/compte-cotisations/{{id_ccotisation}}" } },
+        { "name": "Par compte", "request": { "method": "GET", "url": "{{base_url}}/api/compte-cotisations/compte/{{id_compte}}" } },
+        { "name": "Par plan", "request": { "method": "GET", "url": "{{base_url}}/api/compte-cotisations/plan/{{id_plan_cotisation}}" } }
+      ]
+    },
+    {
+      "name": "Rôles",
+      "item": [
+        {
+          "name": "Créer rôle",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{base_url}}/api/roles",
+            "body": { "mode": "raw", "raw": "{\n  \"code\": \"ADMIN\",\n  \"nom\": \"Administrateur\"\n}" }
+          }
+        },
+        { "name": "Lister rôles", "request": { "method": "GET", "url": "{{base_url}}/api/roles" } }
+      ]
+    },
+    {
+      "name": "Utilisateurs",
+      "item": [
+        {
+          "name": "Créer utilisateur",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{base_url}}/api/utilisateurs",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"login\": \"{{login_user}}\",\n  \"password\": \"changeme\",\n  \"idRole\": {{id_role}},\n  \"nom\": \"Doe\",\n  \"prenom\": \"John\",\n  \"telephone\": \"699999999\",\n  \"email\": \"john@doe.com\",\n  \"statut\": \"ACTIF\"\n}"
+            }
+          }
+        },
+        { "name": "Lister utilisateurs", "request": { "method": "GET", "url": "{{base_url}}/api/utilisateurs" } },
+        { "name": "Utilisateur par login", "request": { "method": "GET", "url": "{{base_url}}/api/utilisateurs/{{login_user}}" } }
+      ]
+    },
+    {
+      "name": "Employés",
+      "item": [
+        {
+          "name": "Créer employé",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{base_url}}/api/employes",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"matricule\": \"\",\n  \"typeEmploye\": \"COLLECTEUR\",\n  \"loginUtilisateur\": \"{{login_user}}\"\n}"
+            }
+          }
+        },
+        { "name": "Lister employés", "request": { "method": "GET", "url": "{{base_url}}/api/employes" } },
+        { "name": "Employé par matricule", "request": { "method": "GET", "url": "{{base_url}}/api/employes/{{matricule}}" } },
+        { "name": "Collecteurs", "request": { "method": "GET", "url": "{{base_url}}/api/employes/collecteurs" } },
+        { "name": "Superviseurs", "request": { "method": "GET", "url": "{{base_url}}/api/employes/superviseurs" } }
+      ]
+    }
+  ]
+}
+

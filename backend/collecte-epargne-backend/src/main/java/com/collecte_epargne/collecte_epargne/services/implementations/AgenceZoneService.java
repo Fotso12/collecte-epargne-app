@@ -9,6 +9,7 @@ import com.collecte_epargne.collecte_epargne.services.interfaces.AgenceZoneInter
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -24,7 +25,9 @@ public class AgenceZoneService implements AgenceZoneInterface {
     }
 
     @Override
+    @SuppressWarnings("null")
     public AgenceZoneDto save(AgenceZoneDto agenceZoneDto) {
+        Objects.requireNonNull(agenceZoneDto, "agenceZoneDto ne doit pas être null");
         if(agenceZoneDto.getCode().isEmpty() && agenceZoneDto.getNom().isEmpty() || agenceZoneDto.getNom()==null) {
 
             throw new RuntimeException("Données incorret");
@@ -43,36 +46,33 @@ public class AgenceZoneService implements AgenceZoneInterface {
 
     @Override
     public AgenceZoneDto getById(Integer idAgence) {
-        AgenceZone agenceZone = agenceZoneRepository.findById(idAgence).get();
-        if(agenceZone == null){
-            throw new RuntimeException("Agence non trouvée");
-        }else{
-            return agenceZoneMapper.toDto(agenceZone);
-        }
+        Objects.requireNonNull(idAgence, "idAgence ne doit pas être null");
+        AgenceZone agenceZone = agenceZoneRepository.findById(idAgence)
+                .orElseThrow(() -> new RuntimeException("Agence non trouvée"));
+        return agenceZoneMapper.toDto(agenceZone);
     }
 
     @Override
     public AgenceZoneDto update(Integer idAgence, AgenceZoneDto agenceZoneDto) {
-        AgenceZone agenceZone = agenceZoneRepository.findById(idAgence).get();
-        if(agenceZone==null){
-            throw new RuntimeException("agence non trouvé");
-        }else{
-            agenceZone.setAdresse(agenceZoneDto.getAdresse());
-            agenceZone.setCode(agenceZoneDto.getCode());
-            agenceZone.setNom(agenceZoneDto.getNom());
-            agenceZone.setTelephone(agenceZoneDto.getTelephone());
-            agenceZone.setStatut(agenceZoneDto.getStatut());
-            agenceZone.setQuartier(agenceZoneDto.getQuartier());
-            agenceZone.setVille(agenceZoneDto.getVille());
-            agenceZone.setDescription(agenceZoneDto.getDescription());
-            agenceZoneRepository.save(agenceZone);
-            return agenceZoneMapper.toDto(agenceZone);
-
-        }
+        Objects.requireNonNull(idAgence, "idAgence ne doit pas être null");
+        Objects.requireNonNull(agenceZoneDto, "agenceZoneDto ne doit pas être null");
+        AgenceZone agenceZone = agenceZoneRepository.findById(idAgence)
+                .orElseThrow(() -> new RuntimeException("agence non trouvée"));
+        agenceZone.setAdresse(agenceZoneDto.getAdresse());
+        agenceZone.setCode(agenceZoneDto.getCode());
+        agenceZone.setNom(agenceZoneDto.getNom());
+        agenceZone.setTelephone(agenceZoneDto.getTelephone());
+        agenceZone.setStatut(agenceZoneDto.getStatut());
+        agenceZone.setQuartier(agenceZoneDto.getQuartier());
+        agenceZone.setVille(agenceZoneDto.getVille());
+        agenceZone.setDescription(agenceZoneDto.getDescription());
+        agenceZoneRepository.save(agenceZone);
+        return agenceZoneMapper.toDto(agenceZone);
     }
 
     @Override
     public void delete(Integer idAgence) {
+        Objects.requireNonNull(idAgence, "idAgence ne doit pas être null");
         boolean exist = agenceZoneRepository.existsById(idAgence);
         if(!exist){
             throw new RuntimeException("Agence inexistante");

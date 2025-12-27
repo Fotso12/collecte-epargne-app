@@ -2,7 +2,6 @@ package com.collecte_epargne.collecte_epargne.controllers;
 
 import com.collecte_epargne.collecte_epargne.dtos.TypeCompteDto;
 import com.collecte_epargne.collecte_epargne.services.implementations.TypeCompteService;
-import com.collecte_epargne.collecte_epargne.services.interfaces.TypeCompteInterface;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,7 +24,7 @@ public class TypeCompteController {
         try {
             return new ResponseEntity<>(typeCompteService.save(typeCompteDto), HttpStatus.CREATED);
         } catch (Exception e) {
-            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
     }
 
@@ -43,7 +42,7 @@ public class TypeCompteController {
         try {
             return new ResponseEntity<>(typeCompteService.getById(id), HttpStatus.OK);
         } catch (Exception e) {
-            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }
 
@@ -52,7 +51,7 @@ public class TypeCompteController {
         try {
             return new ResponseEntity<>(typeCompteService.getByCode(code), HttpStatus.OK);
         } catch (Exception e) {
-            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }
 
@@ -61,7 +60,7 @@ public class TypeCompteController {
         try {
             return new ResponseEntity<>(typeCompteService.update(id, typeCompteDto), HttpStatus.OK);
         } catch (Exception e) {
-            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
     }
 

@@ -2,7 +2,6 @@ package com.collecte_epargne.collecte_epargne.controllers;
 
 import com.collecte_epargne.collecte_epargne.dtos.ClientDto;
 import com.collecte_epargne.collecte_epargne.services.implementations.ClientService;
-import com.collecte_epargne.collecte_epargne.services.interfaces.ClientInterface;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
