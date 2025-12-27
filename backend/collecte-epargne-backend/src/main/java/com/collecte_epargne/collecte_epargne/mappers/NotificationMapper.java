@@ -6,21 +6,25 @@ import com.collecte_epargne.collecte_epargne.entities.Transaction;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
+import org.mapstruct.Named;
 import org.springframework.stereotype.Component;
 
 @Component
 @Mapper(componentModel = "spring")
 public interface NotificationMapper {
 
-    @Mapping(source = "transaction", target = "idTransaction")
+    @Mapping(
+            source = "transaction",
+            target = "idTransaction",
+            qualifiedByName = "transactionToId"
+    )
     NotificationDto toDto(Notification notification);
 
-    // --- Conversion Helper (Entité -> ID)
+    @Named("transactionToId")
     default String transactionToId(Transaction transaction) {
         return transaction != null ? transaction.getIdTransaction() : null;
     }
 
-    // --- Conversion DTO -> Entité (Ignorer les objets relationnels)
     @Mapping(target = "transaction", ignore = true)
     Notification toEntity(NotificationDto notificationDto);
 }
