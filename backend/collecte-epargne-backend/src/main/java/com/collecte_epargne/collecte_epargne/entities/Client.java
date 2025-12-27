@@ -76,6 +76,10 @@ public class Client {
     @OneToMany(mappedBy = "client")
     private Set<Compte> comptes;
 
+    public Client() {
+
+    }
+
     public String getCodeClient() {
         return codeClient;
     }

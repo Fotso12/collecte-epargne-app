@@ -100,6 +100,12 @@ public class Transaction {
     @Column(name = "HASH_TRANSACTION")
     private String hashTransaction;
 
+    public Transaction() {
+
+    }
+
+
+
     public String getIdTransaction() {
         return idTransaction;
     }

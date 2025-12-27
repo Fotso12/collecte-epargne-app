@@ -76,6 +76,10 @@ public class TransactionOffline {
     @JoinColumn(name = "ID_TRANSACTION_FINALE")
     private Transaction transactionFinale;
 
+    public TransactionOffline() {
+
+    }
+
     public String getIdOffline() {
         return idOffline;
     }

@@ -64,6 +64,10 @@ public class Employe {
     @OneToMany(mappedBy = "collecteurAssigne")
     private Set<Client> clientsAssignes;
 
+    public Employe() {
+
+    }
+
     public Integer getIdEmploye() {
         return idEmploye;
     }
