@@ -218,6 +218,4 @@ public class TransactionOffline {
         this.transactionFinale = transactionFinale;
     }
 
-    public TransactionOffline() {
-    }
 }

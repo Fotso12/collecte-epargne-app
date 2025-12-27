@@ -161,6 +161,4 @@ public class Employe {
         this.clientsAssignes = clientsAssignes;
     }
 
-    public Employe() {
-    }
 }

@@ -298,6 +298,4 @@ public class Transaction {
         this.hashTransaction = hashTransaction;
     }
 
-    public Transaction() {
-    }
 }

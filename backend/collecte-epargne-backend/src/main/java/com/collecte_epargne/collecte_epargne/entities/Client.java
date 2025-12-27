@@ -218,6 +218,4 @@ public class Client {
         this.comptes = comptes;
     }
 
-    public Client() {
-    }
 }
