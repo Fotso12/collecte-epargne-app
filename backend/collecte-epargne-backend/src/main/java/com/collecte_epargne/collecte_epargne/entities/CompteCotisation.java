@@ -132,4 +132,7 @@ public class CompteCotisation {
         this.compte = compte;
         this.planCotisation = planCotisation;
     }
+
+    public CompteCotisation() {
+    }
 }

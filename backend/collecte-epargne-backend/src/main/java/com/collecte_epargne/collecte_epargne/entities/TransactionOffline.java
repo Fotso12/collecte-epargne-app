@@ -217,4 +217,5 @@ public class TransactionOffline {
         this.compte = compte;
         this.transactionFinale = transactionFinale;
     }
+
 }

@@ -11,12 +11,22 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.stream.Collectors;
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> feature/backend-création-des-entities-et-enum
 @Service
 public class AgenceZoneService implements AgenceZoneInterface {
 
 
     private AgenceZoneRepository agenceZoneRepository;
     private AgenceZoneMapper agenceZoneMapper;
+
+    public AgenceZoneService(AgenceZoneRepository agenceZoneRepository, AgenceZoneMapper agenceZoneMapper) {
+        this.agenceZoneRepository = agenceZoneRepository;
+        this.agenceZoneMapper = agenceZoneMapper;
+    }
+
     @Override
     public AgenceZoneDto save(AgenceZoneDto agenceZoneDto) {
         if(agenceZoneDto.getCode().isEmpty() && agenceZoneDto.getNom().isEmpty() || agenceZoneDto.getNom()==null) {

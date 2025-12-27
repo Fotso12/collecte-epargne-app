@@ -20,7 +20,6 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.stream.Collectors;
 
-
 @Service
 public class EmployeService implements EmployeInterface {
 
@@ -41,6 +40,7 @@ public class EmployeService implements EmployeInterface {
         this.clientMapper = clientMapper;
         this.codeGenerator = codeGenerator;
     }
+
 
     // --- CRUD Générique ---
 

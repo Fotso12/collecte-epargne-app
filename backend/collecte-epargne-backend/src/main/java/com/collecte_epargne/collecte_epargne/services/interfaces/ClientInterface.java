@@ -9,12 +9,18 @@ public interface ClientInterface {
 
     List<ClientDto> getAll();
 
-    ClientDto getById(String codeClient);
+    ClientDto getById(Long numeroClient);
 
-    ClientDto update(String codeClient, ClientDto clientDto);
+    ClientDto update(Long numeroClient, ClientDto clientDto);
 
-    void delete(String codeClient);
+    void delete(Long numClient);
 
     // Ajout de fonctions de recherche spécifiques si nécessaire
-    ClientDto getByNumeroClient(String numeroClient);
+    ClientDto getByNumeroClient(Long numeroClient);
+
+    ClientDto getByCodeClient(String codeClient);
+
+    ClientDto updateByCodeClient(String codeClient, ClientDto clientDto);
+
+    void deleteByCodeClient(String codeClient);
 }

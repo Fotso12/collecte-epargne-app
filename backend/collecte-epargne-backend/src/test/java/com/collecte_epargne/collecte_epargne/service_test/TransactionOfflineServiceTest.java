@@ -60,7 +60,7 @@ public class TransactionOfflineServiceTest {
 
         when(mapper.toEntity(dto)).thenReturn(entity);
         when(employeRepository.findById(1)).thenReturn(Optional.of(new Employe()));
-        when(clientRepository.findById("CL1")).thenReturn(Optional.of(new Client()));
+        when(clientRepository.findByCodeClient("CL1")).thenReturn(Optional.of(new Client()));
         when(compteRepository.findById("C1")).thenReturn(Optional.of(new Compte()));
         when(repository.save(entity)).thenReturn(entity);
         when(mapper.toDto(entity)).thenReturn(dto);

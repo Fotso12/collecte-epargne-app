@@ -125,4 +125,6 @@ public class EmployeController {
     public ResponseEntity<List<EmployeDto>> getCollecteursByTotalClientScore() {
         return new ResponseEntity<>(employeService.getCollecteursOrderedByTotalClientScore(), HttpStatus.OK);
     }
+
+
 }

@@ -96,4 +96,7 @@ public class Recu {
         this.fichierPath = fichierPath;
         this.dateGeneration = dateGeneration;
     }
+
+    public Recu() {
+    }
 }
