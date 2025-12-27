@@ -26,8 +26,8 @@ public interface TransactionOfflineMapper {
         return employe != null ? employe.getIdEmploye() : null;
     }
 
-    default String clientToCode(Client client) {
-        return client != null ? client.getCodeClient() : null;
+    default Long clientToCode(Client client) {
+        return client != null ? client.getNumeroClient() : null;
     }
 
     default String compteToId(Compte compte) {

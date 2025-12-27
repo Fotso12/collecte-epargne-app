@@ -13,9 +13,9 @@ public class ClientDto implements Serializable {
     @Size(max = 50)
     String codeClient;
 
-    @Size(max = 50)
+
     @NotNull
-    String numeroClient;
+    Long numeroClient;
 
     @Size(max = 255)
     String adresse;
@@ -64,11 +64,11 @@ public class ClientDto implements Serializable {
         this.codeClient = codeClient;
     }
 
-    public String getNumeroClient() {
+    public Long getNumeroClient() {
         return numeroClient;
     }
 
-    public void setNumeroClient(String numeroClient) {
+    public void setNumeroClient(Long numeroClient) {
         this.numeroClient = numeroClient;
     }
 
@@ -171,7 +171,7 @@ public class ClientDto implements Serializable {
     public ClientDto() {
     }
 
-    public ClientDto(String codeClient, String numeroClient, String adresse, TypeCNI typeCni, String numCni, String photoPath, String cniRectoPath, String cniVersoPath, LocalDate dateNaissance, String lieuNaissance, String profession, Integer scoreEpargne, String loginUtilisateur, String codeCollecteurAssigne) {
+    public ClientDto(String codeClient, Long numeroClient, String adresse, TypeCNI typeCni, String numCni, String photoPath, String cniRectoPath, String cniVersoPath, LocalDate dateNaissance, String lieuNaissance, String profession, Integer scoreEpargne, String loginUtilisateur, String codeCollecteurAssigne) {
         this.codeClient = codeClient;
         this.numeroClient = numeroClient;
         this.adresse = adresse;

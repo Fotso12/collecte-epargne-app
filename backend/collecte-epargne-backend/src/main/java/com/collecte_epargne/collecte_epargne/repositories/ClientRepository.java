@@ -10,14 +10,20 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface ClientRepository extends JpaRepository<Client, String> {
+public interface ClientRepository extends JpaRepository<Client, Long> {
 
     // Trouver un client par son numéro unique (numeroClient)
-    Optional<Client> findByNumeroClient(String numeroClient);
+    Optional<Client> findByNumeroClient(Long numeroClient);
 
     // Trouver un client par son numéro de CNI
     Optional<Client> findByNumCni(String numCni);
 
+    Optional<Client> findByCodeClient(String codeClient);
+
+
+    void deleteByCodeClient(String codeClient);
     // Trouver tous les clients assignés à un collecteur spécifique (nécessaire pour la recherche des employés)
     List<Client> findByCollecteurAssigneIdEmploye(Integer idEmploye);
+
+    boolean existsByCodeClient(String codeClient);
 }

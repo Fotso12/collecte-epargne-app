@@ -10,6 +10,7 @@ import com.collecte_epargne.collecte_epargne.repositories.EmployeRepository;
 import com.collecte_epargne.collecte_epargne.repositories.UtilisateurRepository;
 import com.collecte_epargne.collecte_epargne.services.interfaces.ClientInterface;
 import com.collecte_epargne.collecte_epargne.utils.TypeEmploye;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -59,7 +60,7 @@ public class ClientService implements ClientInterface {
 
     @Override
     public ClientDto save(ClientDto clientDto) {
-        if (clientDto.getNumeroClient() == null || clientDto.getNumeroClient().isEmpty()) {
+        if (clientDto.getNumeroClient() == null) {
             throw new IllegalArgumentException("Le numéro client est obligatoire.");
         }
 
@@ -83,19 +84,26 @@ public class ClientService implements ClientInterface {
     }
 
     @Override
-    public ClientDto getById(String codeClient) {
-        Client client = clientRepository.findById(codeClient)
+    public ClientDto getById(Long numeroClient) {
+        Client client = clientRepository.findById(numeroClient)
+                .orElseThrow(() -> new RuntimeException("Client non trouvé avec le numéro : " + numeroClient));
+        return clientMapper.toDto(client);
+    }
+
+    @Override
+    public ClientDto getByCodeClient(String codeClient) {
+
+        Client client = clientRepository.findByCodeClient(codeClient)
                 .orElseThrow(() -> new RuntimeException("Client non trouvé avec le code : " + codeClient));
         return clientMapper.toDto(client);
     }
 
     @Override
-    public ClientDto update(String codeClient, ClientDto clientDto) {
-        Client existingClient = clientRepository.findById(codeClient)
-                .orElseThrow(() -> new RuntimeException("Client non trouvé pour la mise à jour : " + codeClient));
+    public ClientDto update(Long numeroClient, ClientDto clientDto) {
+        Client existingClient = clientRepository.findById(numeroClient)
+                .orElseThrow(() -> new RuntimeException("Client non trouvé pour la mise à jour : " + numeroClient));
 
         // Mettre à jour les champs non-relationnels
-        existingClient.setNumeroClient(clientDto.getNumeroClient());
         existingClient.setAdresse(clientDto.getAdresse());
         existingClient.setTypeCni(clientDto.getTypeCni());
         existingClient.setNumCni(clientDto.getNumCni());
@@ -117,17 +125,53 @@ public class ClientService implements ClientInterface {
     }
 
     @Override
-    public void delete(String codeClient) {
-        if (!clientRepository.existsById(codeClient)) {
-            throw new RuntimeException("Client inexistant : " + codeClient);
+    public void delete(Long numClient) {
+        if (!clientRepository.existsById(numClient)) {
+            throw new RuntimeException("Client inexistant : " + numClient);
         }
-        clientRepository.deleteById(codeClient);
+        clientRepository.deleteById(numClient);
     }
 
     @Override
-    public ClientDto getByNumeroClient(String numeroClient) {
+    public ClientDto getByNumeroClient(Long numeroClient) {
         Client client = clientRepository.findByNumeroClient(numeroClient)
                 .orElseThrow(() -> new RuntimeException("Client non trouvé avec le numéro : " + numeroClient));
         return clientMapper.toDto(client);
     }
+
+    @Override
+    @Transactional
+    public ClientDto updateByCodeClient(String codeClient, ClientDto clientDto) {
+        Client existingClient = clientRepository.findByCodeClient(codeClient)
+                .orElseThrow(() -> new RuntimeException("Client non trouvé pour la mise à jour : " + codeClient));
+
+        // Mettre à jour les champs non-relationnels
+        existingClient.setAdresse(clientDto.getAdresse());
+        existingClient.setTypeCni(clientDto.getTypeCni());
+        existingClient.setNumCni(clientDto.getNumCni());
+        existingClient.setDateNaissance(clientDto.getDateNaissance());
+        existingClient.setLieuNaissance(clientDto.getLieuNaissance());
+        existingClient.setProfession(clientDto.getProfession());
+        existingClient.setScoreEpargne(clientDto.getScoreEpargne());
+
+        // Mettre à jour les chemins des fichiers si fournis (omettant les validations complexes ici)
+        existingClient.setPhotoPath(clientDto.getPhotoPath());
+        existingClient.setCniRectoPath(clientDto.getCniRectoPath());
+        existingClient.setCniVersoPath(clientDto.getCniVersoPath());
+
+        // Mettre à jour les relations
+        assignerRelations(existingClient, clientDto);
+
+        Client updatedClient = clientRepository.save(existingClient);
+        return clientMapper.toDto(updatedClient);
+    }
+
+    @Override
+    public void deleteByCodeClient(String codeClient) {
+        if (!clientRepository.existsByCodeClient(codeClient)) {
+            throw new RuntimeException("Client inexistant : " + codeClient);
+        }
+        clientRepository.deleteByCodeClient(codeClient);
+    }
+
 }

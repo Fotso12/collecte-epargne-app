@@ -36,7 +36,7 @@ public class CompteService implements CompteInterface {
     private void assignerRelations(Compte compte, CompteDto dto) {
         // 1. Client (CODE_CLIENT)
         if (dto.getCodeClient() != null) {
-            Client client = clientRepository.findById(dto.getCodeClient())
+            Client client = clientRepository.findByCodeClient(dto.getCodeClient())
                     .orElseThrow(() -> new RuntimeException("Client non trouvé avec le code : " + dto.getCodeClient()));
             compte.setClient(client);
         }
@@ -61,7 +61,7 @@ public class CompteService implements CompteInterface {
         }
 
         // Vérifier que le client existe avant de créer le compte
-        if (compteDto.getCodeClient() == null || !clientRepository.existsById(compteDto.getCodeClient())) {
+        if (compteDto.getCodeClient() == null || !clientRepository.existsByCodeClient(compteDto.getCodeClient())) {
             throw new RuntimeException("Le client doit exister avant de créer un compte. Code client : " + compteDto.getCodeClient());
         }
 

@@ -14,14 +14,13 @@ import java.util.Set;
 @Table(name = "client")
 public class Client {
     @Id
-    @Size(max = 50)
-    @Column(name = "CODE_CLIENT", nullable = false, length = 50)
-    private String codeClient;
+    @GeneratedValue(strategy = GenerationType.IDENTITY) // L'ID est maintenant géré par la base (1, 2, 3...)
+    @Column(name = "NUMERO_CLIENT")
+    private Long numeroClient;
 
     @Size(max = 50)
-    @NotNull
-    @Column(name = "NUMERO_CLIENT", nullable = false, length = 50)
-    private String numeroClient;
+    @Column(name = "CODE_CLIENT", nullable = false, unique = true, length = 50)
+    private String codeClient; // Devient une colonne simple mais unique (ex: CLT2025...)
 
     @Size(max = 255)
     @Column(name = "ADRESSE")
@@ -85,11 +84,11 @@ public class Client {
         this.codeClient = codeClient;
     }
 
-    public String getNumeroClient() {
+    public Long getNumeroClient() {
         return numeroClient;
     }
 
-    public void setNumeroClient(String numeroClient) {
+    public void setNumeroClient(Long numeroClient) {
         this.numeroClient = numeroClient;
     }
 
@@ -197,7 +196,7 @@ public class Client {
         this.comptes = comptes;
     }
 
-    public Client(String codeClient, String numeroClient, String adresse, TypeCNI typeCni, String numCni, String photoPath, String cniRectoPath, String cniVersoPath, LocalDate dateNaissance, String lieuNaissance, String profession, Integer scoreEpargne, Utilisateur utilisateur, Employe collecteurAssigne, Set<Compte> comptes) {
+    public Client(String codeClient, Long numeroClient, String adresse, TypeCNI typeCni, String numCni, String photoPath, String cniRectoPath, String cniVersoPath, LocalDate dateNaissance, String lieuNaissance, String profession, Integer scoreEpargne, Utilisateur utilisateur, Employe collecteurAssigne, Set<Compte> comptes) {
         this.codeClient = codeClient;
         this.numeroClient = numeroClient;
         this.adresse = adresse;

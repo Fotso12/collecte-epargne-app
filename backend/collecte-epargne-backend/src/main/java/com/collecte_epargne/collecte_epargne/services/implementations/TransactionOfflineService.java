@@ -24,14 +24,7 @@ public class TransactionOfflineService implements TransactionOfflineInterface {
     private final CompteRepository compteRepository;
     private final TransactionRepository transactionRepository;
 
-    public TransactionOfflineService(
-            TransactionOfflineRepository repository,
-            TransactionOfflineMapper mapper,
-            EmployeRepository employeRepository,
-            ClientRepository clientRepository,
-            CompteRepository compteRepository,
-            TransactionRepository transactionRepository
-    ) {
+    public TransactionOfflineService(TransactionOfflineRepository repository, TransactionOfflineMapper mapper, EmployeRepository employeRepository, ClientRepository clientRepository, CompteRepository compteRepository, TransactionRepository transactionRepository) {
         this.repository = repository;
         this.mapper = mapper;
         this.employeRepository = employeRepository;
@@ -55,7 +48,7 @@ public class TransactionOfflineService implements TransactionOfflineInterface {
         );
 
         entity.setClient(
-                clientRepository.findById(dto.getCodeClient())
+                clientRepository.findByCodeClient(dto.getCodeClient())
                         .orElseThrow(() -> new RuntimeException("Client introuvable"))
         );
 
