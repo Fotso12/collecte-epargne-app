@@ -1,5 +1,6 @@
-package com.collecte_epargne.collecte_epargne.controllers;
+package com.collecte_epargne.collecte_epargne.controller_test;
 
+import com.collecte_epargne.collecte_epargne.controllers.CompteCotisationController;
 import com.collecte_epargne.collecte_epargne.dtos.CompteCotisationDto;
 import com.collecte_epargne.collecte_epargne.services.implementations.CompteCotisationService;
 import com.collecte_epargne.collecte_epargne.utils.StatutPlanCotisation;

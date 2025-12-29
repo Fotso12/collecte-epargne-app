@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -37,29 +36,21 @@ public class CompteService implements CompteInterface {
     private void assignerRelations(Compte compte, CompteDto dto) {
         // 1. Client (CODE_CLIENT)
         if (dto.getCodeClient() != null) {
-<<<<<<< HEAD
-            String codeClient = Objects.requireNonNull(dto.getCodeClient());
-            Client client = clientRepository.findById(codeClient)
-=======
             Client client = clientRepository.findByCodeClient(dto.getCodeClient())
->>>>>>> e7d8b8a8ef19a82cdbc5dd8aa8c4525106492910
                     .orElseThrow(() -> new RuntimeException("Client non trouvé avec le code : " + dto.getCodeClient()));
             compte.setClient(client);
         }
 
         // 2. TypeCompte (ID_TYPE)
         if (dto.getIdTypeCompte() != null) {
-            Integer idType = Objects.requireNonNull(dto.getIdTypeCompte());
-            TypeCompte typeCompte = typeCompteRepository.findById(idType)
+            TypeCompte typeCompte = typeCompteRepository.findById(dto.getIdTypeCompte())
                     .orElseThrow(() -> new RuntimeException("Type de compte non trouvé avec l'ID : " + dto.getIdTypeCompte()));
             compte.setTypeCompte(typeCompte);
         }
     }
 
     @Override
-    @SuppressWarnings("null")
     public CompteDto save(CompteDto compteDto) {
-        Objects.requireNonNull(compteDto, "compteDto ne doit pas être null");
         if (compteDto.getNumCompte() == null || compteDto.getNumCompte().isEmpty()) {
             throw new IllegalArgumentException("Le numéro de compte est obligatoire.");
         }
@@ -102,7 +93,6 @@ public class CompteService implements CompteInterface {
 
     @Override
     public CompteDto getById(String idCompte) {
-        Objects.requireNonNull(idCompte, "idCompte ne doit pas être null");
         Compte compte = compteRepository.findById(idCompte)
                 .orElseThrow(() -> new RuntimeException("Compte non trouvé avec l'ID : " + idCompte));
         return compteMapper.toDto(compte);
@@ -110,8 +100,6 @@ public class CompteService implements CompteInterface {
 
     @Override
     public CompteDto update(String idCompte, CompteDto compteDto) {
-        Objects.requireNonNull(idCompte, "idCompte ne doit pas être null");
-        Objects.requireNonNull(compteDto, "compteDto ne doit pas être null");
         Compte existingCompte = compteRepository.findById(idCompte)
                 .orElseThrow(() -> new RuntimeException("Compte non trouvé pour la mise à jour : " + idCompte));
 
@@ -136,7 +124,6 @@ public class CompteService implements CompteInterface {
 
     @Override
     public void delete(String idCompte) {
-        Objects.requireNonNull(idCompte, "idCompte ne doit pas être null");
         if (!compteRepository.existsById(idCompte)) {
             throw new RuntimeException("Compte inexistant : " + idCompte);
         }
@@ -145,7 +132,6 @@ public class CompteService implements CompteInterface {
 
     @Override
     public CompteDto getByNumCompte(String numCompte) {
-        Objects.requireNonNull(numCompte, "numCompte ne doit pas être null");
         Compte compte = compteRepository.findByNumCompte(numCompte)
                 .orElseThrow(() -> new RuntimeException("Compte non trouvé avec le numéro : " + numCompte));
         return compteMapper.toDto(compte);
@@ -153,7 +139,6 @@ public class CompteService implements CompteInterface {
 
     @Override
     public List<CompteDto> getByClient(String codeClient) {
-        Objects.requireNonNull(codeClient, "codeClient ne doit pas être null");
         return compteRepository.findByClientCodeClient(codeClient).stream()
                 .map(compteMapper::toDto)
                 .collect(Collectors.toList());

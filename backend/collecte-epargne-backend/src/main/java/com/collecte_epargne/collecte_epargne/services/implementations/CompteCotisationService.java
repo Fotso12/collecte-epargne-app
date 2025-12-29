@@ -24,10 +24,7 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-@Setter
-@Getter
 @Service
-@AllArgsConstructor
 public class CompteCotisationService implements CompteCotisationInterface {
 
     private static final Logger logger = LoggerFactory.getLogger(CompteCotisationService.class);
@@ -36,6 +33,13 @@ public class CompteCotisationService implements CompteCotisationInterface {
     private final CompteCotisationMapper compteCotisationMapper;
     private final CompteRepository compteRepository;
     private final PlanCotisationRepository planCotisationRepository;
+
+    public CompteCotisationService(CompteCotisationRepository compteCotisationRepository, CompteCotisationMapper compteCotisationMapper, CompteRepository compteRepository, PlanCotisationRepository planCotisationRepository) {
+        this.compteCotisationRepository = compteCotisationRepository;
+        this.compteCotisationMapper = compteCotisationMapper;
+        this.compteRepository = compteRepository;
+        this.planCotisationRepository = planCotisationRepository;
+    }
 
     private void assignerRelations(CompteCotisation entity, CompteCotisationDto dto) {
         if (dto.getIdCompte() != null) {

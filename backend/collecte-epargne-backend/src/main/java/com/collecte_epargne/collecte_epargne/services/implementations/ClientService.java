@@ -63,12 +63,9 @@ public class ClientService implements ClientInterface {
     @Override
     @SuppressWarnings("null")
     public ClientDto save(ClientDto clientDto) {
-<<<<<<< HEAD
         Objects.requireNonNull(clientDto, "clientDto ne doit pas être null");
-        if (clientDto.getNumeroClient() == null || clientDto.getNumeroClient().isEmpty()) {
-=======
+
         if (clientDto.getNumeroClient() == null) {
->>>>>>> e7d8b8a8ef19a82cdbc5dd8aa8c4525106492910
             throw new IllegalArgumentException("Le numéro client est obligatoire.");
         }
 
@@ -92,11 +89,7 @@ public class ClientService implements ClientInterface {
     }
 
     @Override
-<<<<<<< HEAD
-    public ClientDto getById(String codeClient) {
-        Objects.requireNonNull(codeClient, "codeClient ne doit pas être null");
-        Client client = clientRepository.findById(codeClient)
-=======
+
     public ClientDto getById(Long numeroClient) {
         Client client = clientRepository.findById(numeroClient)
                 .orElseThrow(() -> new RuntimeException("Client non trouvé avec le numéro : " + numeroClient));
@@ -107,23 +100,16 @@ public class ClientService implements ClientInterface {
     public ClientDto getByCodeClient(String codeClient) {
 
         Client client = clientRepository.findByCodeClient(codeClient)
->>>>>>> e7d8b8a8ef19a82cdbc5dd8aa8c4525106492910
                 .orElseThrow(() -> new RuntimeException("Client non trouvé avec le code : " + codeClient));
         return clientMapper.toDto(client);
     }
 
     @Override
-<<<<<<< HEAD
-    public ClientDto update(String codeClient, ClientDto clientDto) {
-        Objects.requireNonNull(codeClient, "codeClient ne doit pas être null");
-        Objects.requireNonNull(clientDto, "clientDto ne doit pas être null");
-        Client existingClient = clientRepository.findById(codeClient)
-                .orElseThrow(() -> new RuntimeException("Client non trouvé pour la mise à jour : " + codeClient));
-=======
+
     public ClientDto update(Long numeroClient, ClientDto clientDto) {
         Client existingClient = clientRepository.findById(numeroClient)
                 .orElseThrow(() -> new RuntimeException("Client non trouvé pour la mise à jour : " + numeroClient));
->>>>>>> e7d8b8a8ef19a82cdbc5dd8aa8c4525106492910
+
 
         // Mettre à jour les champs non-relationnels
         existingClient.setAdresse(clientDto.getAdresse());
@@ -147,27 +133,16 @@ public class ClientService implements ClientInterface {
     }
 
     @Override
-<<<<<<< HEAD
-    public void delete(String codeClient) {
-        Objects.requireNonNull(codeClient, "codeClient ne doit pas être null");
-        if (!clientRepository.existsById(codeClient)) {
-            throw new RuntimeException("Client inexistant : " + codeClient);
-=======
+
     public void delete(Long numClient) {
         if (!clientRepository.existsById(numClient)) {
             throw new RuntimeException("Client inexistant : " + numClient);
->>>>>>> e7d8b8a8ef19a82cdbc5dd8aa8c4525106492910
         }
         clientRepository.deleteById(numClient);
     }
 
     @Override
-<<<<<<< HEAD
-    public ClientDto getByNumeroClient(String numeroClient) {
-        Objects.requireNonNull(numeroClient, "numeroClient ne doit pas être null");
-=======
     public ClientDto getByNumeroClient(Long numeroClient) {
->>>>>>> e7d8b8a8ef19a82cdbc5dd8aa8c4525106492910
         Client client = clientRepository.findByNumeroClient(numeroClient)
                 .orElseThrow(() -> new RuntimeException("Client non trouvé avec le numéro : " + numeroClient));
         return clientMapper.toDto(client);

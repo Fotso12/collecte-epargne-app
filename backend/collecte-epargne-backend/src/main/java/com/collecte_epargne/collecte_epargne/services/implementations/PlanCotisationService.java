@@ -19,10 +19,7 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-@Setter
-@Getter
 @Service
-@AllArgsConstructor
 public class PlanCotisationService implements PlanCotisationInterface {
 
     private static final Logger logger = LoggerFactory.getLogger(PlanCotisationService.class);
@@ -30,6 +27,12 @@ public class PlanCotisationService implements PlanCotisationInterface {
     private final PlanCotisationRepository planCotisationRepository;
     private final PlanCotisationMapper planCotisationMapper;
     private final CompteCotisationRepository compteCotisationRepository;
+
+    public PlanCotisationService(PlanCotisationRepository planCotisationRepository, PlanCotisationMapper planCotisationMapper, CompteCotisationRepository compteCotisationRepository) {
+        this.planCotisationRepository = planCotisationRepository;
+        this.planCotisationMapper = planCotisationMapper;
+        this.compteCotisationRepository = compteCotisationRepository;
+    }
 
     private void appliquerValeursParDefaut(PlanCotisation entity) {
         if (entity.getIdPlan() == null || entity.getIdPlan().isEmpty()) {
