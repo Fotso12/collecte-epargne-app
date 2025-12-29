@@ -23,15 +23,18 @@ public class UtilisateurService implements UtilisateurInterface {
     private final UtilisateurRepository utilisateurRepository;
     private final UtilisateurMapper utilisateurMapper;
     private final RoleRepository roleRepository;
+    // Injection du service d'envoi d'emails pour notifier les nouveaux utilisateurs
+    private final EmailService emailService;
 
     private static final Logger log = LoggerFactory.getLogger(UtilisateurService.class);
 
     // Pour la relation Role
 
-    public UtilisateurService(UtilisateurRepository utilisateurRepository, UtilisateurMapper utilisateurMapper, RoleRepository roleRepository) {
+    public UtilisateurService(UtilisateurRepository utilisateurRepository, UtilisateurMapper utilisateurMapper, RoleRepository roleRepository, EmailService emailService) {
         this.utilisateurRepository = utilisateurRepository;
         this.utilisateurMapper = utilisateurMapper;
         this.roleRepository = roleRepository;
+        this.emailService = emailService;
     }
 
     // Méthode utilitaire pour attacher l'entité Role (inchangée)
@@ -72,6 +75,19 @@ public class UtilisateurService implements UtilisateurInterface {
 
         Utilisateur savedUtilisateur = utilisateurRepository.save(utilisateurToSave);
         log.info("Utilisateur sauvegardé avec succès avec login: {}", savedUtilisateur.getLogin());
+
+        // ===== ENVOI D'EMAIL AUTOMATIQUE =====
+        // Après la création réussie de l'utilisateur, on envoie un email avec ses identifiants
+        try {
+            // Appel du service EmailService pour envoyer l'email avec login et mot de passe en clair
+            emailService.sendUserCredentialsEmail(savedUtilisateur.getEmail(), savedUtilisateur.getLogin(), password);
+        } catch (Exception e) {
+            // Gestion d'erreur : si l'envoi d'email échoue, on log l'erreur mais on ne fait pas échouer la création
+            // Cela permet à l'utilisateur d'être créé même si le serveur d'email est indisponible
+            System.err.println("Erreur lors de l'envoi de l'email : " + e.getMessage());
+        }
+        // ===== FIN ENVOI D'EMAIL =====
+
         return utilisateurMapper.toDto(savedUtilisateur);
     }
 
