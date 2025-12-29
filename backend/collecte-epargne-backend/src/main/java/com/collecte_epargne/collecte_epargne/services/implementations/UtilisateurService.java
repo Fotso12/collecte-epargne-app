@@ -7,6 +7,8 @@ import com.collecte_epargne.collecte_epargne.mappers.UtilisateurMapper;
 import com.collecte_epargne.collecte_epargne.repositories.RoleRepository;
 import com.collecte_epargne.collecte_epargne.repositories.UtilisateurRepository;
 import com.collecte_epargne.collecte_epargne.services.interfaces.UtilisateurInterface;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -21,6 +23,8 @@ public class UtilisateurService implements UtilisateurInterface {
     private final UtilisateurRepository utilisateurRepository;
     private final UtilisateurMapper utilisateurMapper;
     private final RoleRepository roleRepository;
+
+    private static final Logger log = LoggerFactory.getLogger(UtilisateurService.class);
 
     // Pour la relation Role
 
@@ -46,6 +50,7 @@ public class UtilisateurService implements UtilisateurInterface {
     @Override
     @SuppressWarnings("null")
     public UtilisateurDto save(UtilisateurDto utilisateurDto, String password) {
+        log.info("Saving utilisateur with login: {}", utilisateurDto.getLogin());
         Objects.requireNonNull(utilisateurDto, "utilisateurDto ne doit pas être null");
         if (utilisateurDto.getLogin() == null || utilisateurDto.getLogin().isEmpty() || password == null) {
             throw new IllegalArgumentException("Le login et le mot de passe sont obligatoires.");
@@ -66,11 +71,13 @@ public class UtilisateurService implements UtilisateurInterface {
         assignerRelations(utilisateurToSave, utilisateurDto);
 
         Utilisateur savedUtilisateur = utilisateurRepository.save(utilisateurToSave);
+        log.info("Utilisateur saved successfully with login: {}", savedUtilisateur.getLogin());
         return utilisateurMapper.toDto(savedUtilisateur);
     }
 
     @Override
     public List<UtilisateurDto> getAll() {
+        log.info("Retrieving all utilisateurs");
         return utilisateurRepository.findAll().stream()
                 .map(utilisateurMapper::toDto)
                 .collect(Collectors.toList());
@@ -79,6 +86,7 @@ public class UtilisateurService implements UtilisateurInterface {
     @Override
     public UtilisateurDto getByLogin(String login) {
         Objects.requireNonNull(login, "login ne doit pas être null");
+        log.info("Retrieving utilisateur with login: {}", login);
         Utilisateur utilisateur = utilisateurRepository.findById(login)
                 .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé avec le login : " + login));
         return utilisateurMapper.toDto(utilisateur);
@@ -87,6 +95,7 @@ public class UtilisateurService implements UtilisateurInterface {
     @Override
     public UtilisateurDto getByEmail(String email) {
         Objects.requireNonNull(email, "email ne doit pas être null");
+        log.info("Retrieving utilisateur with email: {}", email);
         Utilisateur utilisateur = utilisateurRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé avec l'email : " + email));
         return utilisateurMapper.toDto(utilisateur);
@@ -96,6 +105,7 @@ public class UtilisateurService implements UtilisateurInterface {
     public UtilisateurDto update(String login, UtilisateurDto utilisateurDto) {
         Objects.requireNonNull(login, "login ne doit pas être null");
         Objects.requireNonNull(utilisateurDto, "utilisateurDto ne doit pas être null");
+        log.info("Updating utilisateur with login: {}", login);
         Utilisateur existingUtilisateur = utilisateurRepository.findById(login)
                 .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé pour la mise à jour : " + login));
 
@@ -109,12 +119,14 @@ public class UtilisateurService implements UtilisateurInterface {
         assignerRelations(existingUtilisateur, utilisateurDto);
 
         Utilisateur updatedUtilisateur = utilisateurRepository.save(existingUtilisateur);
+        log.info("Utilisateur updated successfully with login: {}", updatedUtilisateur.getLogin());
         return utilisateurMapper.toDto(updatedUtilisateur);
     }
 
     @Override
     public void updatePassword(String login, String newPassword) {
         Objects.requireNonNull(login, "login ne doit pas être null");
+        log.info("Updating password for utilisateur with login: {}", login);
         Utilisateur existingUtilisateur = utilisateurRepository.findById(login)
                 .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé : " + login));
 
@@ -127,16 +139,19 @@ public class UtilisateurService implements UtilisateurInterface {
         existingUtilisateur.setPassword(newPassword); // Actuellement en clair (NON SÉCURISÉ)
 
         utilisateurRepository.save(existingUtilisateur);
+        log.info("Password updated for utilisateur with login: {}", login);
     }
 
     @Override
     public void delete(String login) {
         Objects.requireNonNull(login, "login ne doit pas être null");
+        log.info("Deleting utilisateur with login: {}", login);
         if (!utilisateurRepository.existsById(login)) {
             throw new RuntimeException("Utilisateur inexistant : " + login);
         }
         // Note: Grâce à CascadeType.ALL dans l'entité Utilisateur,
         // la suppression de l'utilisateur entraînera la suppression de l'Employe/Client associé.
         utilisateurRepository.deleteById(login);
+        log.info("Utilisateur deleted with login: {}", login);
     }
 }
