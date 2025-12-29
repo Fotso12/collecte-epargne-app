@@ -13,6 +13,8 @@ import com.collecte_epargne.collecte_epargne.utils.StatutPlanCotisation;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -27,6 +29,8 @@ import java.util.stream.Collectors;
 @Service
 @AllArgsConstructor
 public class CompteCotisationService implements CompteCotisationInterface {
+
+    private static final Logger logger = LoggerFactory.getLogger(CompteCotisationService.class);
 
     private final CompteCotisationRepository compteCotisationRepository;
     private final CompteCotisationMapper compteCotisationMapper;
@@ -77,11 +81,15 @@ public class CompteCotisationService implements CompteCotisationInterface {
     @Override
     @SuppressWarnings("null")
     public CompteCotisationDto save(CompteCotisationDto dto) {
+        logger.info("Début de la création d'un compte de cotisation - Compte: {}, Plan: {}", 
+                dto.getIdCompte(), dto.getIdPlanCotisation());
         Objects.requireNonNull(dto, "Le payload ne peut pas être null");
         if (dto.getIdCompte() == null) {
+            logger.error("Échec de la création du compte de cotisation : L'identifiant du compte est obligatoire");
             throw new IllegalArgumentException("L'identifiant du compte est obligatoire pour créer un compte de cotisation.");
         }
         if (dto.getIdPlanCotisation() == null) {
+            logger.error("Échec de la création du compte de cotisation : L'identifiant du plan de cotisation est obligatoire");
             throw new IllegalArgumentException("L'identifiant du plan de cotisation est obligatoire.");
         }
 
@@ -90,31 +98,47 @@ public class CompteCotisationService implements CompteCotisationInterface {
         assignerRelations(entity, dto);
 
         CompteCotisation saved = Objects.requireNonNull(compteCotisationRepository.save(entity));
+        logger.info("Compte de cotisation créé avec succès - ID: {}, Compte: {}, Plan: {}, Statut: {}", 
+                saved.getId(), saved.getCompte().getIdCompte(), saved.getPlanCotisation().getIdPlan(), saved.getStatut());
         return compteCotisationMapper.toDto(saved);
     }
 
     @Override
     public List<CompteCotisationDto> getAll() {
-        return compteCotisationRepository.findAll().stream()
+        logger.debug("Récupération de tous les comptes de cotisation");
+        List<CompteCotisationDto> comptes = compteCotisationRepository.findAll().stream()
                 .map(compteCotisationMapper::toDto)
                 .collect(Collectors.toList());
+        logger.info("Récupération réussie de {} compte(s) de cotisation", comptes.size());
+        return comptes;
     }
 
     @Override
     public CompteCotisationDto getById(String id) {
+        logger.debug("Récupération du compte de cotisation avec l'ID: {}", id);
         Objects.requireNonNull(id, "id ne doit pas être null");
         CompteCotisation compteCotisation = compteCotisationRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Compte de cotisation non trouvé : " + id));
+                .orElseThrow(() -> {
+                    logger.warn("Compte de cotisation non trouvé avec l'ID: {}", id);
+                    return new RuntimeException("Compte de cotisation non trouvé : " + id);
+                });
+        logger.info("Compte de cotisation récupéré avec succès - ID: {}, Statut: {}", 
+                compteCotisation.getId(), compteCotisation.getStatut());
         return compteCotisationMapper.toDto(compteCotisation);
     }
 
     @Override
     public CompteCotisationDto update(String id, CompteCotisationDto dto) {
+        logger.info("Début de la mise à jour du compte de cotisation - ID: {}, Statut: {}", id, dto.getStatut());
         Objects.requireNonNull(id, "id ne doit pas être null");
         Objects.requireNonNull(dto, "Le payload ne peut pas être null");
         CompteCotisation existing = compteCotisationRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Compte de cotisation non trouvé pour mise à jour : " + id));
+                .orElseThrow(() -> {
+                    logger.warn("Tentative de mise à jour d'un compte de cotisation inexistant - ID: {}", id);
+                    return new RuntimeException("Compte de cotisation non trouvé pour mise à jour : " + id);
+                });
 
+        logger.debug("Mise à jour des champs du compte de cotisation - ID: {}", id);
         existing.setDateAdhesion(dto.getDateAdhesion());
         existing.setMontantTotalVerse(dto.getMontantTotalVerse());
         existing.setNombreVersements(dto.getNombreVersements());
@@ -125,32 +149,45 @@ public class CompteCotisationService implements CompteCotisationInterface {
         assignerRelations(existing, dto);
 
         CompteCotisation updated = compteCotisationRepository.save(existing);
+        logger.info("Compte de cotisation mis à jour avec succès - ID: {}, Montant total versé: {}, Statut: {}", 
+                updated.getId(), updated.getMontantTotalVerse(), updated.getStatut());
         return compteCotisationMapper.toDto(updated);
     }
 
     @Override
     public void delete(String id) {
+        logger.info("Début de la suppression du compte de cotisation - ID: {}", id);
         Objects.requireNonNull(id, "id ne doit pas être null");
         if (!compteCotisationRepository.existsById(id)) {
+            logger.warn("Tentative de suppression d'un compte de cotisation inexistant - ID: {}", id);
             throw new RuntimeException("Compte de cotisation inexistant : " + id);
         }
         compteCotisationRepository.deleteById(id);
+        logger.info("Compte de cotisation supprimé avec succès - ID: {}", id);
     }
 
     @Override
     public List<CompteCotisationDto> getByCompte(String idCompte) {
+        logger.debug("Récupération des comptes de cotisation pour le compte - ID: {}", idCompte);
         Objects.requireNonNull(idCompte, "idCompte ne doit pas être null");
-        return compteCotisationRepository.findByCompteIdCompte(idCompte).stream()
+        List<CompteCotisationDto> comptes = compteCotisationRepository.findByCompteIdCompte(idCompte).stream()
                 .map(compteCotisationMapper::toDto)
                 .collect(Collectors.toList());
+        logger.info("Récupération réussie de {} compte(s) de cotisation pour le compte ID: {}", 
+                comptes.size(), idCompte);
+        return comptes;
     }
 
     @Override
     public List<CompteCotisationDto> getByPlanCotisation(String idPlanCotisation) {
+        logger.debug("Récupération des comptes de cotisation pour le plan - ID: {}", idPlanCotisation);
         Objects.requireNonNull(idPlanCotisation, "idPlanCotisation ne doit pas être null");
-        return compteCotisationRepository.findByPlanCotisationIdPlan(idPlanCotisation).stream()
+        List<CompteCotisationDto> comptes = compteCotisationRepository.findByPlanCotisationIdPlan(idPlanCotisation).stream()
                 .map(compteCotisationMapper::toDto)
                 .collect(Collectors.toList());
+        logger.info("Récupération réussie de {} compte(s) de cotisation pour le plan ID: {}", 
+                comptes.size(), idPlanCotisation);
+        return comptes;
     }
 }
 
