@@ -16,131 +16,174 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+
 @Service
 public class CompteService implements CompteInterface {
 
+    private static final Logger log = LoggerFactory.getLogger(CompteService.class);
+
     private final CompteRepository compteRepository;
     private final CompteMapper compteMapper;
-    private final ClientRepository clientRepository; // Pour vérifier l'existence du client
-    private final TypeCompteRepository typeCompteRepository; // Pour vérifier l'existence du type de compte
+    private final ClientRepository clientRepository;
+    private final TypeCompteRepository typeCompteRepository;
 
-
-    public CompteService(CompteRepository compteRepository, CompteMapper compteMapper, ClientRepository clientRepository, TypeCompteRepository typeCompteRepository) {
+    public CompteService(CompteRepository compteRepository,
+                         CompteMapper compteMapper,
+                         ClientRepository clientRepository,
+                         TypeCompteRepository typeCompteRepository) {
         this.compteRepository = compteRepository;
         this.compteMapper = compteMapper;
         this.clientRepository = clientRepository;
         this.typeCompteRepository = typeCompteRepository;
     }
 
-    // Méthode utilitaire pour attacher les entités relationnelles
     private void assignerRelations(Compte compte, CompteDto dto) {
-        // 1. Client (CODE_CLIENT)
+        log.debug("Assignation des relations pour le compte {}", dto.getNumCompte());
+
         if (dto.getCodeClient() != null) {
             Client client = clientRepository.findByCodeClient(dto.getCodeClient())
-                    .orElseThrow(() -> new RuntimeException("Client non trouvé avec le code : " + dto.getCodeClient()));
+                    .orElseThrow(() -> {
+                        log.error("Client non trouvé code={}", dto.getCodeClient());
+                        return new RuntimeException("Client non trouvé avec le code : " + dto.getCodeClient());
+                    });
             compte.setClient(client);
         }
 
-        // 2. TypeCompte (ID_TYPE)
         if (dto.getIdTypeCompte() != null) {
             TypeCompte typeCompte = typeCompteRepository.findById(dto.getIdTypeCompte())
-                    .orElseThrow(() -> new RuntimeException("Type de compte non trouvé avec l'ID : " + dto.getIdTypeCompte()));
+                    .orElseThrow(() -> {
+                        log.error("TypeCompte non trouvé id={}", dto.getIdTypeCompte());
+                        return new RuntimeException("Type de compte non trouvé");
+                    });
             compte.setTypeCompte(typeCompte);
         }
     }
 
     @Override
     public CompteDto save(CompteDto compteDto) {
+        log.info("Création d'un compte numCompte={}", compteDto.getNumCompte());
+
         if (compteDto.getNumCompte() == null || compteDto.getNumCompte().isEmpty()) {
+            log.warn("Numéro de compte manquant");
             throw new IllegalArgumentException("Le numéro de compte est obligatoire.");
         }
 
-        // Vérification de l'unicité
         if (compteRepository.findByNumCompte(compteDto.getNumCompte()).isPresent()) {
+            log.warn("Compte déjà existant numCompte={}", compteDto.getNumCompte());
             throw new RuntimeException("Un compte avec ce numéro existe déjà.");
         }
 
-        // Vérifier que le client existe avant de créer le compte
-        if (compteDto.getCodeClient() == null || !clientRepository.existsByCodeClient(compteDto.getCodeClient())) {
-            throw new RuntimeException("Le client doit exister avant de créer un compte. Code client : " + compteDto.getCodeClient());
+        if (compteDto.getCodeClient() == null ||
+                !clientRepository.existsByCodeClient(compteDto.getCodeClient())) {
+            log.warn("Client inexistant pour création compte codeClient={}", compteDto.getCodeClient());
+            throw new RuntimeException("Le client doit exister avant de créer un compte.");
         }
 
-        Compte compteToSave = compteMapper.toEntity(compteDto);
+        Compte compte = compteMapper.toEntity(compteDto);
 
-        // Initialiser les valeurs par défaut si non fournies
-        if (compteToSave.getSolde() == null) {
-            compteToSave.setSolde(BigDecimal.ZERO);
-        }
-        if (compteToSave.getSoldeDisponible() == null) {
-            compteToSave.setSoldeDisponible(BigDecimal.ZERO);
-        }
-        if (compteToSave.getDateOuverture() == null) {
-            compteToSave.setDateOuverture(LocalDate.now());
-        }
+        if (compte.getSolde() == null) compte.setSolde(BigDecimal.ZERO);
+        if (compte.getSoldeDisponible() == null) compte.setSoldeDisponible(BigDecimal.ZERO);
+        if (compte.getDateOuverture() == null) compte.setDateOuverture(LocalDate.now());
 
-        assignerRelations(compteToSave, compteDto);
+        assignerRelations(compte, compteDto);
 
-        Compte savedCompte = compteRepository.save(compteToSave);
+        Compte savedCompte = compteRepository.save(compte);
+        log.info("Compte créé avec succès id={}", savedCompte.getIdCompte());
+
         return compteMapper.toDto(savedCompte);
     }
 
     @Override
     public List<CompteDto> getAll() {
-        return compteRepository.findAll().stream()
+        log.info("Récupération de tous les comptes");
+
+        List<CompteDto> comptes = compteRepository.findAll()
+                .stream()
                 .map(compteMapper::toDto)
                 .collect(Collectors.toList());
+
+        log.info("Nombre de comptes trouvés : {}", comptes.size());
+        return comptes;
     }
 
     @Override
     public CompteDto getById(String idCompte) {
+        log.info("Recherche compte id={}", idCompte);
+
         Compte compte = compteRepository.findById(idCompte)
-                .orElseThrow(() -> new RuntimeException("Compte non trouvé avec l'ID : " + idCompte));
+                .orElseThrow(() -> {
+                    log.error("Compte non trouvé id={}", idCompte);
+                    return new RuntimeException("Compte non trouvé");
+                });
+
         return compteMapper.toDto(compte);
     }
 
     @Override
-    public CompteDto update(String idCompte, CompteDto compteDto) {
-        Compte existingCompte = compteRepository.findById(idCompte)
-                .orElseThrow(() -> new RuntimeException("Compte non trouvé pour la mise à jour : " + idCompte));
-
-        // Mettre à jour les champs non-relationnels
-        existingCompte.setNumCompte(compteDto.getNumCompte());
-        existingCompte.setSolde(compteDto.getSolde());
-        existingCompte.setSoldeDisponible(compteDto.getSoldeDisponible());
-        existingCompte.setDateOuverture(compteDto.getDateOuverture());
-        existingCompte.setDateDerniereTransaction(compteDto.getDateDerniereTransaction());
-        existingCompte.setTauxPenalite(compteDto.getTauxPenalite());
-        existingCompte.setTauxBonus(compteDto.getTauxBonus());
-        existingCompte.setStatut(compteDto.getStatut());
-        existingCompte.setMotifBlocage(compteDto.getMotifBlocage());
-        existingCompte.setDateCloture(compteDto.getDateCloture());
-
-        // Mettre à jour les relations
-        assignerRelations(existingCompte, compteDto);
-
-        Compte updatedCompte = compteRepository.save(existingCompte);
-        return compteMapper.toDto(updatedCompte);
-    }
-
-    @Override
-    public void delete(String idCompte) {
-        if (!compteRepository.existsById(idCompte)) {
-            throw new RuntimeException("Compte inexistant : " + idCompte);
-        }
-        compteRepository.deleteById(idCompte);
-    }
-
-    @Override
     public CompteDto getByNumCompte(String numCompte) {
+        log.info("Recherche compte numCompte={}", numCompte);
+
         Compte compte = compteRepository.findByNumCompte(numCompte)
-                .orElseThrow(() -> new RuntimeException("Compte non trouvé avec le numéro : " + numCompte));
+                .orElseThrow(() -> {
+                    log.error("Compte non trouvé numCompte={}", numCompte);
+                    return new RuntimeException("Compte non trouvé");
+                });
+
         return compteMapper.toDto(compte);
     }
 
     @Override
     public List<CompteDto> getByClient(String codeClient) {
-        return compteRepository.findByClientCodeClient(codeClient).stream()
+        log.info("Recherche comptes par client codeClient={}", codeClient);
+
+        return compteRepository.findByClientCodeClient(codeClient)
+                .stream()
                 .map(compteMapper::toDto)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public CompteDto update(String idCompte, CompteDto compteDto) {
+        log.info("Mise à jour compte id={}", idCompte);
+
+        Compte compte = compteRepository.findById(idCompte)
+                .orElseThrow(() -> {
+                    log.error("Compte non trouvé pour update id={}", idCompte);
+                    return new RuntimeException("Compte non trouvé");
+                });
+
+        compte.setNumCompte(compteDto.getNumCompte());
+        compte.setSolde(compteDto.getSolde());
+        compte.setSoldeDisponible(compteDto.getSoldeDisponible());
+        compte.setDateOuverture(compteDto.getDateOuverture());
+        compte.setDateDerniereTransaction(compteDto.getDateDerniereTransaction());
+        compte.setTauxPenalite(compteDto.getTauxPenalite());
+        compte.setTauxBonus(compteDto.getTauxBonus());
+        compte.setStatut(compteDto.getStatut());
+        compte.setMotifBlocage(compteDto.getMotifBlocage());
+        compte.setDateCloture(compteDto.getDateCloture());
+
+        assignerRelations(compte, compteDto);
+
+        Compte updated = compteRepository.save(compte);
+        log.info("Compte mis à jour id={}", idCompte);
+
+        return compteMapper.toDto(updated);
+    }
+
+    @Override
+    public void delete(String idCompte) {
+        log.info("Suppression compte id={}", idCompte);
+
+        if (!compteRepository.existsById(idCompte)) {
+            log.warn("Tentative suppression compte inexistant id={}", idCompte);
+            throw new RuntimeException("Compte inexistant");
+        }
+
+        compteRepository.deleteById(idCompte);
+        log.info("Compte supprimé id={}", idCompte);
     }
 }
