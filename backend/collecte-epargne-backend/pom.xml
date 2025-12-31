@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.5.9</version>
+		<version>3.2.5</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.collecte-epargne</groupId>
@@ -49,6 +49,20 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-websocket</artifactId>
+		</dependency>
+		<!-- Dépendance explicite pour Spring WebSocket (nécessaire pour les classes WebSocketMessageBrokerConfigurer, etc.) -->
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-websocket</artifactId>
+		</dependency>
+		<!-- Dépendance pour Spring Messaging (nécessaire pour les classes de messagerie WebSocket) -->
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-messaging</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -147,7 +161,6 @@
 <!--							<artifactId>lombok-mapstruct-binding</artifactId>-->
 <!--							<version>${lombok-mapstruct-binding.version}</version>-->
 <!--						</path>-->
->>>>>>> feature/backend-création-des-entities-et-enum
 						<path>
 							<groupId>org.mapstruct</groupId>
 							<artifactId>mapstruct-processor</artifactId>
