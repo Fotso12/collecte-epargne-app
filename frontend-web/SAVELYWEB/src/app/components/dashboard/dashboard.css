@@ -1,0 +1,69 @@
+/* Le wrapper prend en compte la largeur de la sidebar (250px) et la hauteur de la topbar */
+.dashboard-wrapper {
+  padding: 20px;
+  background-color: #f0f2f5;
+  min-height: calc(100vh - 90px); /* Ajuste la hauteur */
+}
+
+/* GRILLE DES CARTES */
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.card {
+  padding: 25px;
+  border-radius: 15px;
+  color: white;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  transition: transform 0.3s ease;
+}
+
+.card:hover { transform: translateY(-5px); }
+
+.blue { background: linear-gradient(135deg, #3498db, #2980b9); }
+.purple { background: linear-gradient(135deg, #8e44ad, #7d3c98); }
+.orange { background: linear-gradient(135deg, #f39c12, #d68910); }
+.green { background: linear-gradient(135deg, #27ae60, #1e8449); }
+
+.card i { font-size: 2.5rem; opacity: 0.5; }
+.card h3 { margin: 0; font-size: 1.8rem; font-weight: 700; }
+.card p { margin: 0; font-size: 0.9rem; opacity: 0.9; }
+
+/* TABLEAU DESIGN */
+.table-area {
+  background: white;
+  padding: 25px;
+  border-radius: 15px;
+  box-shadow: 0 2px 15px rgba(0,0,0,0.05);
+}
+
+.table-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.btn-view-all {
+  background: #f0f2f5;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 8px;
+  color: #2c3e50;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+table { width: 100%; border-collapse: collapse; }
+th { text-align: left; padding: 15px; color: #95a5a6; font-size: 0.85rem; border-bottom: 1px solid #eee; }
+td { padding: 15px; border-bottom: 1px solid #eee; font-size: 0.95rem; color: #2c3e50; }
+
+.tag { padding: 5px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: bold; }
+.tag-ok { background: #e8f8f5; color: #27ae60; }
+.tag-wait { background: #fef5e7; color: #f39c12; }
