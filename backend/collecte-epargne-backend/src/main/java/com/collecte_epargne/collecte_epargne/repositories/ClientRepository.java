@@ -1,6 +1,8 @@
 package com.collecte_epargne.collecte_epargne.repositories;
 
 import com.collecte_epargne.collecte_epargne.entities.Client;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 
@@ -27,4 +29,8 @@ public interface ClientRepository extends JpaRepository<Client, Long> {
     //Trouver les clients en fonction de leur code
     Optional<Client> findByCodeClient(String codeClient);
     boolean existsByCodeClient(String codeClient);
+
+    // On utilise JOIN FETCH pour charger l'utilisateur dans la même requête SQL
+    @Query("SELECT c FROM Client c JOIN FETCH c.utilisateur WHERE c.codeClient = :codeClient")
+    Optional<Client> findByCodeClientWithUtilisateur(@Param("codeClient") String codeClient);
 }

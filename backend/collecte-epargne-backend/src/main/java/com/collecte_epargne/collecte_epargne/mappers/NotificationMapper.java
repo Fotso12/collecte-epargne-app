@@ -5,19 +5,12 @@ import com.collecte_epargne.collecte_epargne.entities.Notification;
 import com.collecte_epargne.collecte_epargne.entities.Transaction;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-
 import org.mapstruct.Named;
-import org.springframework.stereotype.Component;
 
-@Component
 @Mapper(componentModel = "spring")
 public interface NotificationMapper {
 
-    @Mapping(
-            source = "transaction",
-            target = "idTransaction",
-            qualifiedByName = "transactionToId"
-    )
+    @Mapping(source = "transaction", target = "idTransaction", qualifiedByName = "transactionToId")
     NotificationDto toDto(Notification notification);
 
     @Named("transactionToId")
@@ -25,6 +18,8 @@ public interface NotificationMapper {
         return transaction != null ? transaction.getIdTransaction() : null;
     }
 
+    // On s'assure que codeClient est bien copié du DTO vers l'entité
     @Mapping(target = "transaction", ignore = true)
+    @Mapping(source = "codeClient", target = "codeClient")
     Notification toEntity(NotificationDto notificationDto);
 }

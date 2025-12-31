@@ -27,12 +27,12 @@ public class Notification {
     private Transaction transaction;
 
     @NotNull
-    @Lob
+    @Enumerated(EnumType.STRING)
     @Column(name = "TYPE", nullable = false)
     private TypeNotification type;
 
     @NotNull
-    @Lob
+    @Enumerated(EnumType.STRING)
     @Column(name = "CATEGORIE", nullable = false)
     private CategorieNotification categorie;
 

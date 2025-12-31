@@ -5,5 +5,6 @@ public enum CategorieNotification {
     TRANSACTION,
     RAPPEL_COTISATION,
     ALERTE,
-    PROMO
+    PROMO,
+    INFO
 }

@@ -96,6 +96,22 @@
 			<artifactId>mapstruct</artifactId>
 			<version>${org.mapstruct.version}</version>
 		</dependency>
+<!--Dépendance pour RABBITMQ-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-amqp</artifactId>
+        </dependency>
+<!--Pour le Websockect-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-websocket</artifactId>
+        </dependency>
+<!--Dependance pour lire le .env-->
+        <dependency>
+            <groupId>me.paulschwarz</groupId>
+            <artifactId>spring-dotenv</artifactId>
+            <version>4.0.0</version>
+        </dependency>
 		<!--  ========== BASE DE DONNÉES ==========  -->
 		<dependency>
 			<groupId>com.mysql</groupId>
@@ -147,7 +163,6 @@
 <!--							<artifactId>lombok-mapstruct-binding</artifactId>-->
 <!--							<version>${lombok-mapstruct-binding.version}</version>-->
 <!--						</path>-->
->>>>>>> feature/backend-création-des-entities-et-enum
 						<path>
 							<groupId>org.mapstruct</groupId>
 							<artifactId>mapstruct-processor</artifactId>
