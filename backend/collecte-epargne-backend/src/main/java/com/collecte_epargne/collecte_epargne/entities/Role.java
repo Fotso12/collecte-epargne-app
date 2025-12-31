@@ -3,14 +3,13 @@ package com.collecte_epargne.collecte_epargne.entities;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.Getter;
-import lombok.Setter;
+
 
 import java.util.Set;
 
-@Getter
-@Setter
+
 @Entity
+
 @Table(name = "role")
 public class Role {
     @Id
@@ -35,5 +34,57 @@ public class Role {
     // Relation OneToMany vers Utilisateur (Role est référencé par plusieurs Utilisateurs)
     @OneToMany(mappedBy = "role") // 'role' est le nom du champ ManyToOne dans Utilisateur.java
     private Set<Utilisateur> utilisateurs;
+
+    public Role() {
+
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
+    }
+
+    public String getNom() {
+        return nom;
+    }
+
+    public void setNom(String nom) {
+        this.nom = nom;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public Set<Utilisateur> getUtilisateurs() {
+        return utilisateurs;
+    }
+
+    public void setUtilisateurs(Set<Utilisateur> utilisateurs) {
+        this.utilisateurs = utilisateurs;
+    }
+
+    public Role(Integer id, String code, String nom, String description, Set<Utilisateur> utilisateurs) {
+        this.id = id;
+        this.code = code;
+        this.nom = nom;
+        this.description = description;
+        this.utilisateurs = utilisateurs;
+    }
 
 }

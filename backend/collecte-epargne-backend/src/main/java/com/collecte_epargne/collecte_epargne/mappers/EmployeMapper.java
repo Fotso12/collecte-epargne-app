@@ -1,7 +1,6 @@
 package com.collecte_epargne.collecte_epargne.mappers;
 
 import com.collecte_epargne.collecte_epargne.dtos.EmployeDto;
-import com.collecte_epargne.collecte_epargne.entities.AgenceZone;
 import com.collecte_epargne.collecte_epargne.entities.Employe;
 import com.collecte_epargne.collecte_epargne.entities.Utilisateur;
 import org.mapstruct.Mapper;
