@@ -1,0 +1,49 @@
+/* --- Mise en page générale --- */
+.container-fluid { background-color: #f4f7f6; min-height: 100vh; padding: 20px; }
+.table-container { background: white; border-radius: 12px; overflow: hidden; }
+.avatar { 
+  width: 35px; height: 35px; border-radius: 8px; font-weight: bold; font-size: 0.8rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;
+  display: flex; align-items: center; justify-content: center;
+}
+
+/* --- SYSTEME MODAL MANUEL (Anti-Transparence) --- */
+.modal-backdrop-custom {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(0, 0, 0, 0.6); /* Fond noir semi-transparent */
+  z-index: 2000;
+}
+
+.modal-wrapper-custom {
+  position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+  z-index: 2001; width: 90%; max-width: 700px;
+}
+
+.modal-content-custom {
+  background: #ffffff !important; /* Fond blanc forcé */
+  border-radius: 15px; border: none;
+  display: flex; flex-direction: column;
+  animation: modalIn 0.3s ease-out;
+}
+
+.modal-header-custom {
+  padding: 1.2rem; border-bottom: 1px solid #eee; background: #f8f9fa;
+  border-radius: 15px 15px 0 0; display: flex; justify-content: space-between; align-items: center;
+}
+
+.modal-body-custom { padding: 2rem; color: #333; }
+.modal-footer-custom { padding: 1rem; border-top: 1px solid #eee; }
+
+.btn-close-custom {
+  background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #999;
+}
+
+@keyframes modalIn {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* --- Badges Subtiles --- */
+.bg-success-subtle { background-color: #d1e7dd; color: #0f5132; }
+.bg-warning-subtle { background-color: #fff3cd; color: #664d03; }
+.bg-danger-subtle { background-color: #f8d7da; color: #842029; }

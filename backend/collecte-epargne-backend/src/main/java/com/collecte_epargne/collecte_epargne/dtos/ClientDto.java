@@ -1,11 +1,13 @@
 package com.collecte_epargne.collecte_epargne.dtos;
 
+import com.collecte_epargne.collecte_epargne.utils.StatutGenerique;
 import com.collecte_epargne.collecte_epargne.utils.TypeCNI;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 
 import java.io.Serializable;
+import java.time.Instant;
 import java.time.LocalDate;
 
 
@@ -53,8 +55,61 @@ public class ClientDto implements Serializable {
     // Remplacer Employe par l'ID du Collecteur
     String codeCollecteurAssigne;
 
-    // Les comptes sont généralement omis ou chargés séparément
+    private String nomCollecteur;
 
+    private String nom;
+
+    private String prenom;
+
+    private String telephone;
+
+    private StatutGenerique statut;
+
+    private Instant dateCreation;
+
+    public String getNom() {
+        return nom;
+    }
+
+    public void setNom(String nom) {
+        this.nom = nom;
+    }
+
+    public String getPrenom() {
+        return prenom;
+    }
+
+    public void setPrenom(String prenom) {
+        this.prenom = prenom;
+    }
+
+    public String getTelephone() {
+        return telephone;
+    }
+
+    public void setTelephone(String telephone) {
+        this.telephone = telephone;
+    }
+
+    public StatutGenerique getStatut() {
+        return statut;
+    }
+
+    public void setStatut(StatutGenerique statut) {
+        this.statut = statut;
+    }
+
+    public Instant getDateCreation() {
+        return dateCreation;
+    }
+
+    public void setDateCreation(Instant dateCreation) {
+        this.dateCreation = dateCreation;
+    }
+
+    // Les comptes sont généralement omis ou chargés séparément
+public String getNomCollecteur() { return nomCollecteur; }
+    public void setNomCollecteur(String nomCollecteur) { this.nomCollecteur = nomCollecteur; }
 
     public String getCodeClient() {
         return codeClient;

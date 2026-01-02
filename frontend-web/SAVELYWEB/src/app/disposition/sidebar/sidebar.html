@@ -1,0 +1,32 @@
+<div class="layout-container">
+  <header class="topbar">
+    <div class="search-container">
+      <i class="fas fa-search"></i>
+      <input type="text" placeholder="Rechercher...">
+    </div>
+    <div class="topbar-actions">
+      <button class="has-tooltip"><i class="fas fa-bell"></i><span class="tooltip">Notifications</span></button>
+      <button class="has-tooltip"><i class="fas fa-user-circle"></i><span class="tooltip">Profil</span></button>
+      <button class="has-tooltip btn-logout-top"><i class="fas fa-sign-out-alt"></i><span class="tooltip tooltip-red">Déconnexion</span></button>
+    </div>
+  </header>
+
+  <nav class="sidebar">
+    <div class="sidebar-header">
+      <img src="/img/logo-savely.jpg" class="logo" alt="Logo">
+      <h1 class="app-name">SAVELY</h1>
+    </div>
+    <ul class="nav-links">
+      <li><a routerLink="/accueil" routerLinkActive="active"><i class="fas fa-home"></i><span>Accueil</span></a></li>
+      <li><a routerLink="/clients" routerLinkActive="active"><i class="fas fa-users"></i><span>Clients</span></a></li>
+      <li><a><i class="fas fa-hand-holding-usd"></i><span>Collecteurs</span></a></li>
+    </ul>
+    <div class="sidebar-footer">
+      <a class="logout-link"><i class="fas fa-sign-out-alt"></i><span>Déconnexion</span></a>
+    </div>
+  </nav>
+
+  <main class="main-content">
+    <router-outlet></router-outlet>
+  </main>
+</div>
