@@ -7,6 +7,11 @@ import com.collecte_epargne.collecte_epargne.mappers.UtilisateurMapper;
 import com.collecte_epargne.collecte_epargne.repositories.RoleRepository;
 import com.collecte_epargne.collecte_epargne.repositories.UtilisateurRepository;
 import com.collecte_epargne.collecte_epargne.services.interfaces.UtilisateurInterface;
+import com.collecte_epargne.collecte_epargne.utils.StatutGenerique;
+
+import jakarta.persistence.EntityNotFoundException;
+
+import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -169,5 +174,19 @@ public class UtilisateurService implements UtilisateurInterface {
         // la suppression de l'utilisateur entraînera la suppression de l'Employe/Client associé.
         utilisateurRepository.deleteById(login);
         log.info("Utilisateur supprimé avec login: {}", login);
+    }
+
+    @Override
+    @Transactional
+    public UtilisateurDto updateStatut(String login, String statut) {
+        // 1. Récupération de l'entité via Repository
+        Utilisateur utilisateur = utilisateurRepository.findById(login)
+            .orElseThrow(() -> new EntityNotFoundException("Utilisateur non trouvé"));
+
+        // 2. Mise à jour via l'Enum
+        utilisateur.setStatut(StatutGenerique.valueOf(statut.toUpperCase()));
+
+        // 3. Sauvegarde et retour via Mapper
+        return utilisateurMapper.toDto(utilisateurRepository.save(utilisateur));
     }
 }

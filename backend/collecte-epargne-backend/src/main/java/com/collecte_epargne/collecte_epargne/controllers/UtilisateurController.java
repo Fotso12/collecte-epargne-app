@@ -125,4 +125,13 @@ public class UtilisateurController {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
         }
     }
+    @PutMapping("/{login}/statut")
+    public ResponseEntity<UtilisateurDto> updateStatut(@PathVariable String login, @RequestBody Map<String, String> payload) {
+        String nouveauStatut = payload.get("statut");
+        if (nouveauStatut == null) {
+            return ResponseEntity.badRequest().build();
+        }
+        UtilisateurDto updated = utilisateurService.updateStatut(login, nouveauStatut);
+        return ResponseEntity.ok(updated);
+    }
 }

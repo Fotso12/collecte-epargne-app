@@ -11,20 +11,20 @@
           <label class="form-label small fw-bold">Code Client</label>
           <div class="input-group">
             <span class="input-group-text bg-light border-end-0"><i class="fas fa-barcode"></i></span>
-            <input type="text" class="form-control bg-light border-start-0" placeholder="Ex: CLI-001" 
+            <input type="text" class="form-control bg-light border-start-0" placeholder="Ex: CLI2025" 
                    [(ngModel)]="filtreCode" (input)="appliquerFiltres()">
           </div>
         </div>
         <div class="col-md-4">
-          <label class="form-label small fw-bold">Rechercher Collecteur</label>
+          <label class="form-label small fw-bold">Rechercher Collecteur Assigné</label>
           <div class="input-group">
             <span class="input-group-text bg-light border-end-0"><i class="fas fa-user-tie"></i></span>
-            <input type="text" class="form-control bg-light border-start-0" placeholder="Nom ou ID agent" 
+            <input type="text" class="form-control bg-light border-start-0" placeholder="Nom" 
                    [(ngModel)]="filtreCollecteur" (input)="appliquerFiltres()">
           </div>
         </div>
         <div class="col-md-4">
-          <label class="form-label small fw-bold">Profession</label>
+          <label class="form-label small fw-bold">Profession Client</label>
           <div class="input-group">
             <span class="input-group-text bg-light border-end-0"><i class="fas fa-briefcase"></i></span>
             <input type="text" class="form-control bg-light border-start-0" placeholder="Ex: Commerçant" 
@@ -41,7 +41,7 @@
         <tr>
           <th>Code</th>
           <th>Client / Profession</th> <th>Statut</th>
-          <th>Collecteur</th>
+          <th>Collecteur Assigné</th>
           <th>Score</th>
           <th class="text-end">Actions</th>
         </tr>

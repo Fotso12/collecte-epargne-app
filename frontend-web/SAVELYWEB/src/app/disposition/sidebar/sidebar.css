@@ -28,3 +28,15 @@
 .has-tooltip { position: relative; background: none; border: none; color: #ecf0f1; cursor: pointer; }
 .tooltip { visibility: hidden; position: absolute; top: 120%; left: 50%; transform: translateX(-50%); background: #34495e; padding: 5px 10px; border-radius: 4px; font-size: 0.7rem; opacity: 0; transition: 0.3s; }
 .has-tooltip:hover .tooltip { visibility: visible; opacity: 1; }
+
+/* Garde tout ton code actuel et ajoute/vérifie juste ceci pour les icônes */
+.nav-links li a i {
+  width: 25px; /* Force une largeur fixe pour que les textes soient alignés verticalement */
+  margin-right: 15px;
+  font-size: 1.1rem;
+}
+
+/* Optionnel : couleur rouge pour le tooltip de déconnexion si tu veux l'activer */
+.tooltip-red {
+  background: #e74c3c !important;
+}
