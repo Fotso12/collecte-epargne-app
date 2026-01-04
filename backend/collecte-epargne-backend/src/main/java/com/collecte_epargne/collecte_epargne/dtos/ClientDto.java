@@ -2,70 +2,82 @@ package com.collecte_epargne.collecte_epargne.dtos;
 
 import com.collecte_epargne.collecte_epargne.utils.StatutGenerique;
 import com.collecte_epargne.collecte_epargne.utils.TypeCNI;
+import com.opencsv.bean.CsvBindByName;
+import com.opencsv.bean.CsvDate;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-
 
 import java.io.Serializable;
 import java.time.Instant;
 import java.time.LocalDate;
 
-
 public class ClientDto implements Serializable {
+
     @Size(max = 50)
+    @CsvBindByName(column = "code_client")
     String codeClient;
 
-
     @NotNull
+    @CsvBindByName(column = "numero_client")
     Long numeroClient;
 
     @Size(max = 255)
+    @CsvBindByName(column = "adresse")
     String adresse;
 
     @NotNull
+    @CsvBindByName(column = "type_cni")
     TypeCNI typeCni;
 
     @Size(max = 50)
     @NotNull
+    @CsvBindByName(column = "numero_cni")
     String numCni;
 
     @Size(max = 255)
+    @CsvBindByName(column = "photo_path")
     String photoPath;
 
     @Size(max = 255)
+    @CsvBindByName(column = "cni_recto_path")
     String cniRectoPath;
 
     @Size(max = 255)
+    @CsvBindByName(column = "cni_verso_path")
     String cniVersoPath;
 
+    @CsvBindByName(column = "date_naissance")
+    @CsvDate("yyyy-MM-dd")
     LocalDate dateNaissance;
 
     @Size(max = 100)
+    @CsvBindByName(column = "lieu_naissance")
     String lieuNaissance;
 
     @Size(max = 100)
+    @CsvBindByName(column = "profession")
     String profession;
 
+    @CsvBindByName(column = "score_epargne")
     Integer scoreEpargne;
 
     // Remplacer Utilisateur par le LOGIN
     @NotNull
+    @CsvBindByName(column = "login_utilisateur")
     String loginUtilisateur;
 
     // Remplacer Employe par l'ID du Collecteur
+    @CsvBindByName(column = "id_collecteur")
     String codeCollecteurAssigne;
 
     private String nomCollecteur;
-
     private String nom;
-
     private String prenom;
-
     private String telephone;
-
     private StatutGenerique statut;
-
     private Instant dateCreation;
+
+    // --- GETTERS ET SETTERS EXISTANTS ---
 
     public String getNom() {
         return nom;
@@ -107,8 +119,7 @@ public class ClientDto implements Serializable {
         this.dateCreation = dateCreation;
     }
 
-    // Les comptes sont généralement omis ou chargés séparément
-public String getNomCollecteur() { return nomCollecteur; }
+    public String getNomCollecteur() { return nomCollecteur; }
     public void setNomCollecteur(String nomCollecteur) { this.nomCollecteur = nomCollecteur; }
 
     public String getCodeClient() {
@@ -222,6 +233,8 @@ public String getNomCollecteur() { return nomCollecteur; }
     public void setCodeCollecteurAssigne(String codeCollecteurAssigne) {
         this.codeCollecteurAssigne = codeCollecteurAssigne;
     }
+
+    // --- CONSTRUCTEURS EXISTANTS ---
 
     public ClientDto() {
     }
