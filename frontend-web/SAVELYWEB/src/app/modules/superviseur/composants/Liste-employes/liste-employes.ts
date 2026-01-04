@@ -93,27 +93,36 @@ export class ListeEmployesComponent implements OnInit {
     );
   }
 
+  /**
+   * ENREGISTRER : Mis à jour pour profiter du Transactional Backend
+   */
   enregistrer() {
     if (this.employeForm.invalid) return;
     const val = this.employeForm.getRawValue();
 
     if (this.isEditMode && this.employeSelectionne) {
+      // Préparation du payload de modification
       const payloadModif = { ...this.employeSelectionne, ...val };
       delete (payloadModif as any).password;
 
+      // Un seul appel suffit car le backend synchronise Employe et Utilisateur
       this.employeService.modifierEmploye(this.employeSelectionne.matricule!, payloadModif).pipe(
-        switchMap(() => this.utilisateurService.modifierStatut(payloadModif.loginUtilisateur!, val.statut)),
-        catchError(err => { console.error(err); return of(null); })
+        catchError(err => {
+          console.error('Erreur Update:', err);
+          return of(null);
+        })
       ).subscribe(res => {
-        if (res !== null) {
-          this.showFeedback('Modifications enregistrées');
+        if (res) {
+          this.showFeedback('Modifications enregistrées avec succès');
           this.fermerModalAjout();
           this.chargerDonnees();
         } else {
           this.showFeedback('Erreur lors de la modification', true);
         }
       });
+
     } else {
+      // Logique de Création
       const roleId = this.typeActuel === TypeEmploye.CAISSIER ? 2 : 3;
       this.utilisateurService.enregistrerUtilisateur({ ...val, idRole: roleId }).pipe(
         switchMap(() => this.employeService.enregistrerEmploye({
@@ -176,26 +185,20 @@ export class ListeEmployesComponent implements OnInit {
     this.cdr.detectChanges();
   }
 
-  /**
-   * FONCTION CORRIGÉE : Gère la suppression coordonnée
-   * Si le Backend est déjà corrigé, le switchMap sera ignoré ou géré proprement.
-   */
   confirmerSuppression() {
     if (!this.confirmSuppression.matricule) return;
 
     this.employeService.supprimerEmploye(this.confirmSuppression.matricule).pipe(
-      // On tente de supprimer l'utilisateur ensuite, seulement si un login est présent
-      // et que le backend n'a pas déjà fait le travail par cascade.
       switchMap(() => {
         if (this.confirmSuppression.login) {
           return this.utilisateurService.supprimerUtilisateur(this.confirmSuppression.login).pipe(
-            catchError(() => of('Utilisateur déjà supprimé par cascade'))
+            catchError(() => of('Cascade déjà gérée par le backend'))
           );
         }
         return of(null);
       }),
       catchError(err => {
-        console.error('Erreur lors de la suppression', err);
+        console.error('Erreur suppression:', err);
         return of(null);
       })
     ).subscribe({
@@ -203,7 +206,7 @@ export class ListeEmployesComponent implements OnInit {
         if (res !== null) {
           this.showFeedback('Suppression effectuée avec succès');
         } else {
-          this.showFeedback('Erreur lors de la suppression (voir logs)', true);
+          this.showFeedback('Erreur lors de la suppression', true);
         }
         this.confirmSuppression.show = false;
         this.chargerDonnees();

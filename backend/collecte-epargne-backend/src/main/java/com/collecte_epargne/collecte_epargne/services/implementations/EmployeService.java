@@ -103,21 +103,39 @@ public class EmployeService implements EmployeInterface {
     }
 
     @Override
-    public EmployeDto update(String  matricule, EmployeDto employeDto) {
-        Objects.requireNonNull(matricule, "matricule ne doit pas être null");
-        Objects.requireNonNull(employeDto, "employeDto ne doit pas être null");
-        Employe existingEmploye = employeRepository.findByMatricule(matricule)
-                .orElseThrow(() -> new RuntimeException("Employé non trouvé : " + matricule));
+@jakarta.transaction.Transactional // Assure que si l'un échoue, rien n'est modifié
+public EmployeDto update(String matricule, EmployeDto employeDto) {
+    Objects.requireNonNull(matricule, "matricule ne doit pas être null");
+    Objects.requireNonNull(employeDto, "employeDto ne doit pas être null");
+    
+    // 1. Trouver l'employé existant
+    Employe existingEmploye = employeRepository.findByMatricule(matricule)
+            .orElseThrow(() -> new RuntimeException("Employé non trouvé : " + matricule));
 
-        // Mettre à jour les champs de l'entité existante depuis le DTO
-        existingEmploye.setTypeEmploye(employeDto.getTypeEmploye());
-        existingEmploye.setCommissionTaux(employeDto.getCommissionTaux());
+    // 2. Mettre à jour l'entité Utilisateur liée (Champs partagés)
+    if (existingEmploye.getUtilisateur() != null) {
+        Utilisateur user = existingEmploye.getUtilisateur();
+        // On met à jour les infos de base qui viennent du DTO employé
+        user.setNom(employeDto.getNom());
+        user.setPrenom(employeDto.getPrenom());
+        user.setEmail(employeDto.getEmail());
+        user.setTelephone(employeDto.getTelephone());
 
-        assignerRelations(existingEmploye, employeDto);
-
-        Employe updatedEmploye = employeRepository.save(existingEmploye);
-        return employeMapper.toDto(updatedEmploye);
+        utilisateurRepository.save(user);
     }
+
+    // 3. Mettre à jour les champs spécifiques à l'Employé
+    existingEmploye.setTypeEmploye(employeDto.getTypeEmploye());
+    existingEmploye.setCommissionTaux(employeDto.getCommissionTaux());
+    existingEmploye.setDateEmbauche(employeDto.getDateEmbauche());
+
+    // 4. Gérer les relations (Changement de superviseur ou d'agence)
+    assignerRelations(existingEmploye, employeDto);
+
+    // 5. Sauvegarder l'employé
+    Employe updatedEmploye = employeRepository.save(existingEmploye);
+    return employeMapper.toDto(updatedEmploye);
+}
 
     // ... getById, delete, et getAll (non modifiés)
 
@@ -130,14 +148,27 @@ public class EmployeService implements EmployeInterface {
     }
 
     @Override
-    public void delete(String  matricule) {
+    @jakarta.transaction.Transactional // Crucial pour que les deux suppressions fonctionnent ensemble
+    public void delete(String matricule) {
         Objects.requireNonNull(matricule, "matricule ne doit pas être null");
-        // 1. Trouver l'Employé par son MATRICULE (String)
+        
+        // 1. Trouver l'Employé par son MATRICULE
         Employe employe = employeRepository.findByMatricule(matricule)
                 .orElseThrow(() -> new RuntimeException("Employé inexistant : " + matricule));
 
-        // 2. Supprimer par son ID PRIMAIRE (Integer)
-        employeRepository.deleteById(Objects.requireNonNull(employe.getIdEmploye()));
+        // 2. Récupérer le login de l'utilisateur associé AVANT de supprimer l'employé
+        String loginAssocie = null;
+        if (employe.getUtilisateur() != null) {
+            loginAssocie = employe.getUtilisateur().getLogin();
+        }
+
+        // 3. Supprimer d'abord l'Employé (pour libérer la contrainte de clé étrangère)
+        employeRepository.delete(employe);
+        
+        // 4. Supprimer l'Utilisateur associé si existant
+        if (loginAssocie != null) {
+            utilisateurRepository.deleteById(loginAssocie);
+        }
     }
 
     @Override
