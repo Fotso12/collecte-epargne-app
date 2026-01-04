@@ -23,4 +23,8 @@ export class UtilisateurService {
   getUtilisateurParLogin(login: string): Observable<any> {
     return this.http.get<any>(`${this.apiUrl}/${login}`);
   }
+
+  supprimerUtilisateur(login: string): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${login}`);
+  }
 }

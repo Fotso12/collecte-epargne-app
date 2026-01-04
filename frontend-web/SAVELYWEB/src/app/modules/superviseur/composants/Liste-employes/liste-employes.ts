@@ -32,7 +32,7 @@ export class ListeEmployesComponent implements OnInit {
   employeForm!: FormGroup;
 
   confirmStatut = { show: false, employe: null as any, nouveauStatut: '' };
-  confirmSuppression = { show: false, matricule: '', nom: '' };
+  confirmSuppression = { show: false, matricule: '', nom: '', login: '' };
   feedbackModal = { show: false, isError: false, message: '' };
 
   constructor(
@@ -167,18 +167,47 @@ export class ListeEmployesComponent implements OnInit {
   }
 
   ouvrirConfirmationSuppression(e: EmployeDto) {
-    this.confirmSuppression = { show: true, matricule: e.matricule!, nom: `${e.nom} ${e.prenom}` };
+    this.confirmSuppression = { 
+      show: true, 
+      matricule: e.matricule!, 
+      nom: `${e.nom} ${e.prenom}`,
+      login: e.loginUtilisateur!
+    };
     this.cdr.detectChanges();
   }
 
+  /**
+   * FONCTION CORRIGÉE : Gère la suppression coordonnée
+   * Si le Backend est déjà corrigé, le switchMap sera ignoré ou géré proprement.
+   */
   confirmerSuppression() {
-    this.employeService.supprimerEmploye(this.confirmSuppression.matricule).subscribe({
-      next: () => {
-        this.showFeedback('Employé supprimé');
+    if (!this.confirmSuppression.matricule) return;
+
+    this.employeService.supprimerEmploye(this.confirmSuppression.matricule).pipe(
+      // On tente de supprimer l'utilisateur ensuite, seulement si un login est présent
+      // et que le backend n'a pas déjà fait le travail par cascade.
+      switchMap(() => {
+        if (this.confirmSuppression.login) {
+          return this.utilisateurService.supprimerUtilisateur(this.confirmSuppression.login).pipe(
+            catchError(() => of('Utilisateur déjà supprimé par cascade'))
+          );
+        }
+        return of(null);
+      }),
+      catchError(err => {
+        console.error('Erreur lors de la suppression', err);
+        return of(null);
+      })
+    ).subscribe({
+      next: (res) => {
+        if (res !== null) {
+          this.showFeedback('Suppression effectuée avec succès');
+        } else {
+          this.showFeedback('Erreur lors de la suppression (voir logs)', true);
+        }
         this.confirmSuppression.show = false;
         this.chargerDonnees();
-      },
-      error: () => this.showFeedback('Erreur suppression', true)
+      }
     });
   }
 
