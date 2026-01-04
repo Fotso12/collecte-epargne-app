@@ -35,6 +35,14 @@ export class ListeEmployesComponent implements OnInit {
   confirmSuppression = { show: false, matricule: '', nom: '', login: '' };
   feedbackModal = { show: false, isError: false, message: '' };
 
+  // --- Propriétés Clients ---
+  isClientsModalOpen = false;
+  tousLesClientsDuCollecteur: any[] = [];
+  clientsAffiches: any[] = [];
+  pageActuelleClient = 1;
+  taillePageClient = 10;
+  collecteurActif: any = null;
+
   constructor(
     private employeService: EmployeService,
     private utilisateurService: UtilisateurService,
@@ -93,19 +101,57 @@ export class ListeEmployesComponent implements OnInit {
     );
   }
 
-  /**
-   * ENREGISTRER : Mis à jour pour profiter du Transactional Backend
-   */
+  ouvrirListeClients(collecteur: any) {
+    // Sécurité : Si le matricule est absent, on ne lance pas la requête (évite l'erreur 400)
+    if (!collecteur || !collecteur.matricule) {
+      console.error("Matricule manquant pour le collecteur:", collecteur);
+      this.showFeedback('Erreur: Matricule introuvable', true);
+      return;
+    }
+
+    this.collecteurActif = collecteur;
+    this.pageActuelleClient = 1;
+    this.employeService.getClientsByCollecteur(collecteur.matricule).subscribe({
+      next: (data) => {
+        this.tousLesClientsDuCollecteur = data;
+        this.mettreAJourTrancheClients();
+        this.isClientsModalOpen = true;
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error("Erreur chargement clients:", err);
+        this.showFeedback('Erreur lors du chargement des clients', true);
+      }
+    });
+  }
+
+  mettreAJourTrancheClients() {
+    const debut = (this.pageActuelleClient - 1) * this.taillePageClient;
+    const fin = debut + this.taillePageClient;
+    this.clientsAffiches = this.tousLesClientsDuCollecteur.slice(debut, fin);
+  }
+
+  changerPageClient(direction: number) {
+    this.pageActuelleClient += direction;
+    this.mettreAJourTrancheClients();
+  }
+
+  get totalPagesClient(): number {
+    return Math.ceil(this.tousLesClientsDuCollecteur.length / this.taillePageClient);
+  }
+
+  fermerModalClients() {
+    this.isClientsModalOpen = false;
+  }
+
   enregistrer() {
     if (this.employeForm.invalid) return;
     const val = this.employeForm.getRawValue();
 
     if (this.isEditMode && this.employeSelectionne) {
-      // Préparation du payload de modification
       const payloadModif = { ...this.employeSelectionne, ...val };
       delete (payloadModif as any).password;
 
-      // Un seul appel suffit car le backend synchronise Employe et Utilisateur
       this.employeService.modifierEmploye(this.employeSelectionne.matricule!, payloadModif).pipe(
         catchError(err => {
           console.error('Erreur Update:', err);
@@ -122,7 +168,6 @@ export class ListeEmployesComponent implements OnInit {
       });
 
     } else {
-      // Logique de Création
       const roleId = this.typeActuel === TypeEmploye.CAISSIER ? 2 : 3;
       this.utilisateurService.enregistrerUtilisateur({ ...val, idRole: roleId }).pipe(
         switchMap(() => this.employeService.enregistrerEmploye({

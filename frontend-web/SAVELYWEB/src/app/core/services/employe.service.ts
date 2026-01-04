@@ -17,11 +17,16 @@ export class EmployeService {
     return this.http.get<EmployeDto[]>(`${this.apiUrl}/collecteurs`);
   }
 
+  // Route synchronisée avec le contrôleur Java : /api/employes/collecteurs/{matricule}/clients
+  getClientsByCollecteur(matricule: string): Observable<any[]> {
+  // L'URL générée sera : http://localhost:8082/api/employes/collecteurs/COL202675898/clients
+  return this.http.get<any[]>(`${this.apiUrl}/collecteurs/${matricule}/clients`);
+}
+
   enregistrerEmploye(employe: EmployeDto): Observable<EmployeDto> {
     return this.http.post<EmployeDto>(this.apiUrl, employe);
   }
 
-  /** Modification : On passe le matricule dans l'URL + l'objet complet */
   modifierEmploye(matricule: string, employe: any): Observable<any> {
     return this.http.put(`${this.apiUrl}/${matricule}`, employe);
   }

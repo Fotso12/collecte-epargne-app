@@ -11,7 +11,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.List;
 
 @RestController
-@RequestMapping("api/employes")
+@RequestMapping("/api/employes")
 public class EmployeController {
 
     private final EmployeService employeService;
@@ -102,11 +102,13 @@ public class EmployeController {
         }
     }
 
-    @GetMapping("/collecteurs/{idCollecteur}/clients")
-    public ResponseEntity<List<ClientDto>> getClientsByCollecteur(@PathVariable String idCollecteur) {
+    @GetMapping("/collecteurs/{matricule}/clients")
+    public ResponseEntity<List<ClientDto>> getClientsByCollecteur(@PathVariable("matricule") String matricule) {
         try {
-            return new ResponseEntity<>(employeService.getClientsByCollecteur(idCollecteur), HttpStatus.OK);
+            // On passe le matricule reçu de l'URL au service
+            return new ResponseEntity<>(employeService.getClientsByCollecteur(matricule), HttpStatus.OK);
         } catch (Exception e) {
+            // C'est ici que l'erreur 400 est générée si le matricule n'est pas trouvé ou invalide
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
         }
     }

@@ -236,21 +236,25 @@ public EmployeDto update(String matricule, EmployeDto employeDto) {
     }
 
     @Override
-    public List<ClientDto> getClientsByCollecteur(String idCollecteur) {
+    public List<ClientDto> getClientsByCollecteur(String matricule) {
+        Objects.requireNonNull(matricule, "Le matricule ne doit pas être null");
 
-        // Correction : Convertir le String en Integer
-        Objects.requireNonNull(idCollecteur, "idCollecteur ne doit pas être null");
-        Integer idCollecteurInt = Integer.parseInt(idCollecteur);
-        Employe collecteur = employeRepository.findById(idCollecteurInt)
-                .orElseThrow(() -> new RuntimeException("Collecteur non trouvé : " + idCollecteur));
+        // 1. On cherche l'employé par son MATRICULE (String) et non par son ID technique (Integer)
+        // On utilise le repository pour trouver l'entité complète
+        Employe collecteur = employeRepository.findByMatricule(matricule)
+                .orElseThrow(() -> new RuntimeException("Collecteur non trouvé avec le matricule : " + matricule));
 
+        // 2. Vérification du rôle
         if (collecteur.getTypeEmploye() != TypeEmploye.COLLECTEUR) {
-            throw new IllegalArgumentException("L'employé ID " + idCollecteur + " n'est pas un collecteur.");
+            throw new IllegalArgumentException("L'employé avec le matricule " + matricule + " n'est pas un collecteur.");
         }
 
-        // Utilisation de la relation ManyToOne/OneToMany via ClientRepository
-        return clientRepository.findByCollecteurAssigneIdEmploye(idCollecteurInt).stream()
+        // 3. Maintenant qu'on a l'objet, on utilise son ID technique interne (Integer)
+        // pour interroger le ClientRepository
+        return clientRepository.findByCollecteurAssigneIdEmploye(collecteur.getIdEmploye()).stream()
                 .map(clientMapper::toDto)
                 .collect(Collectors.toList());
     }
+
+
 }
