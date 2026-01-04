@@ -2,7 +2,7 @@ import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
-import { switchMap } from 'rxjs'; 
+import { switchMap, catchError, of } from 'rxjs'; 
 
 import { EmployeDto, TypeEmploye } from '../../../../donnees/modeles/employe.modele';
 import { EmployeService } from '../../../../core/services/employe.service';
@@ -26,10 +26,13 @@ export class ListeEmployesComponent implements OnInit {
 
   isModalOpen = false;
   isAddModalOpen = false;
-  employeSelectionne: EmployeDto | null = null;
+  isEditMode = false;
+  
+  employeSelectionne: any = null;
   employeForm!: FormGroup;
 
   confirmStatut = { show: false, employe: null as any, nouveauStatut: '' };
+  confirmSuppression = { show: false, matricule: '', nom: '' };
   feedbackModal = { show: false, isError: false, message: '' };
 
   constructor(
@@ -48,7 +51,6 @@ export class ListeEmployesComponent implements OnInit {
       this.typeActuel = path === 'collecteurs' ? TypeEmploye.COLLECTEUR : TypeEmploye.CAISSIER;
       this.titrePage = (this.typeActuel === TypeEmploye.COLLECTEUR) ? 'LISTE DES COLLECTEURS' : 'LISTE DES CAISSIERS';
       this.chargerDonnees();
-      this.appliquerValidateurs();
     });
   }
 
@@ -59,28 +61,16 @@ export class ListeEmployesComponent implements OnInit {
       prenom: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
       telephone: ['', Validators.required],
-      password: ['', [Validators.required, Validators.minLength(6)]],
+      password: [''], 
       dateEmbauche: [new Date().toISOString().split('T')[0], Validators.required],
       commissionTaux: [0],
       statut: [StatutGenerique.ACTIF]
     });
   }
 
-  appliquerValidateurs() {
-    const comm = this.employeForm.get('commissionTaux');
-    if (this.typeActuel === TypeEmploye.COLLECTEUR) {
-      comm?.setValidators([Validators.required, Validators.min(0)]);
-    } else {
-      comm?.clearValidators();
-      comm?.setValue(0);
-    }
-    comm?.updateValueAndValidity();
-  }
-
   chargerDonnees() {
     const serviceCall = (this.typeActuel === TypeEmploye.COLLECTEUR) 
-      ? this.employeService.getCollecteurs() 
-      : this.employeService.getCaissiers();
+      ? this.employeService.getCollecteurs() : this.employeService.getCaissiers();
 
     serviceCall.subscribe({
       next: (data) => {
@@ -91,10 +81,7 @@ export class ListeEmployesComponent implements OnInit {
         this.appliquerFiltres();
         this.cdr.detectChanges();
       },
-      error: (err) => {
-        console.error('Erreur chargement:', err);
-        this.showFeedback('Erreur lors de la récupération des données', true);
-      }
+      error: () => this.showFeedback('Erreur de chargement', true)
     });
   }
 
@@ -102,89 +89,137 @@ export class ListeEmployesComponent implements OnInit {
     const search = this.filtreMatricule.toLowerCase();
     this.employesFiltres = this.employes.filter(e =>
       e.matricule?.toLowerCase().includes(search) ||
-      e.nom?.toLowerCase().includes(search) ||
-      e.prenom?.toLowerCase().includes(search)
+      e.nom?.toLowerCase().includes(search) || e.prenom?.toLowerCase().includes(search)
     );
-  }
-
-  getStatutBtnClass(actuel: any, btn: string) {
-    const valeurStatut = (actuel && typeof actuel === 'object') ? (actuel.statut || actuel.name) : actuel;
-    const sActuel = String(valeurStatut || '').trim().toUpperCase();
-    const sBtn = String(btn || '').trim().toUpperCase();
-
-    if (sActuel !== sBtn) return 'btn-light text-muted opacity-50';
-    
-    switch(sBtn) {
-      case 'ACTIF': return 'btn-success text-white shadow-sm fw-bold';
-      case 'INACTIF': return 'btn-danger text-white fw-bold';
-      case 'SUSPENDU': return 'btn-warning text-dark fw-bold';
-      default: return 'btn-secondary text-white';
-    }
-  }
-
-  ouvrirConfirmationStatut(e: EmployeDto, st: string) {
-    const valActuelle = (e.statut && typeof e.statut === 'object') ? (e.statut as any).statut : e.statut;
-    if (String(valActuelle).toUpperCase() === String(st).toUpperCase()) return;
-    this.confirmStatut = { show: true, employe: e, nouveauStatut: st };
-  }
-
-  confirmerChangementStatut() {
-    const login = this.confirmStatut.employe.loginUtilisateur;
-    const nouveau = this.confirmStatut.nouveauStatut;
-
-    this.utilisateurService.modifierStatut(login, nouveau).subscribe({
-      next: () => {
-        this.confirmStatut.employe.statut = nouveau;
-        this.showFeedback(`Statut de ${login} mis à jour : ${nouveau}`);
-        this.confirmStatut.show = false;
-        this.cdr.detectChanges();
-      },
-      error: (err) => {
-        console.error('Erreur backend:', err);
-        this.showFeedback('Erreur lors du changement de statut', true);
-      }
-    });
   }
 
   enregistrer() {
     if (this.employeForm.invalid) return;
-    const val = this.employeForm.value;
-    const roleId = this.typeActuel === TypeEmploye.CAISSIER ? 2 : 3;
+    const val = this.employeForm.getRawValue();
 
-    this.utilisateurService.enregistrerUtilisateur({ ...val, idRole: roleId }).pipe(
-      switchMap(() => this.employeService.enregistrerEmploye({
-          dateEmbauche: val.dateEmbauche,
-          typeEmploye: this.typeActuel,
-          commissionTaux: val.commissionTaux,
-          loginUtilisateur: val.login,
-          idAgence: 1
-        } as any))
-    ).subscribe({
+    if (this.isEditMode && this.employeSelectionne) {
+      const payloadModif = { ...this.employeSelectionne, ...val };
+      delete (payloadModif as any).password;
+
+      this.employeService.modifierEmploye(this.employeSelectionne.matricule!, payloadModif).pipe(
+        switchMap(() => this.utilisateurService.modifierStatut(payloadModif.loginUtilisateur!, val.statut)),
+        catchError(err => { console.error(err); return of(null); })
+      ).subscribe(res => {
+        if (res !== null) {
+          this.showFeedback('Modifications enregistrées');
+          this.fermerModalAjout();
+          this.chargerDonnees();
+        } else {
+          this.showFeedback('Erreur lors de la modification', true);
+        }
+      });
+    } else {
+      const roleId = this.typeActuel === TypeEmploye.CAISSIER ? 2 : 3;
+      this.utilisateurService.enregistrerUtilisateur({ ...val, idRole: roleId }).pipe(
+        switchMap(() => this.employeService.enregistrerEmploye({
+            ...val,
+            typeEmploye: this.typeActuel,
+            loginUtilisateur: val.login,
+            idAgence: 1
+          } as any))
+      ).subscribe({
+        next: () => {
+          this.showFeedback('Compte créé avec succès !');
+          this.fermerModalAjout();
+          this.chargerDonnees();
+        },
+        error: () => this.showFeedback('Erreur de création', true)
+      });
+    }
+  }
+
+  ouvrirConfirmationStatut(e: EmployeDto, st: string) {
+    if (e.statut === st) return;
+    this.confirmStatut = { show: true, employe: e, nouveauStatut: st };
+    this.cdr.detectChanges();
+  }
+
+  confirmerChangementStatut() {
+    const emp = this.confirmStatut.employe;
+    const nouveau = this.confirmStatut.nouveauStatut;
+    this.utilisateurService.modifierStatut(emp.loginUtilisateur!, nouveau).subscribe({
       next: () => {
-        this.showFeedback('Enregistré avec succès !');
-        this.fermerModalAjout();
-        this.chargerDonnees();
+        emp.statut = nouveau; 
+        this.showFeedback(`Statut mis à jour`);
+        this.confirmStatut.show = false;
+        this.cdr.detectChanges();
       },
-      error: (err) => this.showFeedback('Erreur lors de la création', true)
+      error: () => this.showFeedback('Erreur', true)
     });
   }
 
-  voirDetails(e: EmployeDto) { 
-    this.employeSelectionne = e; 
-    this.isModalOpen = true; 
+  getStatutBtnClass(actuel: any, btn: string) {
+    if (!actuel) return 'btn-light text-muted opacity-50';
+    const sActuel = actuel.toString().toUpperCase();
+    const sBtn = btn.toUpperCase();
+    if (sActuel !== sBtn) return 'btn-light text-muted opacity-50';
+    switch(sActuel) {
+      case 'ACTIF': return 'btn-success text-white fw-bold shadow-sm';
+      case 'INACTIF': return 'btn-danger text-white fw-bold shadow-sm';
+      case 'SUSPENDU': return 'btn-warning text-dark fw-bold shadow-sm';
+      default: return 'btn-secondary text-white';
+    }
   }
-  fermerModal() { this.isModalOpen = false; }
+
+  ouvrirConfirmationSuppression(e: EmployeDto) {
+    this.confirmSuppression = { show: true, matricule: e.matricule!, nom: `${e.nom} ${e.prenom}` };
+    this.cdr.detectChanges();
+  }
+
+  confirmerSuppression() {
+    this.employeService.supprimerEmploye(this.confirmSuppression.matricule).subscribe({
+      next: () => {
+        this.showFeedback('Employé supprimé');
+        this.confirmSuppression.show = false;
+        this.chargerDonnees();
+      },
+      error: () => this.showFeedback('Erreur suppression', true)
+    });
+  }
+
   ouvrirModalAjout() { 
+    this.isEditMode = false; 
     this.employeForm.reset({
-      dateEmbauche: new Date().toISOString().split('T')[0], 
-      commissionTaux: 0, 
-      statut: StatutGenerique.ACTIF
-    }); 
+      dateEmbauche: new Date().toISOString().split('T')[0],
+      commissionTaux: 0, statut: StatutGenerique.ACTIF
+    });
+    this.employeForm.get('login')?.enable();
     this.isAddModalOpen = true; 
   }
+
+  ouvrirModalModification(e: any) { 
+    this.isEditMode = true; 
+    this.employeSelectionne = { ...e };
+    this.employeForm.patchValue({
+      login: e.loginUtilisateur || e.login, 
+      nom: e.nom, 
+      prenom: e.prenom,
+      email: e.email, 
+      telephone: e.telephone,
+      dateEmbauche: e.dateEmbauche, 
+      commissionTaux: e.commissionTaux, 
+      statut: e.statut
+    });
+    this.employeForm.get('login')?.disable();
+    this.isAddModalOpen = true; 
+  }
+
+  voirDetails(e: any) { 
+    this.employeSelectionne = { ...e }; 
+    this.isModalOpen = true; 
+    this.cdr.detectChanges();
+  }
+
+  fermerModal() { this.isModalOpen = false; }
   fermerModalAjout() { this.isAddModalOpen = false; }
+
   showFeedback(m: string, err = false) { 
     this.feedbackModal = {show: true, message: m, isError: err}; 
-    setTimeout(() => this.feedbackModal.show = false, 3000); 
+    setTimeout(() => { this.feedbackModal.show = false; this.cdr.detectChanges(); }, 3000); 
   }
 }

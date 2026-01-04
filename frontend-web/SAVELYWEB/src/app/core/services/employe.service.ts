@@ -9,10 +9,6 @@ export class EmployeService {
 
   constructor(private http: HttpClient) { }
 
-  getTousLesEmployes(): Observable<EmployeDto[]> {
-    return this.http.get<EmployeDto[]>(this.apiUrl);
-  }
-
   getCaissiers(): Observable<EmployeDto[]> {
     return this.http.get<EmployeDto[]>(`${this.apiUrl}/caissiers`);
   }
@@ -21,11 +17,16 @@ export class EmployeService {
     return this.http.get<EmployeDto[]>(`${this.apiUrl}/collecteurs`);
   }
 
-  getEmployeParMatricule(matricule: string): Observable<EmployeDto> {
-    return this.http.get<EmployeDto>(`${this.apiUrl}/${matricule}`);
-  }
-
   enregistrerEmploye(employe: EmployeDto): Observable<EmployeDto> {
     return this.http.post<EmployeDto>(this.apiUrl, employe);
+  }
+
+  /** Modification : On passe le matricule dans l'URL + l'objet complet */
+  modifierEmploye(matricule: string, employe: any): Observable<any> {
+    return this.http.put(`${this.apiUrl}/${matricule}`, employe);
+  }
+
+  supprimerEmploye(matricule: string): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${matricule}`);
   }
 }
