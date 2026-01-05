@@ -16,6 +16,12 @@ public interface ClientMapper {
 
     @Mapping(source = "utilisateur", target = "loginUtilisateur", qualifiedByName = "utilisateurToLogin")
     @Mapping(source = "collecteurAssigne", target = "codeCollecteurAssigne", qualifiedByName = "employeToCode")
+    @Mapping(source = "collecteurAssigne", target = "nomCollecteur", qualifiedByName = "employeToNomComplet")
+    @Mapping(source = "utilisateur.nom", target = "nom")
+    @Mapping(source = "utilisateur.prenom", target = "prenom")
+    @Mapping(source = "utilisateur.telephone", target = "telephone")
+    @Mapping(source = "utilisateur.statut", target = "statut")
+    @Mapping(source = "utilisateur.dateCreation", target = "dateCreation")
     ClientDto toDto(Client client);
 
     @Named("utilisateurToLogin")
@@ -26,6 +32,15 @@ public interface ClientMapper {
     @Named("employeToCode")
     default Integer employeToCode(Employe employe) {
         return employe != null ? employe.getIdEmploye() : null;
+    }
+
+    // AJOUTEZ CE MÉTHODE :
+    @Named("employeToNomComplet")
+    default String employeToNomComplet(Employe employe) {
+        if (employe == null || employe.getUtilisateur() == null) {
+            return "Non assigné";
+        }
+        return employe.getUtilisateur().getNom() + " " + employe.getUtilisateur().getPrenom();
     }
 
     @Mapping(target = "utilisateur", ignore = true)

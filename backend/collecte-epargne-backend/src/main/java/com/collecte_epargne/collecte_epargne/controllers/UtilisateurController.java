@@ -11,10 +11,14 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @RestController
 @RequestMapping("api/utilisateurs")
 public class UtilisateurController {
+
+    private static final Logger logger = LoggerFactory.getLogger(UtilisateurController.class);
 
     private final UtilisateurService utilisateurService;
 
@@ -28,6 +32,7 @@ public class UtilisateurController {
      */
     @PostMapping
     public ResponseEntity<?> save(@Valid @RequestBody UtilisateurCreationRequestDto creationRequestDto) {
+        logger.info("Création d'utilisateur avec login: {}", creationRequestDto.getLogin());
         try {
             // Le DTO de requête a été validé par @Valid (login, idRole, nom, etc. non nulls).
             String password = creationRequestDto.getPassword();
@@ -49,6 +54,7 @@ public class UtilisateurController {
             // 2. Le service hache le mot de passe et sauve l'entité.
             return new ResponseEntity<>(utilisateurService.save(utilisateurDto, password), HttpStatus.CREATED);
         } catch (Exception e) {
+            logger.error("Erreur lors de la création d'utilisateur: {}", e.getMessage(), e);
             // Pour le débogage, vous pouvez logger l'erreur réelle (e.printStackTrace())
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
@@ -56,18 +62,22 @@ public class UtilisateurController {
 
     @GetMapping()
     public ResponseEntity<List<UtilisateurDto>> getAll() {
+        logger.info("Récupération de tous les utilisateurs");
         try {
             return new ResponseEntity<>(utilisateurService.getAll(), HttpStatus.OK);
         } catch (Exception e) {
+            logger.error("Erreur lors de la récupération de tous les utilisateurs: {}", e.getMessage(), e);
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Erreur lors de la récupération des utilisateurs", e);
         }
     }
 
     @GetMapping("/{login}")
     public ResponseEntity<?> getByLogin(@PathVariable String login) {
+        logger.info("Récupération d'utilisateur avec login: {}", login);
         try {
             return new ResponseEntity<>(utilisateurService.getByLogin(login), HttpStatus.OK);
         } catch (Exception e) {
+            logger.error("Erreur lors de la récupération d'utilisateur avec login {}: {}", login, e.getMessage(), e);
             return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
         }
     }
@@ -78,9 +88,11 @@ public class UtilisateurController {
      */
     @PutMapping("/{login}")
     public ResponseEntity<?> update(@PathVariable String login, @Valid @RequestBody UtilisateurDto utilisateurDto) {
+        logger.info("Mise à jour d'utilisateur avec login: {}", login);
         try {
             return new ResponseEntity<>(utilisateurService.update(login, utilisateurDto), HttpStatus.OK);
         } catch (Exception e) {
+            logger.error("Erreur lors de la mise à jour d'utilisateur avec login {}: {}", login, e.getMessage(), e);
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
@@ -88,6 +100,7 @@ public class UtilisateurController {
     // Endpoint spécifique pour la mise à jour du mot de passe
     @PutMapping("/{login}/password")
     public ResponseEntity<?> updatePassword(@PathVariable String login, @RequestBody Map<String, String> payload) {
+        logger.info("Mise à jour du mot de passe pour utilisateur avec login: {}", login);
         try {
             String newPassword = payload.get("newPassword");
             if (newPassword == null) {
@@ -96,17 +109,29 @@ public class UtilisateurController {
             utilisateurService.updatePassword(login, newPassword);
             return new ResponseEntity<>("Mot de passe mis à jour avec succès", HttpStatus.OK);
         } catch (Exception e) {
+            logger.error("Erreur lors de la mise à jour du mot de passe pour utilisateur avec login {}: {}", login, e.getMessage(), e);
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
 
     @DeleteMapping("/{login}")
     public ResponseEntity<?> delete(@PathVariable String login) {
+        logger.info("Suppression d'utilisateur avec login: {}", login);
         try {
             utilisateurService.delete(login);
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         } catch (Exception e) {
+            logger.error("Erreur lors de la suppression d'utilisateur avec login {}: {}", login, e.getMessage(), e);
             return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
         }
+    }
+    @PutMapping("/{login}/statut")
+    public ResponseEntity<UtilisateurDto> updateStatut(@PathVariable String login, @RequestBody Map<String, String> payload) {
+        String nouveauStatut = payload.get("statut");
+        if (nouveauStatut == null) {
+            return ResponseEntity.badRequest().build();
+        }
+        UtilisateurDto updated = utilisateurService.updateStatut(login, nouveauStatut);
+        return ResponseEntity.ok(updated);
     }
 }

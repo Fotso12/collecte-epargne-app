@@ -1,0 +1,173 @@
+<div class="container-fluid mt-2">
+  <div class="dashboard-header mb-4 d-flex justify-content-between align-items-center">
+    <div>
+      <h2 class="text-dark fw-bold">LISTE DE TOUS LES CLIENTS</h2>
+      <p class="text-muted">Gérez et filtrez les comptes épargne des clients SAVELY</p>
+    </div>
+    
+    <div class="d-flex gap-2">
+      <button *ngIf="selectedClientCodes.size > 0" class="btn btn-danger shadow-sm fw-bold" (click)="ouvrirModalSuppressionGroupee()">
+        <i class="fas fa-trash-alt me-2"></i> Supprimer ({{ selectedClientCodes.size }})
+      </button>
+
+      <button class="btn btn-outline-primary shadow-sm fw-bold" (click)="telechargerModeleCSV()">
+        <i class="fas fa-file-download"></i> Modèle CSV
+      </button>
+
+      <input type="file" id="fileInput" (change)="onFichierSelectionne($event)" accept=".csv" style="display: none;">
+      <button class="btn btn-success shadow-sm fw-bold" (click)="declencherChoixFichier()" [disabled]="importationEnCours">
+        <i class="fas" [ngClass]="importationEnCours ? 'fa-spinner fa-spin' : 'fa-file-import'"></i>
+        {{ importationEnCours ? ' Importation...' : ' Importer Clients (CSV)' }}
+      </button>
+    </div>
+  </div>
+
+  <div class="card shadow-sm mb-4 border-0" style="border-radius: 12px; background: white;">
+    <div class="card-body">
+      <div class="row g-3">
+        <div class="col-md-4">
+          <label class="form-label small fw-bold">Code Client</label>
+          <div class="input-group">
+            <span class="input-group-text bg-light border-end-0"><i class="fas fa-barcode"></i></span>
+            <input type="text" class="form-control bg-light border-start-0" placeholder="Ex: CLI2025" 
+                   [(ngModel)]="filtreCode" (input)="appliquerFiltres()">
+          </div>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label small fw-bold">Collecteur Assigné</label>
+          <div class="input-group">
+            <span class="input-group-text bg-light border-end-0"><i class="fas fa-user-tie"></i></span>
+            <input type="text" class="form-control bg-light border-start-0" placeholder="Nom" 
+                   [(ngModel)]="filtreCollecteur" (input)="appliquerFiltres()">
+          </div>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label small fw-bold">Profession</label>
+          <div class="input-group">
+            <span class="input-group-text bg-light border-end-0"><i class="fas fa-briefcase"></i></span>
+            <input type="text" class="form-control bg-light border-start-0" placeholder="Ex: Commerçant" 
+                   [(ngModel)]="filtreProfession" (input)="appliquerFiltres()">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="table-container shadow-sm border-0">
+    <div *ngIf="chargement" class="p-5 text-center">
+      <div class="spinner-border text-primary" role="status"></div>
+      <p class="mt-2 text-muted">Chargement des données...</p>
+    </div>
+
+    <table class="table align-middle mb-0" *ngIf="!chargement">
+      <thead>
+        <tr>
+          <th style="width: 40px;">
+            <input type="checkbox" class="form-check-input" [checked]="isAllSelected()" (change)="toggleAllSelections($event)">
+          </th>
+          <th>Code</th>
+          <th>Client / Profession</th>
+          <th>Statut</th>
+          <th>Collecteur</th>
+          <th>Score</th>
+          <th class="text-end">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let c of clientsFiltres" [class.selected-row]="selectedClientCodes.has(c.codeClient!)">
+          <td>
+            <input type="checkbox" class="form-check-input" [checked]="selectedClientCodes.has(c.codeClient!)" (change)="toggleClientSelection(c.codeClient)">
+          </td>
+          <td><span class="badge bg-light text-dark border">{{ c.codeClient }}</span></td>
+          <td>
+            <div class="user-cell d-flex align-items-center gap-2">
+              <span class="avatar">{{ (c.nom?.substring(0,1) || '') + (c.prenom?.substring(0,1) || '') }}</span>
+              <div class="d-flex flex-column">
+                <span class="fw-semibold">{{ c.nom }} {{ c.prenom }}</span>
+                <small class="text-primary" style="font-size: 0.75rem;">{{ c.profession }}</small>
+              </div>
+            </div>
+          </td>
+          <td>
+            <span class="badge" [ngClass]="{
+              'bg-success-subtle text-success': c.statut === 'ACTIF',
+              'bg-warning-subtle text-warning': c.statut === 'EN_ATTENTE',
+              'bg-danger-subtle text-danger': c.statut === 'BLOQUE' || c.statut === 'INACTIF'
+            }">
+              <i class="fas fa-circle me-1" style="font-size: 0.5rem;"></i> {{ c.statut }}
+            </span>
+          </td>
+          <td><span class="fw-semibold small">{{ c.nomCollecteur || 'Non assigné' }}</span></td>
+          <td>
+            <div class="d-flex align-items-center gap-2">
+              <div class="progress" style="height: 6px; width: 50px;">
+                <div class="progress-bar bg-success" [style.width.%]="c.scoreEpargne"></div>
+              </div>
+              <small class="fw-bold text-muted">{{ c.scoreEpargne || 0 }}%</small>
+            </div>
+          </td>
+          <td class="text-end">
+            <button class="btn btn-sm btn-light border me-1" (click)="voirDetails(c)"><i class="fas fa-eye text-primary"></i></button>
+            <button class="btn btn-sm btn-light border" (click)="ouvrirModalSuppression(c.codeClient)"><i class="fas fa-trash text-danger"></i></button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="modal-backdrop-custom" *ngIf="isModalOpen" (click)="fermerModal()"></div>
+<div class="modal-wrapper-custom" *ngIf="isModalOpen">
+  <div class="modal-content-custom shadow-lg" *ngIf="clientSelectionne">
+    <div class="modal-header-custom p-3 border-bottom d-flex justify-content-between align-items-center bg-light">
+      <h5 class="m-0 fw-bold text-primary"><i class="fas fa-user-circle me-2"></i>Détails du Client</h5>
+      <button class="btn-close" (click)="fermerModal()"></button>
+    </div>
+    <div class="modal-body-custom p-4">
+      <div class="row g-4">
+        <div class="col-md-6 border-end">
+          <h6 class="text-primary fw-bold mb-3 border-bottom pb-1">Identité</h6>
+          <p><strong>Nom:</strong> {{ clientSelectionne.nom }} {{ clientSelectionne.prenom }}</p>
+          <p><strong>Profession:</strong> {{ clientSelectionne.profession }}</p>
+          <p><strong>Téléphone:</strong> {{ clientSelectionne.telephone }}</p>
+          <p><strong>Adresse:</strong> {{ clientSelectionne.adresse }}</p>
+        </div>
+        <div class="col-md-6">
+          <h6 class="text-primary fw-bold mb-3 border-bottom pb-1">Compte & Statut</h6>
+          <p><strong>Code Client:</strong> <span class="badge bg-dark">{{ clientSelectionne.codeClient }}</span></p>
+          <p><strong>Statut:</strong> {{ clientSelectionne.statut }}</p>
+          <p><strong>Collecteur:</strong> {{ clientSelectionne.nomCollecteur }}</p>
+          <p><strong>Score:</strong> {{ clientSelectionne.scoreEpargne }}%</p>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer p-3 text-end">
+      <button class="btn btn-secondary" (click)="fermerModal()">Fermer</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-backdrop-custom" *ngIf="isDeleteModalOpen" (click)="fermerModalSuppression()"></div>
+<div class="modal-wrapper-custom" *ngIf="isDeleteModalOpen">
+  <div class="modal-content-custom shadow-lg border-danger" style="max-width: 450px;">
+    <div class="modal-header-custom p-3 bg-danger-subtle">
+      <h5 class="m-0 fw-bold text-danger"><i class="fas fa-exclamation-triangle me-2"></i>Confirmation</h5>
+      <button class="btn-close" (click)="fermerModalSuppression()"></button>
+    </div>
+    <div class="modal-body-custom p-4 text-center">
+      <i class="fas fa-trash-alt fa-3x text-danger mb-3"></i>
+      <h5 class="fw-bold">{{ isBulkDelete ? 'Suppression groupée' : 'Supprimer ce client ?' }}</h5>
+      <p class="text-muted">
+        <span *ngIf="!isBulkDelete">Êtes-vous sûr de vouloir supprimer le client <strong>{{ clientToDeleteCode }}</strong> ?</span>
+        <span *ngIf="isBulkDelete">Êtes-vous sûr de vouloir supprimer les <strong>{{ selectedClientCodes.size }}</strong> clients sélectionnés ?</span>
+        <br>Cette action est irréversible.
+      </p>
+    </div>
+    <div class="modal-footer p-3 d-flex gap-2 justify-content-center bg-light" style="border-radius: 0 0 15px 15px;">
+      <button class="btn btn-light border px-4" (click)="fermerModalSuppression()">Annuler</button>
+      <button class="btn btn-danger px-4" (click)="confirmerSuppression()">
+        <i class="fas fa-trash me-2"></i>{{ isBulkDelete ? 'Tout supprimer' : 'Supprimer' }}
+      </button>
+    </div>
+  </div>
+</div>
