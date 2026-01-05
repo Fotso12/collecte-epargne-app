@@ -29,4 +29,6 @@ public interface UtilisateurInterface {
 
     // Fonction spécifique
     UtilisateurDto getByEmail(String email);
+
+
 }

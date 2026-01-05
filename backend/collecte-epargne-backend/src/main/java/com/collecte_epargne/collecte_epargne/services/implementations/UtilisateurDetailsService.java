@@ -19,7 +19,7 @@ public class UtilisateurDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String email) {
-        Utilisateur utilisateur = utilisateurRepository.findByEmail(email)
+        Utilisateur utilisateur = utilisateurRepository.findByEmailWithRole(email)
                 .orElseThrow(() ->
                         new UsernameNotFoundException("Utilisateur non trouvé : " + email)
                 );

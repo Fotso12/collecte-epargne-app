@@ -1,6 +1,8 @@
 package com.collecte_epargne.collecte_epargne.controllers;
 import com.collecte_epargne.collecte_epargne.dtos.LoginRequest;
 import com.collecte_epargne.collecte_epargne.dtos.LoginResponse;
+import com.collecte_epargne.collecte_epargne.entities.Utilisateur;
+import com.collecte_epargne.collecte_epargne.repositories.UtilisateurRepository;
 import com.collecte_epargne.collecte_epargne.security.JwtService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -13,11 +15,14 @@ public class AuthController {
 
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
+    private final UtilisateurRepository utilisateurRepository;
 
     public AuthController(AuthenticationManager authenticationManager,
-                          JwtService jwtService) {
+                          JwtService jwtService,
+                          UtilisateurRepository utilisateurRepository) {
         this.authenticationManager = authenticationManager;
         this.jwtService = jwtService;
+        this.utilisateurRepository = utilisateurRepository;
     }
 
     /**
@@ -32,16 +37,25 @@ public class AuthController {
         // 1️⃣ Authentification
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
-                        request.email(),
-                        request.password()
+                        request.getEmail(),
+                        request.getPassword()
                 )
         );
 
-        // 2️⃣ Génération du token
-        String token = jwtService.generateToken(request.email());
+        // 2️⃣ Récupération des détails utilisateur
+        Utilisateur utilisateur = utilisateurRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé"));
 
-        // 3️⃣ Retour du token
-        return ResponseEntity.ok(new LoginResponse(token));
+        // 3️⃣ Génération du token
+        String token = jwtService.generateToken(request.getEmail());
+
+        // 4️⃣ Retour du token avec les détails utilisateur
+        return ResponseEntity.ok(new LoginResponse(
+                token,
+                utilisateur.getLogin(),
+                utilisateur.getEmail(),
+                utilisateur.getRole() != null ? utilisateur.getRole().getNom() : null
+        ));
     }
 }
 
