@@ -1,1 +1,63 @@
-/* You can add global styles to this file, and also import other style files */
+/* --- RESET ET FORCE LE STYLE DES MODALES --- */
+.modal-overlay {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  background: rgba(0, 0, 0, 0.8) !important; /* Fond noir semi-opaque */
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  z-index: 99999 !important;
+}
+
+.modal-content {
+  background-color: #ffffff !important; /* Force le fond blanc */
+  background: white !important;
+  padding: 35px !important;
+  border-radius: 15px !important;
+  text-align: center !important;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5) !important;
+  max-width: 400px !important;
+  width: 90% !important;
+  display: block !important;
+  color: #333 !important; /* Texte en sombre */
+  animation: modalPop 0.3s ease-out !important;
+}
+
+@keyframes modalPop {
+  from { opacity: 0; transform: scale(0.8); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.modal-icon {
+  font-size: 55px !important;
+  margin-bottom: 15px !important;
+  display: block !important;
+}
+.modal-icon.success { color: #27ae60 !important; }
+.modal-icon.warning { color: #e74c3c !important; }
+
+/* Boutons */
+.modal-actions {
+  display: flex !important;
+  gap: 15px !important;
+  margin-top: 25px !important;
+  justify-content: center !important;
+}
+.btn-cancel { background: #eee !important; color: #333 !important; border: none !important; padding: 12px 25px !important; border-radius: 8px !important; cursor: pointer !important; }
+.btn-confirm-logout { background: #e74c3c !important; color: white !important; border: none !important; padding: 12px 25px !important; border-radius: 8px !important; cursor: pointer !important; }
+/* Force l'affichage de la modale Savely */
+.modal-overlay {
+  display: flex !important; /* Force le flexbox */
+  visibility: visible !important; /* Force la visibilité */
+  opacity: 1 !important; /* Force l'opacité */
+  background: rgba(0, 0, 0, 0.85) !important;
+  z-index: 999999 !important;
+}
+
+.modal-content {
+  transform: scale(1) !important; /* Évite qu'elle reste à scale(0) par erreur */
+  display: block !important;
+}

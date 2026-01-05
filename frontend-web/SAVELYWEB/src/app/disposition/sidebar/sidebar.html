@@ -7,7 +7,7 @@
     <div class="topbar-actions">
       <button class="has-tooltip"><i class="fas fa-bell"></i><span class="tooltip">Notifications</span></button>
       <button class="has-tooltip"><i class="fas fa-user-circle"></i><span class="tooltip">Profil</span></button>
-      <button class="has-tooltip btn-logout-top"><i class="fas fa-sign-out-alt"></i><span class="tooltip tooltip-red">Déconnexion</span></button>
+      <button class="has-tooltip btn-logout-top" (click)="openLogoutModal()"><i class="fas fa-sign-out-alt"></i><span class="tooltip tooltip-red">Déconnexion</span></button>
     </div>
   </header>
 
@@ -17,17 +17,29 @@
       <h1 class="app-name">SAVELY</h1>
     </div>
     <ul class="nav-links">
-  <li><a routerLink="/accueil" routerLinkActive="active"><i class="fas fa-home"></i><span>Accueil</span></a></li>
-  <li><a routerLink="/clients" routerLinkActive="active"><i class="fas fa-users"></i><span>Clients</span></a></li>
-  <li><a routerLink="/collecteurs" routerLinkActive="active"><i class="fas fa-hand-holding-usd"></i><span>Collecteurs</span></a></li>
-  <li><a routerLink="/caissiers" routerLinkActive="active"><i class="fas fa-cash-register"></i><span>Caissiers</span></a></li>
-</ul>
+      <li><a routerLink="/accueil" routerLinkActive="active"><i class="fas fa-home"></i><span>Accueil</span></a></li>
+      <li><a routerLink="/clients" routerLinkActive="active"><i class="fas fa-users"></i><span>Clients</span></a></li>
+      <li><a routerLink="/collecteurs" routerLinkActive="active"><i class="fas fa-hand-holding-usd"></i><span>Collecteurs</span></a></li>
+      <li><a routerLink="/caissiers" routerLinkActive="active"><i class="fas fa-cash-register"></i><span>Caissiers</span></a></li>
+    </ul>
     <div class="sidebar-footer">
-      <a class="logout-link"><i class="fas fa-sign-out-alt"></i><span>Déconnexion</span></a>
+      <a class="logout-link" (click)="openLogoutModal()"><i class="fas fa-sign-out-alt"></i><span>Déconnexion</span></a>
     </div>
   </nav>
 
   <main class="main-content">
     <router-outlet></router-outlet>
   </main>
+
+  <div class="modal-overlay" *ngIf="showLogoutModal">
+    <div class="modal-content">
+      <i class="fas fa-exclamation-triangle modal-icon warning"></i>
+      <h3>Déconnexion</h3>
+      <p>Êtes-vous sûr de vouloir quitter Savely ?</p>
+      <div class="modal-actions">
+        <button class="btn-cancel" (click)="closeLogoutModal()">Annuler</button>
+        <button class="btn-confirm-logout" (click)="confirmLogout()">Déconnexion</button>
+      </div>
+    </div>
+  </div>
 </div>
