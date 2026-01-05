@@ -14,6 +14,7 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -30,16 +31,18 @@ public class UtilisateurService implements UtilisateurInterface {
     private final RoleRepository roleRepository;
     // Injection du service d'envoi d'emails pour notifier les nouveaux utilisateurs
     private final EmailService emailService;
+    private final PasswordEncoder passwordEncoder;
 
     private static final Logger log = LoggerFactory.getLogger(UtilisateurService.class);
 
     // Pour la relation Role
 
-    public UtilisateurService(UtilisateurRepository utilisateurRepository, UtilisateurMapper utilisateurMapper, RoleRepository roleRepository, EmailService emailService) {
+    public UtilisateurService(UtilisateurRepository utilisateurRepository, UtilisateurMapper utilisateurMapper, RoleRepository roleRepository, EmailService emailService, PasswordEncoder passwordEncoder) {
         this.utilisateurRepository = utilisateurRepository;
         this.utilisateurMapper = utilisateurMapper;
         this.roleRepository = roleRepository;
         this.emailService = emailService;
+        this.passwordEncoder = passwordEncoder;
     }
 
     // Méthode utilitaire pour attacher l'entité Role (inchangée)
@@ -71,8 +74,7 @@ public class UtilisateurService implements UtilisateurInterface {
         Utilisateur utilisateurToSave = utilisateurMapper.toEntity(utilisateurDto);
 
         // 💥 HACHAGE DU MOT DE PASSE (SÉCURITÉ)
-        // utilisateurToSave.setPassword(passwordEncoder.encode(password));
-        utilisateurToSave.setPassword(password); // Actuellement en clair (NON SÉCURISÉ)
+        utilisateurToSave.setPassword(passwordEncoder.encode(password));
 
         utilisateurToSave.setDateCreation(Instant.now());
 
@@ -156,12 +158,32 @@ public class UtilisateurService implements UtilisateurInterface {
         }
 
         // 💥 HACHAGE DU MOT DE PASSE (SÉCURITÉ)
-        // existingUtilisateur.setPassword(passwordEncoder.encode(newPassword));
-        existingUtilisateur.setPassword(newPassword); // Actuellement en clair (NON SÉCURISÉ)
+        existingUtilisateur.setPassword(passwordEncoder.encode(newPassword));
 
         utilisateurRepository.save(existingUtilisateur);
         log.info("Mot de passe mis à jour pour l'utilisateur avec login: {}", login);
     }
+
+//    @Override
+//    public UtilisateurDto updateStatut(String login, String statut) {
+//        Objects.requireNonNull(login, "login ne doit pas être null");
+//        Objects.requireNonNull(statut, "statut ne doit pas être null");
+//        log.info("Mise à jour du statut pour l'utilisateur avec login: {}", login);
+//        Utilisateur existingUtilisateur = utilisateurRepository.findById(login)
+//                .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé : " + login));
+//
+//        try {
+//            StatutGenerique statutEnum = StatutGenerique.valueOf(statut.toUpperCase());
+//            existingUtilisateur.setStatut(statutEnum);
+//        } catch (IllegalArgumentException e) {
+//            throw new IllegalArgumentException("Statut invalide : " + statut + ". Valeurs possibles : " +
+//                    java.util.Arrays.toString(StatutGenerique.values()));
+//        }
+//
+//        Utilisateur updatedUtilisateur = utilisateurRepository.save(existingUtilisateur);
+//        log.info("Statut mis à jour pour l'utilisateur avec login: {}", login);
+//        return utilisateurMapper.toDto(updatedUtilisateur);
+//    }
 
     @Override
     public void delete(String login) {
