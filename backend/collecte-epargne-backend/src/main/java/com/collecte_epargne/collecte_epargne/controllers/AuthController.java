@@ -52,8 +52,11 @@ public class AuthController {
         // 4️⃣ Retour du token avec les détails utilisateur
         return ResponseEntity.ok(new LoginResponse(
                 token,
+                "Bearer",
                 utilisateur.getLogin(),
                 utilisateur.getEmail(),
+                utilisateur.getNom(),
+                utilisateur.getPrenom(),
                 utilisateur.getRole() != null ? utilisateur.getRole().getNom() : null
         ));
     }

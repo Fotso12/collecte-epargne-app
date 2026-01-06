@@ -7,10 +7,7 @@ import { LoginComponent } from './modules/auth/login/login.component';
 import { AuthGuard } from './core/guards/auth.guard';
 
 export const routes: Routes = [
-  {
-    path: 'login',
-    component: LoginComponent
-  },
+  { path: 'login', component: LoginComponent },
   {
     path: '',
     component: Sidebar,
@@ -18,10 +15,9 @@ export const routes: Routes = [
     children: [
       { path: 'accueil', component: Dashboard },
       { path: 'clients', component: ListeClientsComponent },
-      // Nouvelles routes pour le personnel
       { path: 'collecteurs', component: ListeEmployesComponent },
       { path: 'caissiers', component: ListeEmployesComponent },
-
+      { path: 'profil', loadComponent: () => import('./modules/auth/profil/profil.component').then(m => m.ProfilComponent) }, // Nouvelle route
       { path: '', redirectTo: 'accueil', pathMatch: 'full' }
     ]
   },

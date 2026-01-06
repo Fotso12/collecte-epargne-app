@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet, Router } from '@angular/router';
 import { CommonModule } from '@angular/common'; 
 import { AuthService } from '../../core/services/auth.service';
@@ -10,13 +10,25 @@ import { AuthService } from '../../core/services/auth.service';
   templateUrl: './sidebar.html',
   styleUrl: './sidebar.css',
 })
-export class Sidebar {
+export class Sidebar implements OnInit {
   showLogoutModal = false;
+  currentUser: any = null;
 
   constructor(
     private authService: AuthService,
     private router: Router
   ) {}
+
+  ngOnInit(): void {
+    // S'abonne aux infos de l'utilisateur connecté
+    this.authService.currentUser$.subscribe(user => {
+      this.currentUser = user;
+    });
+  }
+
+  goToProfile(): void {
+    this.router.navigate(['/profil']);
+  }
 
   openLogoutModal(): void {
     this.showLogoutModal = true;

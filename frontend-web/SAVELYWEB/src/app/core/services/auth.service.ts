@@ -15,6 +15,8 @@ export interface AuthResponse {
   login: string;
   email: string;
   role: string;
+  nom?: string;
+  prenom?: string;
 }
 
 @Injectable({
@@ -27,7 +29,7 @@ export class AuthService {
   private isAuthenticatedSubject = new BehaviorSubject<boolean>(this.isBrowser() ? this.hasToken() : false);
   public isAuthenticated$ = this.isAuthenticatedSubject.asObservable();
 
-  private currentUserSubject = new BehaviorSubject<any>(this.isBrowser() ? this.getUser() : null);
+  public currentUserSubject = new BehaviorSubject<any>(this.isBrowser() ? this.getUser() : null);
   public currentUser$ = this.currentUserSubject.asObservable();
 
   constructor(
@@ -50,6 +52,26 @@ export class AuthService {
           this.currentUserSubject.next(response);
         })
       );
+  }
+
+  /**
+   * MÉTHODE AJOUTÉE : Change le mot de passe sur le backend
+   * Utilise le login de l'utilisateur stocké
+   */
+  changePassword(newPassword: string): Observable<any> {
+    const user = this.getUser();
+    const login = user?.login;
+    // Payload attendu par votre Map<String, String> côté Java
+    const payload = { newPassword: newPassword };
+
+    return this.http.put(`http://localhost:8082/api/utilisateurs/${login}/password`, payload, {
+      responseType: 'text' // Car le backend renvoie un String brut
+    });
+  }
+
+  updateLocalUserInfo(updatedUser: any): void {
+    this.setUser(updatedUser);
+    this.currentUserSubject.next(updatedUser);
   }
 
   logout(): void {
@@ -99,7 +121,7 @@ export class AuthService {
 
   getUserRoles(): string[] {
     const user = this.getUser();
-    return user ? user.roles : [];
+    return user ? (user.roles || [user.role]) : [];
   }
 
   hasRole(role: string): boolean {
