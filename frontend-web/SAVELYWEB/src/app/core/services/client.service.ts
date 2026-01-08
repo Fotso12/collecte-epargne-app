@@ -42,4 +42,5 @@ export class ClientService {
   modifierClientParCode(code: string, client: ClientDto): Observable<ClientDto> {
     return this.http.put<ClientDto>(`${this.apiUrl}/code/${code}`, client);
   }
+
 }

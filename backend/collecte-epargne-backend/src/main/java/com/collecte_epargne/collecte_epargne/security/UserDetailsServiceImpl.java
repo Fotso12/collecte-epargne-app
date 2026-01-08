@@ -22,14 +22,17 @@ public class UserDetailsServiceImpl implements UserDetailsService {
                 .orElseThrow(() -> new UsernameNotFoundException("Utilisateur non trouvé avec l'email : " + email));
 
         // Gestion sécurisée du rôle (évite NullPointerException)
+        // Note: Assurez-vous que le nom du rôle en BDD correspond exactement (ex: SUPERVISEUR)
         String roleName = (utilisateur.getRole() != null && utilisateur.getRole().getNom() != null)
                 ? utilisateur.getRole().getNom()
-                : "USER"; // Rôle par défaut si null
+                : "USER";
 
+        // Utilisation de authorities au lieu de roles
+        // Cela permet d'utiliser @PreAuthorize("hasAuthority('SUPERVISEUR')") sans le préfixe ROLE_
         return org.springframework.security.core.userdetails.User.builder()
                 .username(utilisateur.getEmail())
                 .password(utilisateur.getPassword())
-                .roles(roleName)
+                .authorities(roleName)
                 .build();
     }
 }

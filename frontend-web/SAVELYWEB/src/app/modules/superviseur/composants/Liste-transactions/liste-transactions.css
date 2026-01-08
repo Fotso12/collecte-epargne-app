@@ -1,0 +1,66 @@
+/* --- Mise en page --- */
+.container-fluid { background-color: #f8fafc; min-height: 100vh; padding: 25px; }
+.table-container { background: white; border-radius: 16px; overflow: hidden; min-height: 350px; }
+
+/* --- Stats Header --- */
+.stats-card { min-width: 320px; border: 1px solid #e2e8f0; }
+.progress-bar-animated { animation: progress-bar-stripes 1s linear infinite; }
+
+/* --- Table Design Savely --- */
+.table thead th {
+  background-color: #f1f5f9;
+  color: #475569;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  font-weight: 700;
+  padding: 1.25rem 1rem;
+  border: none;
+}
+.table tbody td { padding: 1.1rem 1rem; border-bottom: 1px solid #f1f5f9; }
+
+/* --- Avatars & Icons --- */
+.avatar-sm {
+    width: 32px; height: 32px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.8rem;
+}
+.bg-blue-light { background: #e0e7ff; color: #4338ca; }
+.bg-gray-light { background: #f1f5f9; color: #64748b; }
+
+/* --- Badges Subtiles --- */
+.badge { padding: 0.6em 1.2em; font-weight: 600; border-radius: 10px; font-size: 0.7rem; }
+.bg-success-subtle { background-color: #dcfce7; color: #166534; }
+.bg-warning-subtle { background-color: #fef9c3; color: #854d0e; }
+.bg-info-subtle { background-color: #e0f2fe; color: #075985; }
+.bg-danger-subtle { background-color: #fee2e2; color: #991b1b; }
+
+/* --- Buttons --- */
+.btn-icon {
+    width: 36px; height: 36px; border-radius: 10px;
+    border: 1px solid #e2e8f0; background: white;
+    transition: all 0.2s;
+}
+.btn-view:hover { background: #eff6ff; color: #2563eb; border-color: #2563eb; }
+.btn-validate { background: #dcfce7; color: #166534; border-color: #86efac; }
+.btn-validate:hover { background: #166534; color: white; }
+
+/* --- Modals --- */
+.modal-backdrop-custom {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); z-index: 2000;
+}
+.modal-wrapper-custom {
+  position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+  z-index: 2001; width: 90%; max-width: 650px;
+}
+.modal-content-custom {
+  background: #ffffff; border-radius: 24px; border: none;
+  animation: modalEnter 0.3s ease-out;
+}
+
+@keyframes modalEnter {
+  from { opacity: 0; transform: scale(0.9) translateY(20px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.btn-close-custom { border: none; background: transparent; font-size: 2rem; color: #94a3b8; line-height: 1; }

@@ -28,7 +28,7 @@
       <thead>
         <tr>
           <th class="ps-4">Matricule</th>
-          <th>Employé / Login</th>
+          <th>Employé / Email</th>
           <th *ngIf="typeActuel === 'COLLECTEUR'">Commission</th>
           <th class="text-center">Statut (Contrôle)</th>
           <th class="text-end pe-4">Actions</th>
@@ -42,7 +42,7 @@
               <span class="avatar">{{ e.nom[0] }}{{ e.prenom[0] }}</span>
               <div class="d-flex flex-column">
                 <span class="fw-semibold">{{ e.nom }} {{ e.prenom }}</span>
-                <small class="text-primary fw-bold">{{ e.loginUtilisateur }}</small>
+                <small class="text-primary fw-bold">{{ e.email }}</small>
               </div>
             </div>
           </td>

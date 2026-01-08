@@ -51,6 +51,9 @@ public class SecurityConfig {
                                 "/swagger-ui/**",
                                 "/api/utilisateurs",
                                 "/swagger-ui.html").permitAll()
+                        // On autorise l'accès aux transactions à tout utilisateur authentifié.
+                        // Le contrôle précis (hasAuthority) se fait dans le Controller via @PreAuthorize
+                        .requestMatchers("/api/transactions/**").authenticated()
                         .anyRequest().authenticated()
                 )
 
@@ -96,6 +99,7 @@ public class SecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOriginPatterns(Arrays.asList("http://localhost:4200", "http://localhost:62112"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        // Utilisation de "*" pour les headers afin d'être sûr de ne rien bloquer (Authorization, Content-Type, etc.)
         configuration.setAllowedHeaders(Arrays.asList("*"));
         configuration.setAllowCredentials(true);
 

@@ -5,6 +5,7 @@ import com.collecte_epargne.collecte_epargne.services.implementations.Transactio
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.util.List;
 
@@ -42,7 +43,9 @@ public class TransactionController {
         return ResponseEntity.ok(transactionService.getById(id));
     }
 
-    @PutMapping("/{id}/valider-caissier/{idCaissier}")
+    // Le pattern :{idCaissier:.+} permet de lire l'email complet avec ses points
+    @PutMapping("/{id}/valider-caissier/{idCaissier:.+}")
+    @PreAuthorize("hasAnyAuthority('CAISSIER', 'SUPERVISEUR', 'ROLE_CAISSIER', 'ROLE_SUPERVISEUR')")
     public ResponseEntity<TransactionDto> validerParCaissier(
             @PathVariable String id,
             @PathVariable String idCaissier
@@ -51,7 +54,9 @@ public class TransactionController {
         return ResponseEntity.ok(transactionService.validerParCaissier(id, idCaissier));
     }
 
-    @PutMapping("/{id}/valider-superviseur/{idSuperviseur}")
+    // Modifiez l'annotation PreAuthorize comme ceci :
+    @PutMapping("/{id}/valider-superviseur/{idSuperviseur:.+}")
+    @PreAuthorize("hasAnyRole('SUPERVISEUR', 'ADMIN') or hasAnyAuthority('SUPERVISEUR', 'ROLE_SUPERVISEUR')")
     public ResponseEntity<TransactionDto> validerParSuperviseur(
             @PathVariable String id,
             @PathVariable String idSuperviseur

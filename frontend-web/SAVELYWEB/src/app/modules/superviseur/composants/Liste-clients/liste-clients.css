@@ -1,4 +1,4 @@
-/* --- Mise en page générale (CONSERVÉ) --- */
+/* --- Mise en page générale --- */
 .container-fluid { background-color: #f4f7f6; min-height: 100vh; padding: 20px; }
 .table-container { background: white; border-radius: 12px; overflow: hidden; }
 
@@ -8,26 +8,80 @@
   display: flex; align-items: center; justify-content: center;
 }
 
-/* --- SELECTION (NOUVEAU) --- */
-.selected-row {
-  background-color: rgba(220, 53, 69, 0.05) !important;
+.avatar-large {
+  width: 45px; height: 45px; border-radius: 50%; background: #e9ecef;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: bold; color: #198754; border: 2px solid #198754;
 }
 
-.form-check-input {
+/* --- SELECTION --- */
+.selected-row { background-color: rgba(220, 53, 69, 0.05) !important; }
+.form-check-input { cursor: pointer; border: 2px solid #dee2e6; }
+.form-check-input:checked { background-color: #dc3545; border-color: #dc3545; }
+
+/* --- STYLE DU SELECT TOTALEMENT AMÉLIORÉ --- */
+.custom-select-wrapper {
+  position: relative;
+  display: block;
+  width: 100%;
+}
+
+.select-left-icon {
+  position: absolute;
+  left: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #198754;
+  z-index: 10;
+  pointer-events: none; /* Important pour laisser cliquer le select dessous */
+}
+
+.select-right-arrow {
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #adb5bd;
+  pointer-events: none;
+  font-size: 0.8rem;
+  z-index: 10;
+}
+
+select.custom-select-styled {
+  display: block;
+  width: 100%;
+  appearance: none !important; /* Force la suppression du design natif */
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  padding: 12px 40px 12px 45px !important; /* Espace pour les icônes */
+  height: auto !important;
+  border-radius: 12px !important;
+  border: 2px solid #e9ecef !important;
+  background-color: #f8f9fa !important;
+  font-weight: 500;
+  color: #2d3436;
   cursor: pointer;
-  border: 2px solid #dee2e6;
+  transition: all 0.2s ease;
 }
 
-.form-check-input:checked {
-  background-color: #dc3545;
-  border-color: #dc3545;
+select.custom-select-styled:focus {
+  border-color: #198754 !important;
+  background-color: #ffffff !important;
+  box-shadow: 0 0 0 4px rgba(25, 135, 84, 0.1) !important;
+  outline: none;
 }
 
-/* --- SYSTEME MODAL MANUEL (CONSERVÉ) --- */
+/* Style des options */
+.custom-select-styled option {
+  background-color: #ffffff;
+  color: #2d3436;
+  padding: 10px;
+}
+
+/* --- SYSTEME MODAL MANUEL --- */
 .modal-backdrop-custom {
   position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-  background: rgba(0, 0, 0, 0.6);
-  z-index: 2000;
+  background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(3px); z-index: 2000;
 }
 
 .modal-wrapper-custom {
@@ -37,27 +91,27 @@
 
 .modal-content-custom {
   background: #ffffff !important;
-  border-radius: 15px; border: none;
-  display: flex; flex-direction: column;
-  animation: modalIn 0.3s ease-out;
+  border-radius: 20px; border: none;
+  animation: modalIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-.modal-header-custom {
-  padding: 1.2rem; border-bottom: 1px solid #eee; background: #f8f9fa;
-  border-radius: 15px 15px 0 0; display: flex; justify-content: space-between; align-items: center;
-}
-
-.modal-body-custom { padding: 2rem; color: #333; }
-
-/* Styles spécifiques Suppression (CONSERVÉ) */
-.bg-danger-subtle { background-color: #f8d7da !important; color: #842029; }
-.border-danger { border: 2px solid #f8d7da !important; }
-
+/* Animations */
 @keyframes modalIn {
-  from { opacity: 0; transform: translateY(-20px); }
-  to { opacity: 1; transform: translateY(0); }
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
 }
 
-/* --- Badges Subtiles (CONSERVÉ) --- */
+.animate-bounce {
+  animation: bounce 0.6s ease-out;
+}
+
+@keyframes bounce {
+  0% { transform: scale(0); }
+  70% { transform: scale(1.2); }
+  100% { transform: scale(1); }
+}
+
+/* Badges Subtiles */
 .bg-success-subtle { background-color: #d1e7dd; color: #0f5132; }
 .bg-warning-subtle { background-color: #fff3cd; color: #664d03; }
+.bg-danger-subtle { background-color: #f8d7da; color: #842029; }

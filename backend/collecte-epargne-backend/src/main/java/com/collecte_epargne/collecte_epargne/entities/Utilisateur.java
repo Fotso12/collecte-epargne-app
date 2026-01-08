@@ -65,7 +65,6 @@ public class Utilisateur {
     private Instant dateCreation;
 
     public Utilisateur() {
-
     }
 
     public String getLogin() {
@@ -169,6 +168,4 @@ public class Utilisateur {
         this.statut = statut;
         this.dateCreation = dateCreation;
     }
-
-
 }

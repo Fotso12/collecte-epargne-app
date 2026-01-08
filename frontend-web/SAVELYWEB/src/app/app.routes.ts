@@ -5,6 +5,7 @@ import { ListeClientsComponent } from './modules/superviseur/composants/Liste-cl
 import { ListeEmployesComponent } from './modules/superviseur/composants/Liste-employes/liste-employes';
 import { LoginComponent } from './modules/auth/login/login.component';
 import { AuthGuard } from './core/guards/auth.guard';
+import { ListeTransactionsComponent } from './modules/superviseur/composants/Liste-transactions/liste-transactions';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -17,7 +18,8 @@ export const routes: Routes = [
       { path: 'clients', component: ListeClientsComponent },
       { path: 'collecteurs', component: ListeEmployesComponent },
       { path: 'caissiers', component: ListeEmployesComponent },
-      { path: 'profil', loadComponent: () => import('./modules/auth/profil/profil.component').then(m => m.ProfilComponent) }, // Nouvelle route
+      { path: 'transactions', component: ListeTransactionsComponent },
+      { path: 'profil', loadComponent: () => import('./modules/auth/profil/profil.component').then(m => m.ProfilComponent) },
       { path: '', redirectTo: 'accueil', pathMatch: 'full' }
     ]
   },

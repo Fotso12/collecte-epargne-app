@@ -107,6 +107,9 @@
             </div>
           </td>
           <td class="text-end">
+            <button class="btn btn-sm btn-light border me-1" title="Assigner Collecteur" (click)="ouvrirModalAssignation(c)">
+              <i class="fas fa-user-plus text-success"></i>
+            </button>
             <button class="btn btn-sm btn-light border me-1" (click)="voirDetails(c)"><i class="fas fa-eye text-primary"></i></button>
             <button class="btn btn-sm btn-light border" (click)="ouvrirModalSuppression(c.codeClient)"><i class="fas fa-trash text-danger"></i></button>
           </td>
@@ -160,7 +163,6 @@
       <p class="text-muted">
         <span *ngIf="!isBulkDelete">Êtes-vous sûr de vouloir supprimer le client <strong>{{ clientToDeleteCode }}</strong> ?</span>
         <span *ngIf="isBulkDelete">Êtes-vous sûr de vouloir supprimer les <strong>{{ selectedClientCodes.size }}</strong> clients sélectionnés ?</span>
-        <br>Cette action est irréversible.
       </p>
     </div>
     <div class="modal-footer p-3 d-flex gap-2 justify-content-center bg-light" style="border-radius: 0 0 15px 15px;">
@@ -168,6 +170,67 @@
       <button class="btn btn-danger px-4" (click)="confirmerSuppression()">
         <i class="fas fa-trash me-2"></i>{{ isBulkDelete ? 'Tout supprimer' : 'Supprimer' }}
       </button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-backdrop-custom" *ngIf="isAssignModalOpen" (click)="fermerModalAssignation()"></div>
+<div class="modal-wrapper-custom" *ngIf="isAssignModalOpen">
+  <div class="modal-content-custom shadow-lg" style="max-width: 500px;">
+    <div class="modal-header-custom p-3 border-bottom d-flex justify-content-between align-items-center bg-light">
+      <h5 class="m-0 fw-bold text-success"><i class="fas fa-user-tie me-2"></i>Assigner un Collecteur</h5>
+      <button class="btn-close" (click)="fermerModalAssignation()"></button>
+    </div>
+    <div class="modal-body-custom p-4">
+      <div class="mb-4 d-flex align-items-center gap-3 p-3 bg-light rounded-3 border">
+          <div class="avatar-large">{{ (clientPourAssignation?.nom?.substring(0,1)) }}</div>
+          <div>
+            <p class="text-muted mb-0 small">Client à assigner :</p>
+            <h6 class="fw-bold mb-0 text-dark">{{ clientPourAssignation?.nom }} {{ clientPourAssignation?.prenom }}</h6>
+          </div>
+      </div>
+      
+      <div class="form-group">
+        <label class="form-label fw-bold small mb-2"><i class="fas fa-list-ul me-1"></i> Sélectionner le collecteur</label>
+        
+        <div class="input-group mb-3">
+          <span class="input-group-text bg-white border-end-0"><i class="fas fa-search text-muted small"></i></span>
+          <input type="text" class="form-control form-control-sm border-start-0" 
+                 placeholder="Rechercher par nom ou matricule..." 
+                 [(ngModel)]="rechercheCollecteur">
+        </div>
+
+        <div class="custom-select-wrapper">
+            <i class="fas fa-user-check select-left-icon"></i>
+            <select class="form-select custom-select-styled" [(ngModel)]="collecteurSelectionneId">
+              <option value="">-- Aucun collecteur sélectionné --</option>
+              <option *ngFor="let coll of collecteursFiltres" [value]="coll.id || coll.idEmploye || coll.codeEmploye">
+                {{ coll.nom }} {{ coll.prenom }} ({{ coll.matricule }})
+              </option>
+            </select>
+            <i class="fas fa-chevron-down select-right-arrow"></i>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer p-3 d-flex gap-2 justify-content-end bg-light" style="border-radius: 0 0 15px 15px;">
+      <button class="btn btn-light border px-4" (click)="fermerModalAssignation()">Annuler</button>
+      <button class="btn btn-success px-4 fw-bold" (click)="confirmerAssignation()">
+        <i class="fas fa-check-circle me-1"></i> Valider l'assignation
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-backdrop-custom" *ngIf="isSuccessModalOpen" (click)="fermerModalSucces()"></div>
+<div class="modal-wrapper-custom" *ngIf="isSuccessModalOpen">
+  <div class="modal-content-custom shadow-lg text-center" style="max-width: 400px; border-bottom: 5px solid #198754;">
+    <div class="modal-body-custom p-5">
+      <div class="success-checkmark mb-4">
+        <i class="fas fa-check-circle fa-5x text-success animate-bounce"></i>
+      </div>
+      <h4 class="fw-bold text-dark">Opération Réussie !</h4>
+      <p class="text-muted">Le collecteur a été assigné avec succès au client.</p>
+      <button class="btn btn-success w-100 mt-3 fw-bold py-2 rounded-pill" (click)="fermerModalSucces()">Super !</button>
     </div>
   </div>
 </div>
