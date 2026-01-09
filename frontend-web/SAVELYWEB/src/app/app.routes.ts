@@ -8,6 +8,22 @@ import { AuthGuard } from './core/guards/auth.guard';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
+
+  { path: 'forgot-password', loadComponent: () =>
+      import('./modules/auth/forgot-password/forgot-password.component')
+        .then(m => m.ForgotPasswordComponent)
+  },
+
+  { path: 'verify-code', loadComponent: () =>
+      import('./modules/auth/verify-code/verify-code.component')
+        .then(m => m.VerifyCodeComponent)
+  },
+
+  { path: 'reset-password', loadComponent: () =>
+      import('./modules/auth/reset-password/reset-password.component')
+        .then(m => m.ResetPasswordComponent)
+  },
+
   {
     path: '',
     component: Sidebar,
@@ -17,9 +33,9 @@ export const routes: Routes = [
       { path: 'clients', component: ListeClientsComponent },
       { path: 'collecteurs', component: ListeEmployesComponent },
       { path: 'caissiers', component: ListeEmployesComponent },
-      { path: 'profil', loadComponent: () => import('./modules/auth/profil/profil.component').then(m => m.ProfilComponent) }, // Nouvelle route
       { path: '', redirectTo: 'accueil', pathMatch: 'full' }
     ]
   },
-  { path: '**', redirectTo: '' }
+
+  { path: '**', redirectTo: 'login' }
 ];

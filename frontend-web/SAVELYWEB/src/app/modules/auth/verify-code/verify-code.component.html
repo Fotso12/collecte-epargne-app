@@ -1,0 +1,11 @@
+<div class="login-container">
+  <div class="login-card">
+    <h2>Code de vérification</h2>
+    <p>Entrez le code reçu par mail</p>
+
+    <form [formGroup]="form" (ngSubmit)="submit()">
+      <input class="form-control" formControlName="code" placeholder="Code">
+      <button class="btn-login">Valider</button>
+    </form>
+  </div>
+</div>
