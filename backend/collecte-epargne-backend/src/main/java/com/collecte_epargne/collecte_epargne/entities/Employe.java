@@ -149,6 +149,7 @@ public class Employe {
         this.clientsAssignes = clientsAssignes;
     }
 
+
     public Employe(Integer idEmploye, String matricule, LocalDate dateEmbauche, TypeEmploye typeEmploye, BigDecimal commissionTaux, Utilisateur utilisateur, AgenceZone agenceZone, Employe superviseur, Set<Employe> equipeSupervisee, Set<Client> clientsAssignes) {
         this.idEmploye = idEmploye;
         this.matricule = matricule;
