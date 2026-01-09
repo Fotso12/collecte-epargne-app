@@ -15,6 +15,7 @@ import { AuthService } from '../../../../core/services/auth.service';
   styleUrls: ['./liste-transactions.css']
 })
 export class ListeTransactionsComponent implements OnInit, OnDestroy {
+  // --- Propriétés originales préservées ---
   transactions: any[] = [];
   transactionsFiltrees: any[] = [];
   employes: any[] = [];
@@ -31,19 +32,21 @@ export class ListeTransactionsComponent implements OnInit, OnDestroy {
   transactionSelectionnee?: any;
   StatutTx = StatutTransaction;
 
+  // --- Nouveaux états pour les modals améliorés ---
+  isConfirmModalOpen = false;
+  isRejectModalOpen = false;
+  motifRejetTexte = '';
+
   constructor(
     private transactionService: TransactionService,
     private employeService: EmployeService,
     private authService: AuthService,
     private cdr: ChangeDetectorRef,
-    private zone: NgZone // Injecté pour forcer le cycle de rendu Angular
+    private zone: NgZone 
   ) {}
 
   ngOnInit(): void {
-    // 1. Charger l'utilisateur immédiatement
     this.recupererUtilisateur();
-
-    // 2. S'abonner aux changements d'utilisateur
     if (this.authService?.currentUser$) {
       this.authSub = this.authService.currentUser$.subscribe(userData => {
         if (userData) {
@@ -54,8 +57,6 @@ export class ListeTransactionsComponent implements OnInit, OnDestroy {
         }
       });
     }
-
-    // 3. Charger les transactions
     this.chargerDonnees();
   }
 
@@ -74,18 +75,15 @@ export class ListeTransactionsComponent implements OnInit, OnDestroy {
   chargerDonnees = () => {
     if (this.chargement) return;
     this.chargement = true;
-    this.forcerRendu(); // Affiche le spinner
+    this.forcerRendu(); 
 
     forkJoin({
       txs: this.transactionService.getAll(),
       emps: this.employeService.getAll()
     }).subscribe({
       next: (resultat) => {
-        // Exécution dans la zone Angular pour garantir la mise à jour immédiate de la vue
         this.zone.run(() => {
           this.employes = resultat.emps || [];
-          
-          // Création d'une nouvelle référence de tableau (important pour la détection)
           this.transactions = (resultat.txs || []).map(t => ({
             ...t,
             nomInitiateur: this.trouverNomComplet(t.idEmployeInitiateur),
@@ -111,7 +109,6 @@ export class ListeTransactionsComponent implements OnInit, OnDestroy {
   private forcerRendu() {
     this.cdr.markForCheck();
     this.cdr.detectChanges();
-    // Double sécurité pour les cas asynchrones complexes
     setTimeout(() => {
       this.cdr.detectChanges();
     }, 0);
@@ -128,41 +125,54 @@ export class ListeTransactionsComponent implements OnInit, OnDestroy {
     return emp ? `${emp.prenom} ${emp.nom}` : idRecu;
   }
 
+  // --- Logique de validation avec Modal ---
   validerTransaction(id: string) {
+    this.transactionSelectionnee = this.transactions.find(t => t.idTransaction === id);
+    this.isConfirmModalOpen = true;
+  }
+
+  confirmerValidation() {
     const loginValide = this.user?.login || this.user?.email || JSON.parse(localStorage.getItem('auth_user') || '{}')?.login;
-    if (!loginValide) {
-      alert("Erreur : Identifiant introuvable. Reconnectez-vous.");
+    if (!loginValide || !this.transactionSelectionnee) {
+      alert("Erreur : Identifiant introuvable.");
       return;
     }
 
-    if (confirm(`Confirmer la validation par ${loginValide} ?`)) {
-      this.transactionService.validerParSuperviseur(id, loginValide).subscribe({
-        next: () => {
-          this.zone.run(() => {
-            alert("Transaction validée !");
-            this.isDetailsModalOpen = false;
-            this.chargerDonnees();
-          });
-        },
-        error: (err) => alert("Erreur : " + (err.error?.message || "Serveur injoignable"))
-      });
-    }
+    this.transactionService.validerParSuperviseur(this.transactionSelectionnee.idTransaction, loginValide).subscribe({
+      next: () => {
+        this.zone.run(() => {
+          this.isConfirmModalOpen = false;
+          this.isDetailsModalOpen = false;
+          this.chargerDonnees();
+        });
+      },
+      error: (err) => alert("Erreur : " + (err.error?.message || "Serveur injoignable"))
+    });
   }
 
+  // --- Logique de rejet avec Modal Amélioré ---
   rejeterTransaction(id: string) {
-    const motif = prompt('Motif du rejet :');
-    if (motif?.trim()) {
-      this.transactionService.rejeter(id, motif).subscribe({
-        next: () => {
-          this.zone.run(() => {
-            this.isDetailsModalOpen = false;
-            this.chargerDonnees();
-          });
-        }
-      });
-    }
+    this.transactionSelectionnee = this.transactions.find(t => t.idTransaction === id);
+    this.motifRejetTexte = ''; 
+    this.isRejectModalOpen = true;
   }
 
+  confirmerRejet() {
+    if (!this.motifRejetTexte.trim()) return;
+    
+    this.transactionService.rejeter(this.transactionSelectionnee.idTransaction, this.motifRejetTexte).subscribe({
+      next: () => {
+        this.zone.run(() => {
+          this.isRejectModalOpen = false;
+          this.isDetailsModalOpen = false;
+          this.chargerDonnees();
+        });
+      },
+      error: (err) => alert("Erreur lors du rejet")
+    });
+  }
+
+  // --- Fonctions utilitaires préservées ---
   calculerStats() {
     this.stats.total = this.transactions.length;
     this.stats.validees = this.transactions.filter(t => 
@@ -182,5 +192,10 @@ export class ListeTransactionsComponent implements OnInit, OnDestroy {
 
   chargerTransactions() { this.chargerDonnees(); }
   voirDetails(t: any) { this.transactionSelectionnee = t; this.isDetailsModalOpen = true; }
-  fermerModal() { this.isDetailsModalOpen = false; }
+  
+  fermerModal() { 
+    this.isDetailsModalOpen = false; 
+    this.isConfirmModalOpen = false; 
+    this.isRejectModalOpen = false;
+  }
 }
