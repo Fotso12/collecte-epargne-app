@@ -18,7 +18,14 @@ export class Dashboard implements OnInit {
     totalCaissiers: 0,
     volumeCotisation: 0,
     totalAgences: 0,
-    pourcentageTransactionsValidees: 0
+    pourcentageTransactionsValidees: 0,
+    // Nouveaux KPIs
+    totalComptesActifs: 0,
+    soldeTotalEpargne: 0,
+    volumeRetraits: 0,
+    transactionsEnAttente: 0,
+    tauxPenalites: 0,
+    epargneParClient: 0
   };
   isLoading = true;
 

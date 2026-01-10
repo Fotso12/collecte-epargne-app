@@ -13,6 +13,7 @@ import com.collecte_epargne.collecte_epargne.utils.StatutTransaction;
 import com.collecte_epargne.collecte_epargne.utils.CodeGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -118,9 +119,40 @@ public class TransactionService implements TransactionInterface {
         transaction.setSuperviseurValidateur(superviseur);
         transaction.setDateValidationSuperviseur(Instant.now());
         transaction.setStatut(StatutTransaction.VALIDEE_SUPERVISEUR);
+        
+        Transaction saved = transactionRepository.save(transaction);
+        
+        // Lancer l'auto-complétion asynchrone après 5 secondes
+        autoCompleteTransactionAfterDelay(idTransaction);
 
         log.info("Validation réussie pour la transaction {}", idTransaction);
-        return transactionMapper.toDto(transactionRepository.save(transaction));
+        return transactionMapper.toDto(saved);
+    }
+    
+    /**
+     * Méthode asynchrone pour passer automatiquement une transaction
+     * de VALIDEE_SUPERVISEUR à TERMINEE après 5 secondes
+     */
+    @Async
+    public void autoCompleteTransactionAfterDelay(String idTransaction) {
+        try {
+            // Attendre 1 seconde
+            Thread.sleep(1000);
+            
+            log.info("Auto-complétion de la transaction {} après validation superviseur", idTransaction);
+            
+            Transaction transaction = transactionRepository.findById(idTransaction)
+                    .orElse(null);
+            
+            if (transaction != null && transaction.getStatut() == StatutTransaction.VALIDEE_SUPERVISEUR) {
+                transaction.setStatut(StatutTransaction.TERMINEE);
+                transactionRepository.save(transaction);
+                log.info("Transaction {} passée à TERMINEE automatiquement", idTransaction);
+            }
+        } catch (InterruptedException e) {
+            log.error("Erreur lors de l'auto-complétion de la transaction {}", idTransaction, e);
+            Thread.currentThread().interrupt();
+        }
     }
 
     /**

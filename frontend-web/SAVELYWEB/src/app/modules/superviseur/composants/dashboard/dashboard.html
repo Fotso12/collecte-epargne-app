@@ -1,56 +1,119 @@
 <div class="dashboard-header">
-  <h2>Tableau de Bord</h2>
-  <p>Aperçu global de l'activité SAVELY</p>
+    <h2>Tableau de Bord</h2>
+    <p>Aperçu global de l'activité SAVELY</p>
 </div>
 
+<!-- KPIs Principaux (Ligne 1) -->
 <section class="stats-grid">
-  <div class="stat-card cyan">
-    <i class="fas fa-building card-icon"></i>
-    <div class="card-info">
-      <h3>{{ isLoading ? '...' : (stats.totalAgences | number) }}</h3>
-      <p>Entreprises</p>
+    <div class="stat-card cyan">
+        <i class="fas fa-building card-icon"></i>
+        <div class="card-info">
+            <h3>{{ isLoading ? '...' : (stats.totalAgences | number) }}</h3>
+            <p>Entreprises</p>
+        </div>
     </div>
-  </div>
-  <div class="stat-card blue">
-    <i class="fas fa-user-friends card-icon"></i>
-    <div class="card-info">
-      <h3>{{ isLoading ? '...' : (stats.totalClients | number) }}</h3>
-      <p>Clients</p>
+
+    <div class="stat-card blue">
+        <i class="fas fa-user-friends card-icon"></i>
+        <div class="card-info">
+            <h3>{{ isLoading ? '...' : (stats.totalClients | number) }}</h3>
+            <p>Clients</p>
+        </div>
     </div>
-  </div>
-  <div class="stat-card purple">
-    <i class="fas fa-walking card-icon"></i>
-    <div class="card-info">
-      <h3>{{ isLoading ? '...' : (stats.totalCollecteurs | number) }}</h3>
-      <p>Collecteurs</p>
+
+    <div class="stat-card teal">
+        <i class="fas fa-wallet card-icon"></i>
+        <div class="card-info">
+            <h3>{{ isLoading ? '...' : (stats.totalComptesActifs | number) }}</h3>
+            <p>Comptes Actifs</p>
+        </div>
     </div>
-  </div>
-  <div class="stat-card orange">
-    <i class="fas fa-vault card-icon"></i>
-    <div class="card-info">
-      <h3>{{ isLoading ? '...' : (stats.totalCaissiers | number) }}</h3>
-      <p>Caissiers</p>
+
+    <div class="stat-card success">
+        <i class="fas fa-piggy-bank card-icon"></i>
+        <div class="card-info">
+            <h3>{{ isLoading ? '...' : (stats.soldeTotalEpargne | number:'1.0-0') }}</h3>
+            <p>Épargne (FCFA)</p>
+        </div>
     </div>
-  </div>
-  <div class="stat-card green">
-    <i class="fas fa-chart-line card-icon"></i>
-    <div class="card-info">
-      <h3>{{ isLoading ? '...' : (stats.pourcentageTransactionsValidees | number:'1.0-1') }}%</h3>
-      <p>Validations</p>
+</section>
+
+<!-- KPIs Secondaires (Ligne 2) -->
+<section class="stats-grid mt-3">
+    <div class="stat-card purple">
+        <i class="fas fa-walking card-icon"></i>
+        <div class="card-info">
+            <h3>{{ isLoading ? '...' : (stats.totalCollecteurs | number) }}</h3>
+            <p>Collecteurs</p>
+        </div>
     </div>
-  </div>
-  <div class="stat-card red" *ngIf="stats.volumeCotisation > 0"
-    style="background: white; border-left: 4px solid #dc3545;">
-    <i class="fas fa-coins card-icon" style="color: #dc3545; background: #dc354520;"></i>
-    <div class="card-info">
-      <h3 style="color: #dc3545;">{{ isLoading ? '...' : (stats.volumeCotisation | number) }} FCFA</h3>
-      <p>Volume Dépôts</p>
+
+    <div class="stat-card orange">
+        <i class="fas fa-vault card-icon"></i>
+        <div class="card-info">
+            <h3>{{ isLoading ? '...' : (stats.totalCaissiers | number) }}</h3>
+            <p>Caissiers</p>
+        </div>
     </div>
-  </div>
+
+    <div class="stat-card green">
+        <i class="fas fa-check-circle card-icon"></i>
+        <div class="card-info">
+            <h3>{{ isLoading ? '...' : (stats.pourcentageTransactionsValidees | number:'1.0-1') }}%</h3>
+            <p>Validées</p>
+        </div>
+    </div>
+
+    <div class="stat-card" style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);"
+        *ngIf="stats.transactionsEnAttente > 0">
+        <i class="fas fa-clock card-icon"></i>
+        <div class="card-info">
+            <h3>{{ isLoading ? '...' : (stats.transactionsEnAttente | number) }}</h3>
+            <p>En Attente <span class="badge bg-warning-subtle text-warning"
+                    *ngIf="!isLoading && stats.transactionsEnAttente > 5">!</span></p>
+        </div>
+    </div>
+</section>
+
+<!-- KPIs Financiers (Ligne 3) -->
+<section class="stats-grid mt-3">
+    <div class="stat-card" style="background: #fff; border-left: 4px solid #10b981;">
+        <i class="fas fa-arrow-up card-icon" style="color: #10b981; background: #10b98115;"></i>
+        <div class="card-info">
+            <h3 style="color: #10b981;">{{ isLoading ? '...' : (stats.volumeCotisation | number:'1.0-0') }}</h3>
+            <p>Dépôts (FCFA)</p>
+        </div>
+    </div>
+
+    <div class="stat-card" style="background: #fff; border-left: 4px solid #ef4444;">
+        <i class="fas fa-arrow-down card-icon" style="color: #ef4444; background: #ef444415;"></i>
+        <div class="card-info">
+            <h3 style="color: #ef4444;">{{ isLoading ? '...' : (stats.volumeRetraits | number:'1.0-0') }}</h3>
+            <p>Retraits (FCFA)</p>
+        </div>
+    </div>
+
+    <div class="stat-card" style="background: #fff; border-left: 4px solid #3b82f6;">
+        <i class="fas fa-chart-line card-icon" style="color: #3b82f6; background: #3b82f615;"></i>
+        <div class="card-info">
+            <h3 style="color: #3b82f6;">{{ isLoading ? '...' : (stats.epargneParClient | number:'1.0-0') }}</h3>
+            <p>Moy./Client (FCFA)</p>
+        </div>
+    </div>
+
+    <div class="stat-card" style="background: #fff; border-left: 4px solid #f59e0b;" *ngIf="stats.tauxPenalites > 0">
+        <i class="fas fa-exclamation-triangle card-icon" style="color: #f59e0b; background: #f59e0b15;"></i>
+        <div class="card-info">
+            <h3 style="color: #f59e0b;">{{ isLoading ? '...' : (stats.tauxPenalites | number:'1.0-1') }}%</h3>
+            <p>Pénalités</p>
+        </div>
+    </div>
 </section>
 
 <section class="charts-grid">
+    <!-- Les graphiques seront ajoutés ici -->
 </section>
 
 <section class="table-container summary-section">
+    <!-- Les tableaux récapitulatifs seront ajoutés ici -->
 </section>

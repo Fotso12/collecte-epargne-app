@@ -42,8 +42,8 @@ export class ListeTransactionsComponent implements OnInit, OnDestroy {
     private employeService: EmployeService,
     private authService: AuthService,
     private cdr: ChangeDetectorRef,
-    private zone: NgZone 
-  ) {}
+    private zone: NgZone
+  ) { }
 
   ngOnInit(): void {
     this.recupererUtilisateur();
@@ -75,7 +75,7 @@ export class ListeTransactionsComponent implements OnInit, OnDestroy {
   chargerDonnees = () => {
     if (this.chargement) return;
     this.chargement = true;
-    this.forcerRendu(); 
+    this.forcerRendu();
 
     forkJoin({
       txs: this.transactionService.getAll(),
@@ -117,8 +117,8 @@ export class ListeTransactionsComponent implements OnInit, OnDestroy {
   private trouverNomComplet(idRecu?: any): string {
     if (!idRecu || !this.employes || this.employes.length === 0) return 'Non assigné';
     const idStr = String(idRecu).trim().toLowerCase();
-    const emp = this.employes.find(e => 
-      String(e.idEmploye) === idStr || 
+    const emp = this.employes.find(e =>
+      String(e.idEmploye) === idStr ||
       e.matricule?.toString().toLowerCase() === idStr ||
       e.loginUtilisateur?.toString().toLowerCase() === idStr
     );
@@ -143,7 +143,13 @@ export class ListeTransactionsComponent implements OnInit, OnDestroy {
         this.zone.run(() => {
           this.isConfirmModalOpen = false;
           this.isDetailsModalOpen = false;
+          // Recharger immédiatement pour voir VALIDEE_SUPERVISEUR
           this.chargerDonnees();
+
+          // Auto-refresh après 2 secondes pour voir le passage à TERMINEE
+          setTimeout(() => {
+            this.chargerDonnees();
+          }, 2000);
         });
       },
       error: (err) => alert("Erreur : " + (err.error?.message || "Serveur injoignable"))
@@ -153,13 +159,13 @@ export class ListeTransactionsComponent implements OnInit, OnDestroy {
   // --- Logique de rejet avec Modal Amélioré ---
   rejeterTransaction(id: string) {
     this.transactionSelectionnee = this.transactions.find(t => t.idTransaction === id);
-    this.motifRejetTexte = ''; 
+    this.motifRejetTexte = '';
     this.isRejectModalOpen = true;
   }
 
   confirmerRejet() {
     if (!this.motifRejetTexte.trim()) return;
-    
+
     this.transactionService.rejeter(this.transactionSelectionnee.idTransaction, this.motifRejetTexte).subscribe({
       next: () => {
         this.zone.run(() => {
@@ -175,7 +181,7 @@ export class ListeTransactionsComponent implements OnInit, OnDestroy {
   // --- Fonctions utilitaires préservées ---
   calculerStats() {
     this.stats.total = this.transactions.length;
-    this.stats.validees = this.transactions.filter(t => 
+    this.stats.validees = this.transactions.filter(t =>
       t.statut === 'TERMINEE' || t.statut === 'VALIDEE_SUPERVISEUR'
     ).length;
     this.stats.pourcentage = this.stats.total > 0 ? (this.stats.validees / this.stats.total) * 100 : 0;
@@ -183,7 +189,7 @@ export class ListeTransactionsComponent implements OnInit, OnDestroy {
 
   appliquerFiltres() {
     const search = this.filtreReference.toLowerCase();
-    this.transactionsFiltrees = this.transactions.filter(t => 
+    this.transactionsFiltrees = this.transactions.filter(t =>
       (t.reference?.toLowerCase().includes(search) || t.nomInitiateur?.toLowerCase().includes(search)) &&
       (!this.filtreStatut || t.statut === this.filtreStatut) &&
       (!this.filtreType || t.typeTransaction === this.filtreType)
@@ -192,10 +198,10 @@ export class ListeTransactionsComponent implements OnInit, OnDestroy {
 
   chargerTransactions() { this.chargerDonnees(); }
   voirDetails(t: any) { this.transactionSelectionnee = t; this.isDetailsModalOpen = true; }
-  
-  fermerModal() { 
-    this.isDetailsModalOpen = false; 
-    this.isConfirmModalOpen = false; 
+
+  fermerModal() {
+    this.isDetailsModalOpen = false;
+    this.isConfirmModalOpen = false;
     this.isRejectModalOpen = false;
   }
 }

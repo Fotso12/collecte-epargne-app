@@ -4,15 +4,16 @@
       <h2 class="text-dark fw-bold">SUIVI DES TRANSACTIONS</h2>
       <p class="text-muted">Gestion et validation des flux financiers Savely</p>
     </div>
-    
+
     <div class="stats-card shadow-sm p-3 bg-white rounded-3">
       <div class="d-flex justify-content-between mb-2 small fw-bold">
         <span class="text-muted italic">Efficacité des validations</span>
-        <span class="text-success">{{ stats.validees }}/{{ stats.total }} ({{ stats.pourcentage | number:'1.0-0' }}%)</span>
+        <span class="text-success">{{ stats.validees }}/{{ stats.total }} ({{ stats.pourcentage | number:'1.0-0'
+          }}%)</span>
       </div>
       <div class="progress" style="height: 8px;">
-        <div class="progress-bar bg-success progress-bar-striped progress-bar-animated" 
-             [style.width.%]="stats.pourcentage"></div>
+        <div class="progress-bar bg-success progress-bar-striped progress-bar-animated"
+          [style.width.%]="stats.pourcentage"></div>
       </div>
     </div>
   </div>
@@ -24,8 +25,8 @@
           <label class="form-label small fw-bold text-uppercase">Recherche</label>
           <div class="input-group">
             <span class="input-group-text bg-light border-0"><i class="fas fa-search text-muted"></i></span>
-            <input type="text" class="form-control bg-light border-0" placeholder="Référence ou Nom..." 
-                   [(ngModel)]="filtreReference" (input)="appliquerFiltres()">
+            <input type="text" class="form-control bg-light border-0" placeholder="Référence ou Nom..."
+              [(ngModel)]="filtreReference" (input)="appliquerFiltres()">
           </div>
         </div>
         <div class="col-md-3">
@@ -77,28 +78,36 @@
         <tr *ngFor="let t of transactionsFiltrees">
           <td>
             <div class="fw-bold text-dark">{{ t.reference }}</div>
-            <small class="text-muted"><i class="far fa-calendar-alt me-1"></i>{{ t.dateTransaction | date:'dd/MM/yyyy HH:mm' }}</small>
+            <small class="text-muted"><i class="far fa-calendar-alt me-1"></i>{{ t.dateTransaction | date:'dd/MM/yyyy
+              HH:mm' }}</small>
           </td>
           <td>
-            <div class="fw-bold">{{ t.montant | number }} FCFA</div>
-            <span class="text-primary small fw-semibold">{{ t.typeTransaction }}</span>
+            <div class="fw-bold"
+              [style.color]="t.typeTransaction === 'DEPOT' || t.typeTransaction === 'Dépôt' ? '#10b981' : (t.typeTransaction === 'RETRAIT' || t.typeTransaction === 'Retrait' ? '#ef4444' : '#3b82f6')">
+              {{ t.montant | number }} FCFA
+            </div>
+            <span class="small fw-semibold"
+              [style.color]="t.typeTransaction === 'DEPOT' || t.typeTransaction === 'Dépôt' ? '#10b981' : (t.typeTransaction === 'RETRAIT' || t.typeTransaction === 'Retrait' ? '#ef4444' : '#3b82f6')">
+              {{ t.typeTransaction }}
+            </span>
           </td>
           <td>
             <div class="user-info d-flex align-items-center gap-2">
-               <div class="avatar-sm bg-blue-light"><i class="fas fa-user-edit"></i></div>
-               <div class="d-flex flex-column">
-                  <span class="small fw-bold text-dark">{{ t.nomInitiateur }}</span>
-                  <span class="text-muted" style="font-size: 0.65rem;"> {{ t.dateTransaction }}</span>
-               </div>
+              <div class="avatar-sm bg-blue-light"><i class="fas fa-user-edit"></i></div>
+              <div class="d-flex flex-column">
+                <span class="small fw-bold text-dark">{{ t.nomInitiateur }}</span>
+                <span class="text-muted" style="font-size: 0.65rem;"> {{ t.dateTransaction }}</span>
+              </div>
             </div>
           </td>
           <td>
             <div class="user-info d-flex align-items-center gap-2">
-               <div class="avatar-sm bg-gray-light"><i class="fas fa-cash-register"></i></div>
-               <div class="d-flex flex-column">
-                  <span class="small fw-bold text-dark">{{ t.nomCaissier }}</span>
-                  <span class="text-muted" style="font-size: 0.65rem;">{{ t.dateValidationCaisse ? 'ID: '  : '---' }}</span>
-               </div>
+              <div class="avatar-sm bg-gray-light"><i class="fas fa-cash-register"></i></div>
+              <div class="d-flex flex-column">
+                <span class="small fw-bold text-dark">{{ t.nomCaissier }}</span>
+                <span class="text-muted" style="font-size: 0.65rem;">{{ t.dateValidationCaisse ? 'ID: ' : '---'
+                  }}</span>
+              </div>
             </div>
           </td>
           <td>
@@ -127,10 +136,10 @@
         </tr>
       </tbody>
     </table>
-    
+
     <div *ngIf="!chargement && transactionsFiltrees.length === 0" class="p-5 text-center text-muted">
-        <i class="fas fa-folder-open fa-3x mb-3 opacity-25"></i>
-        <p>Aucune donnée disponible.</p>
+      <i class="fas fa-folder-open fa-3x mb-3 opacity-25"></i>
+      <p>Aucune donnée disponible.</p>
     </div>
   </div>
 </div>
@@ -145,36 +154,39 @@
     <div class="modal-body-custom p-4">
       <div class="row g-4">
         <div class="col-md-6 border-end">
-            <h6 class="text-uppercase small text-muted fw-bold mb-3">Finances</h6>
-            <div class="mb-2"><strong>Montant :</strong> {{ transactionSelectionnee.montant | number }} FCFA</div>
-            <div class="mb-2"><strong>Référence :</strong> {{ transactionSelectionnee.reference }}</div>
-            <div class="mb-2"><strong>Compte :</strong> {{ transactionSelectionnee.idCompte }}</div>
+          <h6 class="text-uppercase small text-muted fw-bold mb-3">Finances</h6>
+          <div class="mb-2"><strong>Montant :</strong> {{ transactionSelectionnee.montant | number }} FCFA</div>
+          <div class="mb-2"><strong>Référence :</strong> {{ transactionSelectionnee.reference }}</div>
+          <div class="mb-2"><strong>Compte :</strong> {{ transactionSelectionnee.idCompte }}</div>
         </div>
         <div class="col-md-6">
-            <h6 class="text-uppercase small text-muted fw-bold mb-3">Intervenants</h6>
-            <div class="mb-2"><strong>Collecteur :</strong> {{ transactionSelectionnee.nomInitiateur }}</div>
-            <div class="mb-2"><strong>Caissier :</strong> {{ transactionSelectionnee.nomCaissier }}</div>
-            <div class="mb-2"><strong>État :</strong> <span class="text-primary fw-bold">{{ transactionSelectionnee.statut }}</span></div>
+          <h6 class="text-uppercase small text-muted fw-bold mb-3">Intervenants</h6>
+          <div class="mb-2"><strong>Collecteur :</strong> {{ transactionSelectionnee.nomInitiateur }}</div>
+          <div class="mb-2"><strong>Caissier :</strong> {{ transactionSelectionnee.nomCaissier }}</div>
+          <div class="mb-2"><strong>État :</strong> <span class="text-primary fw-bold">{{ transactionSelectionnee.statut
+              }}</span></div>
         </div>
         <div class="col-12" *ngIf="transactionSelectionnee.statut === StatutTx.REJETEE">
           <div class="p-3 bg-danger-subtle text-danger rounded-3">
-              <small class="fw-bold">Motif du rejet :</small>
-              <p class="mb-0 fs-7">{{ transactionSelectionnee.motifRejet || 'N/A' }}</p>
+            <small class="fw-bold">Motif du rejet :</small>
+            <p class="mb-0 fs-7">{{ transactionSelectionnee.motifRejet || 'N/A' }}</p>
           </div>
         </div>
         <div class="col-12">
-            <div class="p-3 bg-light rounded-3">
-                <small class="fw-bold text-muted">Observation :</small>
-                <p class="mb-0 fs-7">{{ transactionSelectionnee.description || 'N/A' }}</p>
-            </div>
+          <div class="p-3 bg-light rounded-3">
+            <small class="fw-bold text-muted">Observation :</small>
+            <p class="mb-0 fs-7">{{ transactionSelectionnee.description || 'N/A' }}</p>
+          </div>
         </div>
       </div>
     </div>
     <div class="modal-footer p-3 bg-light d-flex justify-content-end gap-2" style="border-radius: 0 0 20px 20px;">
       <button class="btn btn-outline-secondary px-4 rounded-pill fw-bold" (click)="fermerModal()">Fermer</button>
       <ng-container *ngIf="transactionSelectionnee.statut === StatutTx.VALIDEE_CAISSE">
-        <button class="btn btn-danger px-4 rounded-pill fw-bold" (click)="rejeterTransaction(transactionSelectionnee.idTransaction)">Rejeter</button>
-        <button class="btn btn-success px-4 rounded-pill fw-bold" (click)="validerTransaction(transactionSelectionnee.idTransaction)">Valider l'opération</button>
+        <button class="btn btn-danger px-4 rounded-pill fw-bold"
+          (click)="rejeterTransaction(transactionSelectionnee.idTransaction)">Rejeter</button>
+        <button class="btn btn-success px-4 rounded-pill fw-bold"
+          (click)="validerTransaction(transactionSelectionnee.idTransaction)">Valider l'opération</button>
       </ng-container>
     </div>
   </div>
@@ -188,7 +200,8 @@
     <p class="text-muted">Référence : <strong>{{ transactionSelectionnee?.reference }}</strong></p>
     <div class="d-flex justify-content-center gap-2 mt-4">
       <button class="btn btn-light rounded-pill px-4" (click)="fermerModal()">Annuler</button>
-      <button class="btn btn-success rounded-pill px-4 fw-bold" (click)="confirmerValidation()">Confirmer maintenant</button>
+      <button class="btn btn-success rounded-pill px-4 fw-bold" (click)="confirmerValidation()">Confirmer
+        maintenant</button>
     </div>
   </div>
 </div>
@@ -199,16 +212,17 @@
     <div class="text-center mb-3">
       <div class="icon-confirm-circle text-danger mb-2"><i class="fas fa-times-circle fa-4x"></i></div>
       <h4 class="fw-bold">Motif du Rejet</h4>
-      <p class="text-muted small">Expliquez pourquoi la transaction <strong>{{ transactionSelectionnee?.reference }}</strong> est rejetée.</p>
+      <p class="text-muted small">Expliquez pourquoi la transaction <strong>{{ transactionSelectionnee?.reference
+          }}</strong> est rejetée.</p>
     </div>
     <div class="mb-4">
-      <textarea class="form-control bg-light border-0 rounded-3 p-3" rows="4" 
-                placeholder="Indiquez le motif ici..." [(ngModel)]="motifRejetTexte"></textarea>
+      <textarea class="form-control bg-light border-0 rounded-3 p-3" rows="4" placeholder="Indiquez le motif ici..."
+        [(ngModel)]="motifRejetTexte"></textarea>
     </div>
     <div class="d-flex justify-content-end gap-2">
       <button class="btn btn-light rounded-pill px-4" (click)="fermerModal()">Annuler</button>
-      <button class="btn btn-danger rounded-pill px-4 fw-bold" 
-              [disabled]="!motifRejetTexte.trim()" (click)="confirmerRejet()">
+      <button class="btn btn-danger rounded-pill px-4 fw-bold" [disabled]="!motifRejetTexte.trim()"
+        (click)="confirmerRejet()">
         Confirmer le Rejet
       </button>
     </div>

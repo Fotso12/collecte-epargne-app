@@ -1,106 +1,212 @@
 .dashboard-header {
-    margin-bottom: 25px;
+    margin-bottom: 1.5rem;
 }
 
 .dashboard-header h2 {
-    color: #2c3e50;
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 0.25rem;
+}
+
+.dashboard-header p {
+    font-size: 0.875rem;
+    color: #6b7280;
     margin: 0;
 }
 
+/* Stats Grid - Compact Layout */
 .stats-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 20px;
-    margin-bottom: 30px;
+    gap: 1rem;
+    margin-bottom: 0;
 }
 
+.stats-grid.mt-3 {
+    margin-top: 1rem;
+}
+
+/* Stat Cards - Compact & Modern */
 .stat-card {
-    padding: 20px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     border-radius: 12px;
-    color: white;
+    padding: 1rem 1.25rem;
     display: flex;
     align-items: center;
-    gap: 15px;
-    transition: 0.3s;
+    gap: 1rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    position: relative;
+    overflow: hidden;
+    min-height: 80px;
+}
+
+.stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 100px;
+    height: 100px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    transform: translate(30%, -30%);
 }
 
 .stat-card:hover {
-    transform: translateY(-5px);
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
 }
 
-.blue {
-    background: linear-gradient(135deg, #3498db, #2980b9);
+/* Icon Styling - Compact */
+.card-icon {
+    font-size: 1.75rem;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.25);
+    border-radius: 10px;
+    color: #fff;
+    flex-shrink: 0;
 }
 
-.purple {
-    background: linear-gradient(135deg, #9b59b6, #8e44ad);
+/* Card Info */
+.card-info {
+    flex: 1;
+    color: #fff;
+    min-width: 0;
 }
 
-.orange {
-    background: linear-gradient(135deg, #e67e22, #d35400);
+.card-info h3 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin: 0;
+    line-height: 1.2;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
-.green {
-    background: linear-gradient(135deg, #27ae60, #219150);
+.card-info p {
+    font-size: 0.8rem;
+    margin: 0.25rem 0 0;
+    opacity: 0.95;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
-.cyan {
-    background: linear-gradient(135deg, #17a2b8, #138496);
+/* Color Variants - Modern Palette */
+.stat-card.cyan {
+    background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
 }
 
-.charts-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-    gap: 20px;
-    margin-bottom: 30px;
+.stat-card.blue {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
 }
 
-.chart-card {
-    background: white;
-    padding: 20px;
-    border-radius: 12px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+.stat-card.teal {
+    background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
 }
 
-.table-container {
-    background: white;
-    padding: 20px;
-    border-radius: 12px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+.stat-card.success {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
 }
 
-table {
-    width: 100%;
-    border-collapse: collapse;
+.stat-card.purple {
+    background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
 }
 
-th {
-    text-align: left;
-    padding: 12px;
-    color: #95a5a6;
-    border-bottom: 1px solid #eee;
-    font-size: 0.85rem;
+.stat-card.orange {
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
 }
 
-td {
-    padding: 12px;
-    border-bottom: 1px solid #eee;
-    font-size: 0.9rem;
+.stat-card.green {
+    background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
 }
 
+/* White Cards with Colored Borders */
+.stat-card[style*="background: white"],
+.stat-card[style*="background: #fff"] {
+    color: #1f2937;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    border: 1px solid #e5e7eb;
+}
+
+.stat-card[style*="background: white"] .card-info h3,
+.stat-card[style*="background: #fff"] .card-info h3 {
+    font-weight: 700;
+}
+
+.stat-card[style*="background: white"] .card-info p,
+.stat-card[style*="background: #fff"] .card-info p {
+    color: #6b7280;
+    opacity: 1;
+}
+
+/* Badge Styling */
 .badge {
-    padding: 4px 10px;
-    border-radius: 20px;
-    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 6px;
+    font-size: 0.7rem;
     font-weight: 600;
 }
 
-.badge-ok {
-    background: #e8f8f5;
-    color: #27ae60;
+/* Charts Grid */
+.charts-grid {
+    margin-top: 1.5rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 1rem;
 }
 
-.badge-wait {
-    background: #fef5e7;
-    color: #f39c12;
+/* Summary Section */
+.summary-section {
+    margin-top: 1.5rem;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+    .stats-grid {
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    }
+
+    .card-info h3 {
+        font-size: 1.25rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.75rem;
+    }
+
+    .stat-card {
+        padding: 0.875rem 1rem;
+        min-height: 70px;
+    }
+
+    .card-icon {
+        font-size: 1.5rem;
+        width: 40px;
+        height: 40px;
+    }
+
+    .card-info h3 {
+        font-size: 1.125rem;
+    }
+
+    .card-info p {
+        font-size: 0.7rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
 }
