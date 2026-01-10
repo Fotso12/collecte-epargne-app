@@ -60,8 +60,8 @@ public class ClientController {
             if (file.isEmpty()) {
                 return new ResponseEntity<>("Le fichier est vide", HttpStatus.BAD_REQUEST);
             }
-            clientService.importClientsFromCSV(file);
-            return new ResponseEntity<>("Importation réussie", HttpStatus.OK);
+            java.util.Map<String, Integer> stats = clientService.importClientsFromCSV(file);
+            return new ResponseEntity<>(stats, HttpStatus.OK);
         } catch (Exception e) {
             log.error("Erreur lors de l'importation CSV", e);
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);

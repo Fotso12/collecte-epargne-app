@@ -32,6 +32,9 @@ public class AgenceZoneDto implements Serializable {
     @Size(max = 20)
     String telephone;
 
+    @Size(max = 255)
+    String position;
+
     String description;
 
     StatutGenerique statut;
@@ -116,6 +119,14 @@ public class AgenceZoneDto implements Serializable {
 
     public void setDateCreation(Instant dateCreation) {
         this.dateCreation = dateCreation;
+    }
+
+    public String getPosition() {
+        return position;
+    }
+
+    public void setPosition(String position) {
+        this.position = position;
     }
 
     public AgenceZoneDto() {

@@ -16,6 +16,8 @@ export interface ClientDto {
     codeClient?: string;
     numeroClient: number;
     adresse?: string;
+    ville?: string;
+    idAgence?: number;
     typeCni: TypeCNI;
     numCni: string;
     photoPath?: string;
@@ -31,6 +33,6 @@ export interface ClientDto {
     nom?: string;
     prenom?: string;
     telephone?: string;
-    statut?: StatutGenerique; 
+    statut?: StatutGenerique;
     dateCreation?: string | Date;
 }

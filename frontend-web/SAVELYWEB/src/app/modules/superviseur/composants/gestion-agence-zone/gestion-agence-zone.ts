@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+// 1. Ajoute ChangeDetectorRef dans l'importation existante
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { forkJoin, of } from 'rxjs';
@@ -31,27 +32,29 @@ export class GestionAgenceZoneComponent implements OnInit {
   agenceForm: AgenceZoneDto = this.initialiserForm();
   agenceSelectionnee?: AgenceZoneDto;
   tabActif: 'employes' | 'clients' | 'utilisateurs' = 'employes';
-  
+
   listeEmployes: EmployeDto[] = [];
   listeClients: ClientDto[] = [];
   listeUtilisateurs: UtilisateurDto[] = [];
 
+  // 2. Utilise le type directement sans le "import(...)"
   constructor(
     private agenceService: AgenceZoneService,
     private clientService: ClientService,
     private employeService: EmployeService,
-    private utilisateurService: UtilisateurService
-  ) {}
+    private utilisateurService: UtilisateurService,
+    private cdr: ChangeDetectorRef
+  ) { }
 
   ngOnInit(): void {
     this.chargerAgences();
   }
 
   initialiserForm(): AgenceZoneDto {
-    return { 
-      code: '', nom: '', ville: '', quartier: '', 
-      adresse: '', telephone: '', description: '', 
-      statut: StatutGenerique.ACTIF 
+    return {
+      code: '', nom: '', ville: '', quartier: '',
+      adresse: '', telephone: '', description: '', position: '',
+      statut: StatutGenerique.ACTIF
     };
   }
 
@@ -62,18 +65,20 @@ export class GestionAgenceZoneComponent implements OnInit {
         this.agences = data;
         this.agencesFiltrees = data;
         this.chargement = false;
+        this.cdr.detectChanges(); // Maintenant ceci fonctionnera
       },
       error: (err) => {
         console.error("Erreur chargement agences", err);
         this.chargement = false;
+        this.cdr.detectChanges();
       }
     });
   }
 
   filtrerAgences() {
     const term = this.rechercheTerme.toLowerCase();
-    this.agencesFiltrees = this.agences.filter(a => 
-      a.nom.toLowerCase().includes(term) || 
+    this.agencesFiltrees = this.agences.filter(a =>
+      a.nom.toLowerCase().includes(term) ||
       a.code.toLowerCase().includes(term) ||
       (a.ville && a.ville.toLowerCase().includes(term))
     );
@@ -95,17 +100,21 @@ export class GestionAgenceZoneComponent implements OnInit {
       (payload as any).dateCreation = new Date().toISOString();
     }
 
-    const action = payload.idAgence 
+    const action = payload.idAgence
       ? this.agenceService.update(payload.idAgence, payload)
       : this.agenceService.save(payload);
 
     action.subscribe({
       next: () => {
         this.chargerAgences();
-        this.fermerModals();
-        alert(payload.idAgence ? "Modification réussie !" : "Création réussie !");
+        this.isFormModalOpen = false; // Close form first
+        this.cdr.detectChanges();
+        this.showSuccess(payload.idAgence ? "L'agence a été modifiée avec succès !" : "L'agence a été créée avec succès !");
       },
-      error: (err) => alert("Erreur d'enregistrement : " + err.status)
+      error: (err) => {
+        console.error(err);
+        this.showError("Une erreur est survenue lors de l'enregistrement. Code: " + err.status);
+      }
     });
   }
 
@@ -114,31 +123,53 @@ export class GestionAgenceZoneComponent implements OnInit {
     this.isEntitiesModalOpen = true;
     this.chargement = true;
 
-    // Utilisation de catchError pour éviter que tout échoue si une liste est vide
     forkJoin({
       emps: this.employeService.getAll().pipe(catchError(() => of([]))),
       clis: this.clientService.getTousLesClients().pipe(catchError(() => of([]))),
       utils: this.utilisateurService.getTousLesUtilisateurs().pipe(catchError(() => of([])))
     }).subscribe({
       next: (res) => {
-        // Filtrage strict par ID agence
         const targetId = String(agence.idAgence);
-        
+
         this.listeEmployes = res.emps.filter(e => String(e.idAgence) === targetId);
         this.listeClients = res.clis.filter((c: any) => String(c.idAgence) === targetId);
 
-        // Utilisateurs : on cherche ceux dont le login correspond aux employés filtrés
         const loginsDeLAgence = this.listeEmployes.map(e => e.loginUtilisateur);
         this.listeUtilisateurs = res.utils.filter((u: UtilisateurDto) => loginsDeLAgence.includes(u.login));
-        
+
         this.chargement = false;
+        this.cdr.detectChanges(); // Ajouté ici aussi pour rafraîchir la vue après le forkJoin
       },
-      error: () => this.chargement = false
+      error: () => {
+        this.chargement = false;
+        this.cdr.detectChanges();
+      }
     });
   }
+
+  // Modal states
+  isSuccessModalOpen = false;
+  successMessage = '';
+  isErrorModalOpen = false;
+  errorMessage = '';
 
   fermerModals() {
     this.isFormModalOpen = false;
     this.isEntitiesModalOpen = false;
+    this.isSuccessModalOpen = false;
+    this.isErrorModalOpen = false;
+    this.cdr.detectChanges();
+  }
+
+  showSuccess(message: string) {
+    this.successMessage = message;
+    this.isSuccessModalOpen = true;
+    this.cdr.detectChanges();
+  }
+
+  showError(message: string) {
+    this.errorMessage = message;
+    this.isErrorModalOpen = true;
+    this.cdr.detectChanges();
   }
 }

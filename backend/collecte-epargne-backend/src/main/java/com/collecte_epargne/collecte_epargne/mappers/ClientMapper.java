@@ -17,6 +17,7 @@ public interface ClientMapper {
     @Mapping(source = "utilisateur", target = "loginUtilisateur", qualifiedByName = "utilisateurToLogin")
     @Mapping(source = "collecteurAssigne", target = "codeCollecteurAssigne", qualifiedByName = "employeToCode")
     @Mapping(source = "collecteurAssigne", target = "nomCollecteur", qualifiedByName = "employeToNomComplet")
+    @Mapping(target = "idAgence", source = "collecteurAssigne.agenceZone.idAgence")
     @Mapping(source = "utilisateur.nom", target = "nom")
     @Mapping(source = "utilisateur.prenom", target = "prenom")
     @Mapping(source = "utilisateur.telephone", target = "telephone")

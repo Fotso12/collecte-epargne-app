@@ -20,6 +20,8 @@ export const routes: Routes = [
       { path: 'clients', component: ListeClientsComponent },
       { path: 'collecteurs', component: ListeEmployesComponent },
       { path: 'caissiers', component: ListeEmployesComponent },
+      { path: 'superviseurs', component: ListeEmployesComponent },
+      { path: 'parametres', loadComponent: () => import('./modules/superviseur/composants/parametres/parametres').then(m => m.ParametresComponent) },
       { path: 'transactions', component: ListeTransactionsComponent },
       { path: 'reporting', loadComponent: () => import('./modules/superviseur/composants/reporting/reporting').then(m => m.ReportingComponent) },
       { path: 'profil', loadComponent: () => import('./modules/auth/profil/profil.component').then(m => m.ProfilComponent) },

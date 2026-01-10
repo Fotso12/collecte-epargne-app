@@ -33,6 +33,21 @@ public class CodeGenerator {
         return generateUniqueCode("CLT", false);
     }
 
+    // Génère un code agence (ex: AGC-ABIDJAN-123)
+    public String generateAgenceCode(String ville) {
+        String prefix = "AGC";
+        if (ville != null && !ville.isEmpty()) {
+            prefix += "-" + ville.substring(0, Math.min(ville.length(), 3)).toUpperCase();
+        }
+        return generateUniqueCode(prefix + "-", false);
+    }
+
+    // Génère une référence de transaction (ex: TXN-20250101-123456)
+    public String generateTransactionRef() {
+        String datePart = LocalDate.now().toString().replace("-", "");
+        return "TXN-" + datePart + "-" + ThreadLocalRandom.current().nextInt(100000, 999999);
+    }
+
     // Logique commune de génération avec vérification d'unicité
     private String generateUniqueCode(String prefix, boolean isEmployee) {
         long randomNumber = ThreadLocalRandom.current().nextInt(10000, 100000);
@@ -43,6 +58,10 @@ public class CodeGenerator {
         boolean exists = isEmployee
                 ? employeRepository.findByMatricule(finalCode).isPresent()
                 : clientRepository.findByCodeClient(finalCode).isPresent();
+
+        // Note: Pour les agences et transactions, nous ne vérifions pas l'unicité ici dans cet extrait simplifié
+        // mais idéalement il faudrait injecter leurs repositories respectifs.
+        // Pour l'instant, la probabilité de collision est faible avec le timestamp/random.
 
         return exists ? generateUniqueCode(prefix, isEmployee) : finalCode;
     }

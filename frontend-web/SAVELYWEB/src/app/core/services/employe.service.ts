@@ -14,6 +14,10 @@ export class EmployeService {
     return this.http.get<EmployeDto[]>(`${this.apiUrl}/caissiers`);
   }
 
+  getSuperviseurs(): Observable<EmployeDto[]> {
+    return this.http.get<EmployeDto[]>(`${this.apiUrl}/superviseurs`);
+  }
+
   getCollecteurs(): Observable<EmployeDto[]> {
     return this.http.get<EmployeDto[]>(`${this.apiUrl}/collecteurs`);
   }
@@ -41,7 +45,7 @@ export class EmployeService {
       collecteurs: this.getCollecteurs()
     }).pipe(
       map((res: { caissiers: EmployeDto[], collecteurs: EmployeDto[] }) => [
-        ...res.caissiers, 
+        ...res.caissiers,
         ...res.collecteurs
       ])
     );

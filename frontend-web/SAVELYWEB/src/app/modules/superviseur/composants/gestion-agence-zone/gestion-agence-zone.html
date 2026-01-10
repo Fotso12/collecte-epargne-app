@@ -10,9 +10,8 @@
     <div class="card-body p-2">
       <div class="input-group">
         <span class="input-group-text bg-white border-0"><i class="fas fa-search text-muted"></i></span>
-        <input type="text" class="form-control border-0 shadow-none" 
-               placeholder="Rechercher par nom, code ou ville..." 
-               [(ngModel)]="rechercheTerme" (input)="filtrerAgences()">
+        <input type="text" class="form-control border-0 shadow-none" placeholder="Rechercher par nom, code ou ville..."
+          [(ngModel)]="rechercheTerme" (input)="filtrerAgences()">
       </div>
     </div>
   </div>
@@ -38,11 +37,13 @@
             <td>
               <div class="small text-dark">{{ a.ville }}</div>
               <div class="text-muted extra-small">{{ a.quartier }}</div>
+              <div class="text-muted extra-small" *ngIf="a.position"><i class="fas fa-map-marker-alt me-1"></i>{{
+                a.position }}</div>
             </td>
             <td><small class="text-dark">{{ a.telephone || '---' }}</small></td>
             <td>
-              <span class="badge rounded-pill" 
-                    [ngClass]="a.statut === 'ACTIF' ? 'bg-success-subtle text-success' : 'bg-warning-subtle text-warning'">
+              <span class="badge rounded-pill"
+                [ngClass]="a.statut === 'ACTIF' ? 'bg-success-subtle text-success' : 'bg-warning-subtle text-warning'">
                 {{ a.statut }}
               </span>
             </td>
@@ -84,6 +85,19 @@
             <label class="form-label fw-semibold small">Téléphone</label>
             <input type="text" class="form-control shadow-none" [(ngModel)]="agenceForm.telephone">
           </div>
+          <div class="col-md-6">
+            <label class="form-label fw-semibold small">Quartier</label>
+            <input type="text" class="form-control shadow-none" [(ngModel)]="agenceForm.quartier">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label fw-semibold small">Adresse</label>
+            <input type="text" class="form-control shadow-none" [(ngModel)]="agenceForm.adresse">
+          </div>
+          <div class="col-md-12">
+            <label class="form-label fw-semibold small">Position (Coordonnées GPS, Plus Code ou Lien Maps)</label>
+            <input type="text" class="form-control shadow-none"
+              placeholder="Ex: VG7H+QHG Yaoundé, ou https://maps.google.com/..." [(ngModel)]="agenceForm.position">
+          </div>
           <div class="col-12">
             <label class="form-label fw-semibold small">Statut</label>
             <select class="form-select shadow-none" [(ngModel)]="agenceForm.statut">
@@ -114,20 +128,27 @@
       <div class="modal-body p-4">
         <ul class="nav nav-pills nav-justified bg-light p-1 rounded-pill mb-4 border">
           <li class="nav-item">
-            <button class="nav-link rounded-pill py-2" [class.active]="tabActif === 'employes'" (click)="tabActif = 'employes'">Employés ({{listeEmployes.length}})</button>
+            <button class="nav-link rounded-pill py-2" [class.active]="tabActif === 'employes'"
+              (click)="tabActif = 'employes'">Employés ({{listeEmployes.length}})</button>
           </li>
           <li class="nav-item">
-            <button class="nav-link rounded-pill py-2" [class.active]="tabActif === 'clients'" (click)="tabActif = 'clients'">Clients ({{listeClients.length}})</button>
+            <button class="nav-link rounded-pill py-2" [class.active]="tabActif === 'clients'"
+              (click)="tabActif = 'clients'">Clients ({{listeClients.length}})</button>
           </li>
           <li class="nav-item">
-            <button class="nav-link rounded-pill py-2" [class.active]="tabActif === 'utilisateurs'" (click)="tabActif = 'utilisateurs'">Utilisateurs ({{listeUtilisateurs.length}})</button>
+            <button class="nav-link rounded-pill py-2" [class.active]="tabActif === 'utilisateurs'"
+              (click)="tabActif = 'utilisateurs'">Utilisateurs ({{listeUtilisateurs.length}})</button>
           </li>
         </ul>
 
         <div class="table-container border rounded-3 bg-white overflow-auto" style="max-height: 400px;">
           <table class="table table-hover align-middle mb-0" *ngIf="tabActif === 'employes'">
             <thead class="table-light sticky-top">
-              <tr><th>Matricule</th><th>Nom Complet</th><th>Type</th></tr>
+              <tr>
+                <th>Matricule</th>
+                <th>Nom Complet</th>
+                <th>Type</th>
+              </tr>
             </thead>
             <tbody>
               <tr *ngFor="let e of listeEmployes">
@@ -135,13 +156,19 @@
                 <td>{{e.prenom}} {{e.nom}}</td>
                 <td><span class="badge bg-light text-dark border">{{e.typeEmploye}}</span></td>
               </tr>
-              <tr *ngIf="listeEmployes.length === 0"><td colspan="3" class="text-center p-4 text-muted">Aucun employé.</td></tr>
+              <tr *ngIf="listeEmployes.length === 0">
+                <td colspan="3" class="text-center p-4 text-muted">Aucun employé.</td>
+              </tr>
             </tbody>
           </table>
 
           <table class="table table-hover align-middle mb-0" *ngIf="tabActif === 'clients'">
             <thead class="table-light sticky-top">
-              <tr><th>N° Client</th><th>Nom Complet</th><th>Téléphone</th></tr>
+              <tr>
+                <th>N° Client</th>
+                <th>Nom Complet</th>
+                <th>Téléphone</th>
+              </tr>
             </thead>
             <tbody>
               <tr *ngFor="let c of listeClients">
@@ -149,13 +176,19 @@
                 <td>{{c.prenom}} {{c.nom}}</td>
                 <td>{{c.telephone}}</td>
               </tr>
-              <tr *ngIf="listeClients.length === 0"><td colspan="3" class="text-center p-4 text-muted">Aucun client.</td></tr>
+              <tr *ngIf="listeClients.length === 0">
+                <td colspan="3" class="text-center p-4 text-muted">Aucun client.</td>
+              </tr>
             </tbody>
           </table>
 
           <table class="table table-hover align-middle mb-0" *ngIf="tabActif === 'utilisateurs'">
             <thead class="table-light sticky-top">
-              <tr><th>Login</th><th>Email</th><th>Statut</th></tr>
+              <tr>
+                <th>Login</th>
+                <th>Email</th>
+                <th>Statut</th>
+              </tr>
             </thead>
             <tbody>
               <tr *ngFor="let u of listeUtilisateurs">
@@ -163,11 +196,37 @@
                 <td>{{u.email}}</td>
                 <td><span class="badge bg-info-subtle text-info border">{{u.statut}}</span></td>
               </tr>
-              <tr *ngIf="listeUtilisateurs.length === 0"><td colspan="3" class="text-center p-4 text-muted">Aucun utilisateur.</td></tr>
+              <tr *ngIf="listeUtilisateurs.length === 0">
+                <td colspan="3" class="text-center p-4 text-muted">Aucun utilisateur.</td>
+              </tr>
             </tbody>
           </table>
         </div>
       </div>
     </div>
+  </div>
+</div>
+
+<!-- Success Modal -->
+<div class="modal-overlay" *ngIf="isSuccessModalOpen">
+  <div class="modal-card shadow-lg text-center p-4" style="max-width: 400px;">
+    <div class="mb-3">
+      <i class="fas fa-check-circle text-success" style="font-size: 4rem;"></i>
+    </div>
+    <h4 class="fw-bold text-success mb-2">Succès !</h4>
+    <p class="text-muted mb-4">{{ successMessage }}</p>
+    <button class="btn btn-success rounded-pill px-5 shadow-sm" (click)="fermerModals()">Compris</button>
+  </div>
+</div>
+
+<!-- Error Modal -->
+<div class="modal-overlay" *ngIf="isErrorModalOpen">
+  <div class="modal-card shadow-lg text-center p-4" style="max-width: 400px;">
+    <div class="mb-3">
+      <i class="fas fa-times-circle text-danger" style="font-size: 4rem;"></i>
+    </div>
+    <h4 class="fw-bold text-danger mb-2">Erreur</h4>
+    <p class="text-muted mb-4">{{ errorMessage }}</p>
+    <button class="btn btn-danger rounded-pill px-5 shadow-sm" (click)="fermerModals()">Fermer</button>
   </div>
 </div>

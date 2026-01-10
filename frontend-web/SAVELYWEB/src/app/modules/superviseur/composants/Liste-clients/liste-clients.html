@@ -317,6 +317,10 @@
           <input type="text" class="form-control" [(ngModel)]="clientToEdit.adresse">
         </div>
         <div class="col-md-6">
+          <label class="form-label fw-bold small">Ville</label>
+          <input type="text" class="form-control" [(ngModel)]="clientToEdit.ville">
+        </div>
+        <div class="col-md-6">
           <label class="form-label fw-bold small">Statut</label>
           <select class="form-select" [(ngModel)]="clientToEdit.statut">
             <option value="ACTIF">ACTIF</option>
@@ -331,6 +335,45 @@
       <button class="btn btn-warning px-4 fw-bold" (click)="confirmUpdateClient()">
         <i class="fas fa-save me-1"></i> Enregistrer
       </button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Résultat Importation -->
+<div class="modal-backdrop-custom" *ngIf="isImportResultModalOpen" (click)="fermerModalImportResultat()"></div>
+<div class="modal-wrapper-custom" *ngIf="isImportResultModalOpen">
+  <div class="modal-content-custom shadow-lg text-center" style="max-width: 450px; border-bottom: 5px solid #0d6efd;">
+    <div class="modal-header-custom p-3 bg-light border-bottom d-flex justify-content-between align-items-center">
+      <h5 class="m-0 fw-bold text-primary"><i class="fas fa-file-import me-2"></i>Résultat Importation</h5>
+      <button class="btn-close" (click)="fermerModalImportResultat()"></button>
+    </div>
+    <div class="modal-body-custom p-4">
+      <div class="mb-4">
+        <i class="fas fa-tasks fa-3x text-primary mb-3"></i>
+        <h5 class="fw-bold">Traitement terminé</h5>
+        <p class="text-muted small">Le fichier CSV a été traité intégralement.</p>
+      </div>
+
+      <div class="row g-3">
+        <div class="col-6">
+          <div class="p-3 bg-success-subtle rounded border border-success">
+            <h3 class="fw-bold text-success mb-0">{{ importSuccessCount }}</h3>
+            <small class="text-success fw-bold">SUCCÈS</small>
+          </div>
+        </div>
+        <div class="col-6">
+          <div class="p-3 bg-danger-subtle rounded border border-danger">
+            <h3 class="fw-bold text-danger mb-0">{{ importErrorCount }}</h3>
+            <small class="text-danger fw-bold">ÉCHECS</small>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-4">
+        <button class="btn btn-primary w-100 fw-bold py-2 rounded-pill" (click)="fermerModalImportResultat()">
+          Terminer
+        </button>
+      </div>
     </div>
   </div>
 </div>

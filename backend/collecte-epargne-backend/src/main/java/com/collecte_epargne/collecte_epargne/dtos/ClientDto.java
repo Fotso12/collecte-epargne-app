@@ -25,6 +25,12 @@ public class ClientDto implements Serializable {
     @CsvBindByName(column = "adresse")
     String adresse;
 
+    @Size(max = 100)
+    @CsvBindByName(column = "ville")
+    String ville;
+
+    Integer idAgence;
+
     @NotNull
     @CsvBindByName(column = "type_cni")
     TypeCNI typeCni;
@@ -35,15 +41,15 @@ public class ClientDto implements Serializable {
     String numCni;
 
     @Size(max = 255)
-    @CsvBindByName(column = "photo_path")
+    @CsvBindByName(column = "photoPath")
     String photoPath;
 
     @Size(max = 255)
-    @CsvBindByName(column = "cni_recto_path")
+    @CsvBindByName(column = "cniRectoPath")
     String cniRectoPath;
 
     @Size(max = 255)
-    @CsvBindByName(column = "cni_verso_path")
+    @CsvBindByName(column = "cniVersoPath")
     String cniVersoPath;
 
     @CsvBindByName(column = "date_naissance")
@@ -71,9 +77,19 @@ public class ClientDto implements Serializable {
     String codeCollecteurAssigne;
 
     private String nomCollecteur;
+    
+    @CsvBindByName(column = "nom")
     private String nom;
+    
+    @CsvBindByName(column = "prenom")
     private String prenom;
+    
+    @CsvBindByName(column = "telephone")
     private String telephone;
+    
+    @CsvBindByName(column = "email")
+    private String email;
+    
     private StatutGenerique statut;
     private Instant dateCreation;
 
@@ -101,6 +117,14 @@ public class ClientDto implements Serializable {
 
     public void setTelephone(String telephone) {
         this.telephone = telephone;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public StatutGenerique getStatut() {
@@ -144,6 +168,22 @@ public class ClientDto implements Serializable {
 
     public void setAdresse(String adresse) {
         this.adresse = adresse;
+    }
+
+    public String getVille() {
+        return ville;
+    }
+
+    public void setVille(String ville) {
+        this.ville = ville;
+    }
+
+    public Integer getIdAgence() {
+        return idAgence;
+    }
+
+    public void setIdAgence(Integer idAgence) {
+        this.idAgence = idAgence;
     }
 
     public TypeCNI getTypeCni() {

@@ -20,7 +20,7 @@ export class ClientService {
     const formData = new FormData();
     formData.append('file', file);
     // On précise responseType: 'text' car le backend renvoie souvent un message simple
-    return this.http.post(`${this.apiUrl}/import`, formData, { responseType: 'text' });
+    return this.http.post(`${this.apiUrl}/import`, formData);
   }
 
   enregistrerClient(client: ClientDto): Observable<ClientDto> {

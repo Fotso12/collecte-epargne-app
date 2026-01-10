@@ -4,6 +4,13 @@
 </div>
 
 <section class="stats-grid">
+  <div class="stat-card cyan">
+    <i class="fas fa-building card-icon"></i>
+    <div class="card-info">
+      <h3>{{ isLoading ? '...' : (stats.totalAgences | number) }}</h3>
+      <p>Entreprises</p>
+    </div>
+  </div>
   <div class="stat-card blue">
     <i class="fas fa-user-friends card-icon"></i>
     <div class="card-info">
@@ -32,17 +39,18 @@
       <p>Validations</p>
     </div>
   </div>
-  <div class="stat-card red" *ngIf="stats.volumeCotisation > 0" style="background: white; border-left: 4px solid #dc3545;">
-      <i class="fas fa-coins card-icon" style="color: #dc3545; background: #dc354520;"></i>
-      <div class="card-info">
-        <h3 style="color: #dc3545;">{{ isLoading ? '...' : (stats.volumeCotisation | number) }} FCFA</h3>
-        <p>Volume Dépôts</p>
-      </div>
+  <div class="stat-card red" *ngIf="stats.volumeCotisation > 0"
+    style="background: white; border-left: 4px solid #dc3545;">
+    <i class="fas fa-coins card-icon" style="color: #dc3545; background: #dc354520;"></i>
+    <div class="card-info">
+      <h3 style="color: #dc3545;">{{ isLoading ? '...' : (stats.volumeCotisation | number) }} FCFA</h3>
+      <p>Volume Dépôts</p>
+    </div>
   </div>
 </section>
 
 <section class="charts-grid">
-  </section>
+</section>
 
 <section class="table-container summary-section">
-  </section>
+</section>

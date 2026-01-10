@@ -28,4 +28,6 @@ public interface EmployeRepository extends JpaRepository<Employe, Integer> {
 
     @Query("SELECT e FROM Employe e LEFT JOIN e.clientsAssignes c WHERE e.typeEmploye = com.collecte_epargne.collecte_epargne.utils.TypeEmploye.COLLECTEUR GROUP BY e.idEmploye ORDER BY SUM(c.scoreEpargne) DESC")
     List<Employe> findCollecteursOrderByTotalClientScoreDesc();
+
+    long countByTypeEmploye(TypeEmploye typeEmploye);
 }

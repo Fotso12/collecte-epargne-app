@@ -35,6 +35,8 @@ public class ClientService implements ClientInterface {
     private final EmployeRepository employeRepository;
     private final CodeGenerator codeGenerator;
     private final FileStorageService fileStorageService;
+    private final com.collecte_epargne.collecte_epargne.repositories.RoleRepository roleRepository;
+    private final com.collecte_epargne.collecte_epargne.repositories.AgenceZoneRepository agenceZoneRepository;
 
     private static final Logger log = LoggerFactory.getLogger(ClientService.class);
 
@@ -43,13 +45,17 @@ public class ClientService implements ClientInterface {
                          UtilisateurRepository utilisateurRepository,
                          EmployeRepository employeRepository,
                          CodeGenerator codeGenerator,
-                         FileStorageService fileStorageService) {
+                         FileStorageService fileStorageService,
+                         com.collecte_epargne.collecte_epargne.repositories.RoleRepository roleRepository,
+                         com.collecte_epargne.collecte_epargne.repositories.AgenceZoneRepository agenceZoneRepository) {
         this.clientRepository = clientRepository;
         this.clientMapper = clientMapper;
         this.utilisateurRepository = utilisateurRepository;
         this.employeRepository = employeRepository;
         this.codeGenerator = codeGenerator;
         this.fileStorageService = fileStorageService;
+        this.roleRepository = roleRepository;
+        this.agenceZoneRepository = agenceZoneRepository;
     }
 
     private void assignerRelations(Client client, ClientDto dto) {
@@ -95,10 +101,15 @@ public class ClientService implements ClientInterface {
         log.info("Tentative de sauvegarde d'un nouveau client");
         Objects.requireNonNull(clientDto, "clientDto ne doit pas être null");
 
-        // Vérification si le numéro client existe déjà (si fourni)
         if (clientDto.getNumeroClient() != null && clientRepository.findByNumeroClient(clientDto.getNumeroClient()).isPresent()) {
             log.warn("Échec sauvegarde : Le numéro client {} existe déjà", clientDto.getNumeroClient());
             throw new RuntimeException("Un client avec ce numéro client existe déjà.");
+        }
+
+        // Vérification de la couverture de la ville
+        if (clientDto.getVille() != null && !agenceZoneRepository.existsByVille(clientDto.getVille())) {
+            log.warn("Tentative d'inscription dans une ville non couverte : {}", clientDto.getVille());
+            throw new RuntimeException("Votre ville (" + clientDto.getVille() + ") n'est pas encore prise en compte par nos services.");
         }
 
         Client clientToSave = clientMapper.toEntity(clientDto);
@@ -230,8 +241,11 @@ public class ClientService implements ClientInterface {
     }
 
     @Transactional
-    public void importClientsFromCSV(MultipartFile file) {
+    public java.util.Map<String, Integer> importClientsFromCSV(MultipartFile file) {
         log.info("Début de l'importation CSV");
+        int successCount = 0;
+        int errorCount = 0;
+        
         try (Reader reader = new BufferedReader(new InputStreamReader(file.getInputStream()))) {
             CsvToBean<ClientDto> csvToBean = new CsvToBeanBuilder<ClientDto>(reader)
                     .withType(ClientDto.class)
@@ -240,20 +254,55 @@ public class ClientService implements ClientInterface {
 
             List<ClientDto> dtos = csvToBean.parse();
 
+            // Récupération du rôle CLIENT (ID 3) une seule fois
+            com.collecte_epargne.collecte_epargne.entities.Role roleClient = roleRepository.findById(3)
+                    .orElseThrow(() -> new RuntimeException("Role Client (ID 3) introuvable en base"));
+
             for (ClientDto dto : dtos) {
                 try {
+                    String login = dto.getLoginUtilisateur();
+                    if (login == null || login.isEmpty()) {
+                        log.warn("Ligne ignorée : login utilisateur manquant");
+                        errorCount++;
+                        continue;
+                    }
+
+                    // 1. Création automatique de l'utilisateur s'il n'existe pas
+                    if (!utilisateurRepository.existsById(login)) {
+                        Utilisateur newUser = new Utilisateur();
+                        newUser.setLogin(login);
+                        newUser.setNom(dto.getNom() != null ? dto.getNom() : "Client");
+                        newUser.setPrenom(dto.getPrenom() != null ? dto.getPrenom() : "Nouveau");
+                        newUser.setTelephone(dto.getTelephone() != null ? dto.getTelephone() : "00000000");
+                        newUser.setEmail(dto.getEmail() != null ? dto.getEmail() : login + "@savely.com");
+                        newUser.setPassword("Password123"); // Mot de passe par défaut
+                        newUser.setStatut(com.collecte_epargne.collecte_epargne.utils.StatutGenerique.ACTIF);
+                        newUser.setDateCreation(java.time.Instant.now());
+                        newUser.setRole(roleClient);
+
+                        utilisateurRepository.save(newUser);
+                        log.info("Utilisateur créé automatiquement pour l'import : {}", login);
+                    }
+
                     // Pour l'import CSV, on peut mettre des valeurs par défaut pour les chemins d'images
                     if (dto.getPhotoPath() == null) dto.setPhotoPath("uploads/clients/default.png");
                     if (dto.getCniRectoPath() == null) dto.setCniRectoPath("uploads/clients/default_recto.png");
                     if (dto.getCniVersoPath() == null) dto.setCniVersoPath("uploads/clients/default_verso.png");
 
                     this.save(dto);
+                    successCount++;
                 } catch (Exception e) {
                     log.error("Erreur lors de l'importation de la ligne pour l'utilisateur {} : {}", dto.getLoginUtilisateur(), e.getMessage());
-                    // On continue l'import pour les autres lignes
+                    errorCount++;
                 }
             }
-            log.info("Importation CSV terminée. Nombre de lignes traitées : {}", dtos.size());
+            log.info("Importation CSV terminée. Succès: {}, Erreurs: {}", successCount, errorCount);
+            
+            java.util.Map<String, Integer> stats = new java.util.HashMap<>();
+            stats.put("success", successCount);
+            stats.put("error", errorCount);
+            return stats;
+            
         } catch (Exception e) {
             log.error("Erreur critique lors de l'importation CSV", e);
             throw new RuntimeException("Erreur lors de la lecture du fichier CSV : " + e.getMessage());

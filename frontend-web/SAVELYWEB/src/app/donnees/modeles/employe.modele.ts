@@ -14,5 +14,6 @@ export interface EmployeDto {
 
 export enum TypeEmploye {
   CAISSIER = 'CAISSIER',
-  COLLECTEUR = 'COLLECTEUR'
+  COLLECTEUR = 'COLLECTEUR',
+  SUPERVISEUR = 'SUPERVISEUR'
 }

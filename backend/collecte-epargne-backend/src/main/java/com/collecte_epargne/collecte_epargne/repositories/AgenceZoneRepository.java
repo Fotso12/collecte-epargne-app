@@ -13,4 +13,5 @@ public interface AgenceZoneRepository extends JpaRepository<AgenceZone, Integer>
 
     Optional<AgenceZone> findByCode(String code);
 
+    boolean existsByVille(String ville);
 }

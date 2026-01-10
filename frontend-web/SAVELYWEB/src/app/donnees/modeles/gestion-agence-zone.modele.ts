@@ -9,6 +9,7 @@ export interface AgenceZoneDto {
   adresse?: string;
   telephone?: string;
   description?: string;
+  position?: string;
   statut?: StatutGenerique;
   dateCreation?: Date | string;
 }

@@ -10,6 +10,7 @@ import com.collecte_epargne.collecte_epargne.repositories.EmployeRepository;
 import com.collecte_epargne.collecte_epargne.repositories.TransactionRepository;
 import com.collecte_epargne.collecte_epargne.services.interfaces.TransactionInterface;
 import com.collecte_epargne.collecte_epargne.utils.StatutTransaction;
+import com.collecte_epargne.collecte_epargne.utils.CodeGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -29,24 +30,33 @@ public class TransactionService implements TransactionInterface {
     private final TransactionMapper transactionMapper;
     private final CompteRepository compteRepository;
     private final EmployeRepository employeRepository;
+    private final CodeGenerator codeGenerator;
 
     public TransactionService(
             TransactionRepository transactionRepository,
             TransactionMapper transactionMapper,
             CompteRepository compteRepository,
-            EmployeRepository employeRepository
+            EmployeRepository employeRepository,
+            CodeGenerator codeGenerator
     ) {
         this.transactionRepository = transactionRepository;
         this.transactionMapper = transactionMapper;
         this.compteRepository = compteRepository;
         this.employeRepository = employeRepository;
+        this.codeGenerator = codeGenerator;
     }
 
     @Override
     public TransactionDto create(TransactionDto transactionDto) {
-        log.info("Début création transaction ID={}", transactionDto.getIdTransaction());
+        log.info("Début création transaction");
         Transaction transaction = transactionMapper.toEntity(transactionDto);
-        transaction.setIdTransaction(transactionDto.getIdTransaction());
+        
+        if (transactionDto.getIdTransaction() == null || transactionDto.getIdTransaction().isEmpty()) {
+            transaction.setIdTransaction(codeGenerator.generateTransactionRef());
+        } else {
+            transaction.setIdTransaction(transactionDto.getIdTransaction());
+        }
+
         transaction.setDateTransaction(Instant.now());
         transaction.setStatut(StatutTransaction.EN_ATTENTE);
 

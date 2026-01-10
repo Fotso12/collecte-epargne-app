@@ -6,7 +6,8 @@ import { EmployeService } from '../../../../core/services/employe.service';
 import { CompteService } from '../../../../core/services/compte.service';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { firstValueFrom } from 'rxjs';
+import { firstValueFrom, from, lastValueFrom, of } from 'rxjs';
+import { catchError, mergeMap, tap, toArray } from 'rxjs/operators';
 
 @Component({
   selector: 'app-liste-clients',
@@ -45,6 +46,11 @@ export class ListeClientsComponent implements OnInit {
   selectedClientCodes: Set<string> = new Set();
   isBulkDelete: boolean = false;
 
+  // Variables pour le modal de résultat d'import
+  isImportResultModalOpen: boolean = false;
+  importSuccessCount: number = 0;
+  importErrorCount: number = 0;
+
   constructor(
     private clientService: ClientService,
     private utilisateurService: UtilisateurService,
@@ -73,12 +79,12 @@ export class ListeClientsComponent implements OnInit {
         this.clients = donnees;
         this.appliquerFiltres();
         this.chargement = false;
-        this.cdr.detectChanges();
+        setTimeout(() => this.cdr.detectChanges(), 0);
       },
       error: (err: any) => {
         console.error('Erreur chargement', err);
         this.chargement = false;
-        this.cdr.detectChanges();
+        setTimeout(() => this.cdr.detectChanges(), 0);
       }
     });
   }
@@ -109,6 +115,11 @@ export class ListeClientsComponent implements OnInit {
 
   fermerModalSucces(): void {
     this.isSuccessModalOpen = false;
+    this.cdr.detectChanges();
+  }
+
+  fermerModalImportResultat(): void {
+    this.isImportResultModalOpen = false;
     this.cdr.detectChanges();
   }
 
@@ -152,65 +163,28 @@ export class ListeClientsComponent implements OnInit {
     if (!file) return;
 
     this.importationEnCours = true;
-    const reader = new FileReader();
 
-    reader.onload = async (e: any) => {
-      const content = e.target.result as string;
-      const lines = content.split('\n').filter(l => l.trim() !== '');
-      const headers = lines[0].split(',').map(h => h.trim());
+    // Appel direct au backend pour l'importation optimisée
+    this.clientService.importerClientsCsv(file).subscribe({
+      next: (response: any) => {
+        this.importationEnCours = false;
 
-      let succesCount = 0;
-      let erreurCount = 0;
+        // Le backend renvoie maintenant un objet JSON avec les stats
+        this.importSuccessCount = response.success || 0;
+        this.importErrorCount = response.error || 0;
+        this.isImportResultModalOpen = true;
 
-      const importPromises = lines.slice(1).map(async (line, index) => {
-        const data = line.split(',').map(d => d.trim());
-        const row: any = {};
-        headers.forEach((header, i) => row[header] = data[i]);
-        if (!row.login_utilisateur) return;
-
-        try {
-          try {
-            await firstValueFrom(this.utilisateurService.getUtilisateurParLogin(row.login_utilisateur));
-          } catch (error) {
-            await firstValueFrom(this.utilisateurService.enregistrerUtilisateur({
-              login: row.login_utilisateur,
-              nom: row.nom || 'Client',
-              prenom: row.prenom || 'Nouveau',
-              telephone: row.telephone || '00000000',
-              email: row.email || `${row.login_utilisateur}@savely.com`,
-              password: "Password123",
-              idRole: 3,
-              statut: StatutGenerique.ACTIF
-            }));
-          }
-          const clientDto: any = {
-            numeroClient: Number(row.numero_client),
-            adresse: row.adresse,
-            typeCni: row.type_cni,
-            numCni: row.numero_cni,
-            dateNaissance: row.date_naissance,
-            lieuNaissance: row.lieu_naissance,
-            profession: row.profession,
-            scoreEpargne: Number(row.score_epargne || 0),
-            loginUtilisateur: row.login_utilisateur,
-            codeCollecteurAssigne: row.id_collecteur,
-            statut: StatutGenerique.ACTIF
-          };
-          await firstValueFrom(this.clientService.enregistrerClient(clientDto));
-          succesCount++;
-        } catch (err) {
-          erreurCount++;
-          console.error(`Erreur ligne ${index + 2}:`, err);
-        }
-      });
-
-      await Promise.all(importPromises);
-      this.importationEnCours = false;
-      alert(`Importation terminée !\nSuccès: ${succesCount}\nÉchecs: ${erreurCount}`);
-      this.chargerClients();
-      event.target.value = '';
-    };
-    reader.readAsText(file);
+        this.chargerClients();
+        event.target.value = '';
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error("Erreur import backend", err);
+        this.importationEnCours = false;
+        alert("Erreur lors de l'importation : " + (err.error || err.message));
+        this.cdr.detectChanges();
+      }
+    });
   }
 
   ouvrirModalSuppression(code: string | undefined): void {
@@ -306,14 +280,13 @@ export class ListeClientsComponent implements OnInit {
 
     this.clientService.modifierClientParCode(this.clientToEdit.codeClient, this.clientToEdit).subscribe({
       next: (updatedClient) => {
-        // Mise à jour locale
         const index = this.clients.findIndex(c => c.codeClient === updatedClient.codeClient);
         if (index !== -1) {
           this.clients[index] = updatedClient;
-          this.appliquerFiltres(); // Pour rafraichir la liste affichée
+          this.appliquerFiltres();
         }
         this.fermerModalEdition();
-        this.chargerClients(); // Reload complet pour être sûr
+        this.chargerClients();
       },
       error: (err) => {
         console.error("Erreur lors de la mise à jour client", err);
@@ -353,7 +326,7 @@ export class ListeClientsComponent implements OnInit {
   }
 
   telechargerModeleCSV(): void {
-    const headers = 'numero_client,adresse,type_cni,numero_cni,date_naissance,lieu_naissance,profession,score_epargne,login_utilisateur,id_collecteur,nom,prenom,telephone,email';
+    const headers = 'numero_client,adresse,type_cni,numero_cni,date_naissance,lieu_naissance,profession,score_epargne,login_utilisateur,id_collecteur,nom,prenom,telephone,email,cniRectoPath,cniVersoPath,photoPath,ville';
     const blob = new Blob([headers], { type: 'text/csv;charset=utf-8;' });
     const url = window.URL.createObjectURL(blob);
     const link = document.createElement('a');

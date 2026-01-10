@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ReportingService } from '../../../../core/services/reporting.service';
@@ -22,7 +22,10 @@ export class ReportingComponent {
     totalRetrait: number = 0;
     volumeTotal: number = 0;
 
-    constructor(private reportingService: ReportingService) {
+    constructor(
+        private reportingService: ReportingService,
+        private cdr: ChangeDetectorRef
+    ) {
         const today = new Date();
         this.dateFin = today.toISOString().split('T')[0];
         const sevenDaysAgo = new Date();
@@ -34,17 +37,20 @@ export class ReportingComponent {
         this.chargement = true;
         this.erreur = '';
         this.transactions = [];
+        this.cdr.detectChanges();
 
         this.reportingService.getTransactions(this.dateDebut, this.dateFin).subscribe({
             next: (data) => {
                 this.transactions = data;
                 this.calculerStats();
                 this.chargement = false;
+                this.cdr.detectChanges();
             },
             error: (err) => {
                 console.error("Erreur chargement rapport", err);
                 this.erreur = "Impossible de récupérer les données du rapport.";
                 this.chargement = false;
+                this.cdr.detectChanges();
             }
         });
     }
