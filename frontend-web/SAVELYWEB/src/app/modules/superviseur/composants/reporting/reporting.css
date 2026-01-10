@@ -1,0 +1,12 @@
+.dashboard-header h2 {
+    font-family: 'Poppins', sans-serif;
+    letter-spacing: -0.5px;
+}
+
+.table-container {
+    min-height: 400px;
+}
+
+.card {
+    border-radius: 12px;
+}

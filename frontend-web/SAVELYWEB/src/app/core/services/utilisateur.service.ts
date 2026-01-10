@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { UtilisateurDto } from '../../donnees/modeles/utilisateur.modele';
 // Importez vos interfaces si elles existent
 // import { UtilisateurDto } from '../../donnees/modeles/utilisateur.modele';
 
@@ -26,5 +27,9 @@ export class UtilisateurService {
 
   supprimerUtilisateur(login: string): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${login}`);
+  }
+
+  getTousLesUtilisateurs(): Observable<UtilisateurDto[]> {
+    return this.http.get<UtilisateurDto[]>(this.apiUrl);
   }
 }

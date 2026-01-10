@@ -1,0 +1,102 @@
+<div class="container-fluid mt-2">
+    <div class="dashboard-header mb-4">
+        <h2 class="text-dark fw-bold">RAPPORTS & ANALYSES</h2>
+        <p class="text-muted">Analysez les flux financiers sur une période donnée</p>
+    </div>
+
+    <!-- Filtres -->
+    <div class="card shadow-sm mb-4 border-0 rounded-4">
+        <div class="card-body p-4">
+            <div class="row g-3 align-items-end">
+                <div class="col-md-4">
+                    <label class="form-label small fw-bold text-uppercase">Date Début</label>
+                    <input type="date" class="form-control bg-light border-0" [(ngModel)]="dateDebut">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label small fw-bold text-uppercase">Date Fin</label>
+                    <input type="date" class="form-control bg-light border-0" [(ngModel)]="dateFin">
+                </div>
+                <div class="col-md-4 d-flex gap-2">
+                    <button class="btn btn-primary flex-grow-1 fw-bold" (click)="genererRapport()"
+                        [disabled]="chargement">
+                        <i class="fas fa-search me-2"></i> Générer
+                    </button>
+                    <button class="btn btn-success fw-bold" (click)="exporterCSV()"
+                        [disabled]="transactions.length === 0">
+                        <i class="fas fa-file-csv me-2"></i> Exporter
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Résultats & Stats -->
+    <div *ngIf="erreur" class="alert alert-danger">{{ erreur }}</div>
+
+    <div class="row g-3 mb-4" *ngIf="!chargement && transactions.length > 0">
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm bg-success text-white">
+                <div class="card-body">
+                    <h6 class="text-white-50 text-uppercase small fw-bold">Total Dépôts</h6>
+                    <h3 class="fw-bold mb-0">{{ totalDepot | number }} FCFA</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm bg-warning text-dark">
+                <div class="card-body">
+                    <h6 class="text-black-50 text-uppercase small fw-bold">Total Retraits</h6>
+                    <h3 class="fw-bold mb-0">{{ totalRetrait | number }} FCFA</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm bg-primary text-white">
+                <div class="card-body">
+                    <h6 class="text-white-50 text-uppercase small fw-bold">Volume Total</h6>
+                    <h3 class="fw-bold mb-0">{{ volumeTotal | number }} FCFA</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tableau -->
+    <div class="table-container shadow-sm border-0 bg-white rounded-3 p-3">
+        <div *ngIf="chargement" class="p-5 text-center">
+            <div class="spinner-border text-primary" role="status"></div>
+            <p class="mt-3 text-muted fw-semibold">Génération du rapport en cours...</p>
+        </div>
+
+        <div *ngIf="!chargement && transactions.length === 0" class="text-center py-5 text-muted">
+            <i class="fas fa-chart-bar fa-3x mb-3 opacity-25"></i>
+            <p>Sélectionnez une période et cliquez sur "Générer" pour voir les données.</p>
+        </div>
+
+        <div class="table-responsive" *ngIf="!chargement && transactions.length > 0">
+            <table class="table align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Date</th>
+                        <th>Référence</th>
+                        <th>Type</th>
+                        <th class="text-end">Montant</th>
+                        <th>Statut</th>
+                        <th>Initiateur</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let t of transactions">
+                        <td>{{ t.dateTransaction | date:'dd/MM/yyyy HH:mm' }}</td>
+                        <td class="fw-bold text-primary">{{ t.reference }}</td>
+                        <td><span class="badge"
+                                [ngClass]="t.typeTransaction === 'DEPOT' ? 'bg-success-subtle text-success' : 'bg-warning-subtle text-warning'">{{
+                                t.typeTransaction }}</span></td>
+                        <td class="text-end fw-bold">{{ t.montant | number }}</td>
+                        <td><span class="badge bg-secondary">{{ t.statut }}</span></td>
+                        <td class="small text-muted">{{ t.nomInitiateur || 'N/A' }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

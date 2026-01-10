@@ -4,7 +4,7 @@
       <i class="fas fa-search"></i>
       <input type="text" placeholder="Rechercher...">
     </div>
-    
+
     <div class="topbar-actions">
       <button class="has-tooltip">
         <i class="fas fa-bell"></i>
@@ -36,10 +36,17 @@
     </div>
     <ul class="nav-links">
       <li><a routerLink="/accueil" routerLinkActive="active"><i class="fas fa-home"></i><span>Accueil</span></a></li>
+      <li><a routerLink="/agences" routerLinkActive="active"><i class="fas fa-map-marked-alt"></i><span>Agences &
+            Zones</span></a></li>
       <li><a routerLink="/clients" routerLinkActive="active"><i class="fas fa-users"></i><span>Clients</span></a></li>
-      <li><a routerLink="/collecteurs" routerLinkActive="active"><i class="fas fa-hand-holding-usd"></i><span>Collecteurs</span></a></li>
-      <li><a routerLink="/caissiers" routerLinkActive="active"><i class="fas fa-cash-register"></i><span>Caissiers</span></a></li>
-      <li><a routerLink="/transactions" routerLinkActive="active"><i class="fas fa-exchange-alt"></i><span>Transactions</span></a></li>
+      <li><a routerLink="/collecteurs" routerLinkActive="active"><i
+            class="fas fa-hand-holding-usd"></i><span>Collecteurs</span></a></li>
+      <li><a routerLink="/caissiers" routerLinkActive="active"><i
+            class="fas fa-cash-register"></i><span>Caissiers</span></a></li>
+      <li><a routerLink="/transactions" routerLinkActive="active"><i
+            class="fas fa-exchange-alt"></i><span>Transactions</span></a></li>
+      <li><a routerLink="/reporting" routerLinkActive="active"><i class="fas fa-chart-pie"></i><span>Rapports</span></a>
+      </li>
     </ul>
     <div class="sidebar-footer">
       <a class="logout-link" (click)="openLogoutModal()"><i class="fas fa-sign-out-alt"></i><span>Déconnexion</span></a>

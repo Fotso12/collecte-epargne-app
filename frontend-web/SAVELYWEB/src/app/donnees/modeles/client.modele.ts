@@ -31,6 +31,6 @@ export interface ClientDto {
     nom?: string;
     prenom?: string;
     telephone?: string;
-    statut?: StatutGenerique; // Ou votre enum StatutGenerique
+    statut?: StatutGenerique; 
     dateCreation?: string | Date;
 }

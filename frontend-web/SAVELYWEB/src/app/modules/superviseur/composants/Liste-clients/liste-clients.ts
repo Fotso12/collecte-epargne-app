@@ -2,7 +2,8 @@ import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { ClientDto, TypeCNI, StatutGenerique } from '../../../../donnees/modeles/client.modele';
 import { ClientService } from '../../../../core/services/client.service';
 import { UtilisateurService } from '../../../../core/services/utilisateur.service';
-import { EmployeService } from '../../../../core/services/employe.service'; 
+import { EmployeService } from '../../../../core/services/employe.service';
+import { CompteService } from '../../../../core/services/compte.service';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { firstValueFrom } from 'rxjs';
@@ -19,18 +20,21 @@ export class ListeClientsComponent implements OnInit {
   clientsFiltres: ClientDto[] = [];
   chargement: boolean = true;
   importationEnCours: boolean = false;
-  
+
   clientSelectionne: ClientDto | null = null;
+  comptesClient: any[] = []; // Ajout: Stockage des comptes
+  chargementComptes: boolean = false; // Ajout: Loading state for accounts
+
   isModalOpen: boolean = false;
   isDeleteModalOpen: boolean = false;
-  isSuccessModalOpen: boolean = false; // Nouveau : Modal de succès
+  isSuccessModalOpen: boolean = false;
   clientToDeleteCode: string | null = null;
 
   isAssignModalOpen: boolean = false;
   collecteurs: any[] = [];
-  collecteurSelectionneId: string = ""; 
+  collecteurSelectionneId: string = "";
   clientPourAssignation: ClientDto | null = null;
-  
+
   // Ajout pour la recherche dans le modal d'assignation
   rechercheCollecteur: string = '';
 
@@ -45,6 +49,7 @@ export class ListeClientsComponent implements OnInit {
     private clientService: ClientService,
     private utilisateurService: UtilisateurService,
     private employeService: EmployeService,
+    private compteService: CompteService,
     private cdr: ChangeDetectorRef
   ) { }
 
@@ -55,7 +60,7 @@ export class ListeClientsComponent implements OnInit {
   // Getter pour filtrer la liste des collecteurs dans le select
   get collecteursFiltres() {
     if (!this.rechercheCollecteur) return this.collecteurs;
-    return this.collecteurs.filter(c => 
+    return this.collecteurs.filter(c =>
       `${c.nom} ${c.prenom} ${c.matricule}`.toLowerCase().includes(this.rechercheCollecteur.toLowerCase())
     );
   }
@@ -68,7 +73,7 @@ export class ListeClientsComponent implements OnInit {
         this.clients = donnees;
         this.appliquerFiltres();
         this.chargement = false;
-        this.cdr.detectChanges(); 
+        this.cdr.detectChanges();
       },
       error: (err: any) => {
         console.error('Erreur chargement', err);
@@ -123,17 +128,17 @@ export class ListeClientsComponent implements OnInit {
     }
 
     try {
-      const updateData: any = { 
-        ...this.clientPourAssignation, 
-        codeCollecteurAssigne: idNumerique 
+      const updateData: any = {
+        ...this.clientPourAssignation,
+        codeCollecteurAssigne: idNumerique
       };
 
       await firstValueFrom(this.clientService.modifierClientParCode(this.clientPourAssignation.codeClient, updateData));
-      
+
       this.fermerModalAssignation();
-      this.chargerClients(); 
-      
-      this.isSuccessModalOpen = true; 
+      this.chargerClients();
+
+      this.isSuccessModalOpen = true;
       this.cdr.detectChanges();
 
     } catch (err: any) {
@@ -236,7 +241,7 @@ export class ListeClientsComponent implements OnInit {
     try {
       if (this.isBulkDelete) {
         const codesASupprimer = Array.from(this.selectedClientCodes);
-        const deletePromises = codesASupprimer.map(code => 
+        const deletePromises = codesASupprimer.map(code =>
           firstValueFrom(this.clientService.supprimerClient(code))
         );
         await Promise.all(deletePromises);
@@ -275,16 +280,70 @@ export class ListeClientsComponent implements OnInit {
   }
 
   appliquerFiltres(): void {
-    this.clientsFiltres = this.clients.filter(c => 
+    this.clientsFiltres = this.clients.filter(c =>
       (c.codeClient || '').toLowerCase().includes(this.filtreCode.toLowerCase()) &&
       (c.nomCollecteur || '').toLowerCase().includes(this.filtreCollecteur.toLowerCase()) &&
       (c.profession || '').toLowerCase().includes(this.filtreProfession.toLowerCase())
     );
   }
 
+  // --- Logique Edition Client ---
+  isEditModalOpen: boolean = false;
+  clientToEdit: any = {};
+
+  ouvrirModalEdition(client: ClientDto) {
+    this.clientToEdit = { ...client }; // Copie pour éviter modif directe
+    this.isEditModalOpen = true;
+  }
+
+  fermerModalEdition() {
+    this.isEditModalOpen = false;
+    this.clientToEdit = {};
+  }
+
+  confirmUpdateClient() {
+    if (!this.clientToEdit.codeClient) return;
+
+    this.clientService.modifierClientParCode(this.clientToEdit.codeClient, this.clientToEdit).subscribe({
+      next: (updatedClient) => {
+        // Mise à jour locale
+        const index = this.clients.findIndex(c => c.codeClient === updatedClient.codeClient);
+        if (index !== -1) {
+          this.clients[index] = updatedClient;
+          this.appliquerFiltres(); // Pour rafraichir la liste affichée
+        }
+        this.fermerModalEdition();
+        this.chargerClients(); // Reload complet pour être sûr
+      },
+      error: (err) => {
+        console.error("Erreur lors de la mise à jour client", err);
+        alert("Erreur lors de la mise à jour du client.");
+      }
+    });
+  }
+
   voirDetails(client: ClientDto): void {
     this.clientSelectionne = client;
     this.isModalOpen = true;
+    this.comptesClient = [];
+    this.chargementComptes = true;
+
+    if (client.codeClient) {
+      this.compteService.getComptesParClient(client.codeClient).subscribe({
+        next: (data) => {
+          this.comptesClient = data;
+          this.chargementComptes = false;
+          this.cdr.detectChanges();
+        },
+        error: (err) => {
+          console.error("Erreur chargement comptes", err);
+          this.chargementComptes = false;
+          this.cdr.detectChanges();
+        }
+      });
+    } else {
+      this.chargementComptes = false;
+    }
     this.cdr.detectChanges();
   }
 

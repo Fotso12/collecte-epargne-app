@@ -1,0 +1,173 @@
+<div class="container-fluid p-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="fw-bold m-0 text-dark">Gestion des Agences & Zones</h2>
+    <button class="btn btn-primary rounded-pill px-4 shadow-sm" (click)="ouvrirCreation()">
+      <i class="fas fa-plus me-2"></i>Nouvelle Agence
+    </button>
+  </div>
+
+  <div class="card border-0 shadow-sm mb-4">
+    <div class="card-body p-2">
+      <div class="input-group">
+        <span class="input-group-text bg-white border-0"><i class="fas fa-search text-muted"></i></span>
+        <input type="text" class="form-control border-0 shadow-none" 
+               placeholder="Rechercher par nom, code ou ville..." 
+               [(ngModel)]="rechercheTerme" (input)="filtrerAgences()">
+      </div>
+    </div>
+  </div>
+
+  <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+    <div class="table-responsive">
+      <table class="table align-middle mb-0">
+        <thead class="bg-light text-secondary">
+          <tr>
+            <th class="ps-4">AGENCE</th>
+            <th>LOCALISATION</th>
+            <th>CONTACT</th>
+            <th>STATUT</th>
+            <th class="text-end pe-4">ACTIONS</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let a of agencesFiltrees">
+            <td class="ps-4">
+              <div class="fw-bold text-dark">{{ a.nom }}</div>
+              <code class="small text-primary">{{ a.code }}</code>
+            </td>
+            <td>
+              <div class="small text-dark">{{ a.ville }}</div>
+              <div class="text-muted extra-small">{{ a.quartier }}</div>
+            </td>
+            <td><small class="text-dark">{{ a.telephone || '---' }}</small></td>
+            <td>
+              <span class="badge rounded-pill" 
+                    [ngClass]="a.statut === 'ACTIF' ? 'bg-success-subtle text-success' : 'bg-warning-subtle text-warning'">
+                {{ a.statut }}
+              </span>
+            </td>
+            <td class="text-end pe-4">
+              <button class="btn btn-light btn-sm rounded-circle me-2 border" (click)="voirEntites(a)" title="Détails">
+                <i class="fas fa-users-cog text-primary"></i>
+              </button>
+              <button class="btn btn-light btn-sm rounded-circle border" (click)="ouvrirEdition(a)" title="Modifier">
+                <i class="fas fa-edit text-dark"></i>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="modal-overlay" *ngIf="isFormModalOpen">
+    <div class="modal-card shadow-lg">
+      <div class="modal-header px-4 py-3 border-bottom">
+        <h5 class="fw-bold m-0">{{ agenceForm.idAgence ? 'Modifier l\'Agence' : 'Nouvelle Agence' }}</h5>
+        <button class="btn-close" (click)="fermerModals()"></button>
+      </div>
+      <div class="modal-body p-4">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label fw-semibold small">Code Agence *</label>
+            <input type="text" class="form-control shadow-none" [(ngModel)]="agenceForm.code">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label fw-semibold small">Nom *</label>
+            <input type="text" class="form-control shadow-none" [(ngModel)]="agenceForm.nom">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label fw-semibold small">Ville</label>
+            <input type="text" class="form-control shadow-none" [(ngModel)]="agenceForm.ville">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label fw-semibold small">Téléphone</label>
+            <input type="text" class="form-control shadow-none" [(ngModel)]="agenceForm.telephone">
+          </div>
+          <div class="col-12">
+            <label class="form-label fw-semibold small">Statut</label>
+            <select class="form-select shadow-none" [(ngModel)]="agenceForm.statut">
+              <option value="ACTIF">ACTIF</option>
+              <option value="INACTIF">INACTIF</option>
+              <option value="BLOQUE">BLOQUE</option>
+            </select>
+          </div>
+          <div class="col-12">
+            <label class="form-label fw-semibold small">Description</label>
+            <textarea class="form-control shadow-none" rows="2" [(ngModel)]="agenceForm.description"></textarea>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer px-4 py-3 bg-light rounded-bottom-4">
+        <button class="btn btn-light px-4 border" (click)="fermerModals()">Annuler</button>
+        <button class="btn btn-primary px-4 shadow-sm" (click)="enregistrer()">Enregistrer</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" *ngIf="isEntitiesModalOpen">
+    <div class="modal-card large shadow-lg">
+      <div class="modal-header bg-dark text-white px-4 py-3">
+        <h5 class="m-0 fw-bold">Détails Agence : {{ agenceSelectionnee?.nom }}</h5>
+        <button class="btn-close btn-close-white" (click)="fermerModals()"></button>
+      </div>
+      <div class="modal-body p-4">
+        <ul class="nav nav-pills nav-justified bg-light p-1 rounded-pill mb-4 border">
+          <li class="nav-item">
+            <button class="nav-link rounded-pill py-2" [class.active]="tabActif === 'employes'" (click)="tabActif = 'employes'">Employés ({{listeEmployes.length}})</button>
+          </li>
+          <li class="nav-item">
+            <button class="nav-link rounded-pill py-2" [class.active]="tabActif === 'clients'" (click)="tabActif = 'clients'">Clients ({{listeClients.length}})</button>
+          </li>
+          <li class="nav-item">
+            <button class="nav-link rounded-pill py-2" [class.active]="tabActif === 'utilisateurs'" (click)="tabActif = 'utilisateurs'">Utilisateurs ({{listeUtilisateurs.length}})</button>
+          </li>
+        </ul>
+
+        <div class="table-container border rounded-3 bg-white overflow-auto" style="max-height: 400px;">
+          <table class="table table-hover align-middle mb-0" *ngIf="tabActif === 'employes'">
+            <thead class="table-light sticky-top">
+              <tr><th>Matricule</th><th>Nom Complet</th><th>Type</th></tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let e of listeEmployes">
+                <td class="fw-bold text-primary">{{e.matricule}}</td>
+                <td>{{e.prenom}} {{e.nom}}</td>
+                <td><span class="badge bg-light text-dark border">{{e.typeEmploye}}</span></td>
+              </tr>
+              <tr *ngIf="listeEmployes.length === 0"><td colspan="3" class="text-center p-4 text-muted">Aucun employé.</td></tr>
+            </tbody>
+          </table>
+
+          <table class="table table-hover align-middle mb-0" *ngIf="tabActif === 'clients'">
+            <thead class="table-light sticky-top">
+              <tr><th>N° Client</th><th>Nom Complet</th><th>Téléphone</th></tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let c of listeClients">
+                <td class="fw-bold text-success">{{c.numeroClient}}</td>
+                <td>{{c.prenom}} {{c.nom}}</td>
+                <td>{{c.telephone}}</td>
+              </tr>
+              <tr *ngIf="listeClients.length === 0"><td colspan="3" class="text-center p-4 text-muted">Aucun client.</td></tr>
+            </tbody>
+          </table>
+
+          <table class="table table-hover align-middle mb-0" *ngIf="tabActif === 'utilisateurs'">
+            <thead class="table-light sticky-top">
+              <tr><th>Login</th><th>Email</th><th>Statut</th></tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let u of listeUtilisateurs">
+                <td class="fw-bold text-info">{{u.login}}</td>
+                <td>{{u.email}}</td>
+                <td><span class="badge bg-info-subtle text-info border">{{u.statut}}</span></td>
+              </tr>
+              <tr *ngIf="listeUtilisateurs.length === 0"><td colspan="3" class="text-center p-4 text-muted">Aucun utilisateur.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

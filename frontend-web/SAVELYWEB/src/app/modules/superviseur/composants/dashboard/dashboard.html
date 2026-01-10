@@ -4,10 +4,41 @@
 </div>
 
 <section class="stats-grid">
-  <div class="stat-card blue"><i class="fas fa-user-friends card-icon"></i><div class="card-info"><h3>1,250</h3><p>Clients</p></div></div>
-  <div class="stat-card purple"><i class="fas fa-walking card-icon"></i><div class="card-info"><h3>45</h3><p>Collecteurs</p></div></div>
-  <div class="stat-card orange"><i class="fas fa-vault card-icon"></i><div class="card-info"><h3>12</h3><p>Caissiers</p></div></div>
-  <div class="stat-card green"><i class="fas fa-chart-line card-icon"></i><div class="card-info"><h3>85%</h3><p>Cotisation</p></div></div>
+  <div class="stat-card blue">
+    <i class="fas fa-user-friends card-icon"></i>
+    <div class="card-info">
+      <h3>{{ isLoading ? '...' : (stats.totalClients | number) }}</h3>
+      <p>Clients</p>
+    </div>
+  </div>
+  <div class="stat-card purple">
+    <i class="fas fa-walking card-icon"></i>
+    <div class="card-info">
+      <h3>{{ isLoading ? '...' : (stats.totalCollecteurs | number) }}</h3>
+      <p>Collecteurs</p>
+    </div>
+  </div>
+  <div class="stat-card orange">
+    <i class="fas fa-vault card-icon"></i>
+    <div class="card-info">
+      <h3>{{ isLoading ? '...' : (stats.totalCaissiers | number) }}</h3>
+      <p>Caissiers</p>
+    </div>
+  </div>
+  <div class="stat-card green">
+    <i class="fas fa-chart-line card-icon"></i>
+    <div class="card-info">
+      <h3>{{ isLoading ? '...' : (stats.pourcentageTransactionsValidees | number:'1.0-1') }}%</h3>
+      <p>Validations</p>
+    </div>
+  </div>
+  <div class="stat-card red" *ngIf="stats.volumeCotisation > 0" style="background: white; border-left: 4px solid #dc3545;">
+      <i class="fas fa-coins card-icon" style="color: #dc3545; background: #dc354520;"></i>
+      <div class="card-info">
+        <h3 style="color: #dc3545;">{{ isLoading ? '...' : (stats.volumeCotisation | number) }} FCFA</h3>
+        <p>Volume Dépôts</p>
+      </div>
+  </div>
 </section>
 
 <section class="charts-grid">

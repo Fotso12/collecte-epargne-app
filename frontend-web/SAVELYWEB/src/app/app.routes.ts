@@ -6,6 +6,7 @@ import { ListeEmployesComponent } from './modules/superviseur/composants/Liste-e
 import { LoginComponent } from './modules/auth/login/login.component';
 import { AuthGuard } from './core/guards/auth.guard';
 import { ListeTransactionsComponent } from './modules/superviseur/composants/Liste-transactions/liste-transactions';
+import { GestionAgenceZoneComponent } from './modules/superviseur/composants/gestion-agence-zone/gestion-agence-zone';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -15,10 +16,12 @@ export const routes: Routes = [
     canActivate: [AuthGuard],
     children: [
       { path: 'accueil', component: Dashboard },
+      { path: 'agences', component: GestionAgenceZoneComponent },
       { path: 'clients', component: ListeClientsComponent },
       { path: 'collecteurs', component: ListeEmployesComponent },
       { path: 'caissiers', component: ListeEmployesComponent },
       { path: 'transactions', component: ListeTransactionsComponent },
+      { path: 'reporting', loadComponent: () => import('./modules/superviseur/composants/reporting/reporting').then(m => m.ReportingComponent) },
       { path: 'profil', loadComponent: () => import('./modules/auth/profil/profil.component').then(m => m.ProfilComponent) },
       { path: '', redirectTo: 'accueil', pathMatch: 'full' }
     ]

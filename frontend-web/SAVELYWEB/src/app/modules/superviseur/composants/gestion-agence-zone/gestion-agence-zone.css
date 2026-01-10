@@ -1,0 +1,55 @@
+/* Core Layout Fixes */
+.extra-small { font-size: 0.72rem; font-weight: 500; }
+.bg-success-subtle { background-color: #e8f5e9; color: #2e7d32; }
+.bg-warning-subtle { background-color: #fff8e1; color: #f57f17; }
+.bg-info-subtle { background-color: #e3f2fd; color: #0277bd; }
+
+/* Modal Design System */
+.modal-overlay {
+  position: fixed; top: 0; left: 0; 
+  width: 100vw; height: 100vh;
+  background: rgba(15, 23, 42, 0.6); 
+  backdrop-filter: blur(4px);
+  display: flex; align-items: center; justify-content: center; 
+  z-index: 2000;
+  padding: 1rem;
+}
+
+.modal-card {
+  background: #ffffff; 
+  border-radius: 1.25rem; 
+  width: 100%; 
+  max-width: 550px;
+  max-height: 90vh; 
+  display: flex; 
+  flex-direction: column;
+  overflow: hidden; /* Empêche le débordement global */
+  animation: fadeIn 0.2s ease-out;
+}
+
+.modal-card.large { max-width: 850px; }
+
+.modal-body {
+  overflow-y: auto;
+  overflow-x: hidden; /* Fix pour le débordement horizontal */
+  flex: 1;
+}
+
+.modal-footer { gap: 10px; }
+
+/* Tabs & UI Elements */
+.nav-pills .nav-link { color: #475569; font-weight: 600; font-size: 0.9rem; }
+.nav-pills .nav-link.active { background-color: #0d6efd !important; color: white !important; }
+
+.table-container { 
+  border: 1px solid #e2e8f0;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Fix mobile scroll */
+.table-responsive { border-radius: 12px; }
