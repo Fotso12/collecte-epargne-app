@@ -6,15 +6,12 @@ import com.collecte_epargne.collecte_epargne.utils.TypeTransaction;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.Getter;
-import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.Set;
 
-@Getter
-@Setter
+
 @Entity
 @Table(name = "transaction")
 public class Transaction {
@@ -102,5 +99,203 @@ public class Transaction {
     @Size(max = 255)
     @Column(name = "HASH_TRANSACTION")
     private String hashTransaction;
+
+    public Transaction() {
+
+    }
+
+
+
+    public String getIdTransaction() {
+        return idTransaction;
+    }
+
+    public void setIdTransaction(String idTransaction) {
+        this.idTransaction = idTransaction;
+    }
+
+    public Compte getCompte() {
+        return compte;
+    }
+
+    public void setCompte(Compte compte) {
+        this.compte = compte;
+    }
+
+    public Employe getInitiateur() {
+        return initiateur;
+    }
+
+    public void setInitiateur(Employe initiateur) {
+        this.initiateur = initiateur;
+    }
+
+    public Employe getCaissierValidateur() {
+        return caissierValidateur;
+    }
+
+    public void setCaissierValidateur(Employe caissierValidateur) {
+        this.caissierValidateur = caissierValidateur;
+    }
+
+    public Employe getSuperviseurValidateur() {
+        return superviseurValidateur;
+    }
+
+    public void setSuperviseurValidateur(Employe superviseurValidateur) {
+        this.superviseurValidateur = superviseurValidateur;
+    }
+
+    public Recu getRecu() {
+        return recu;
+    }
+
+    public void setRecu(Recu recu) {
+        this.recu = recu;
+    }
+
+    public Set<Notification> getNotifications() {
+        return notifications;
+    }
+
+    public void setNotifications(Set<Notification> notifications) {
+        this.notifications = notifications;
+    }
+
+    public String getReference() {
+        return reference;
+    }
+
+    public void setReference(String reference) {
+        this.reference = reference;
+    }
+
+    public TypeTransaction getTypeTransaction() {
+        return typeTransaction;
+    }
+
+    public void setTypeTransaction(TypeTransaction typeTransaction) {
+        this.typeTransaction = typeTransaction;
+    }
+
+    public BigDecimal getMontant() {
+        return montant;
+    }
+
+    public void setMontant(BigDecimal montant) {
+        this.montant = montant;
+    }
+
+    public BigDecimal getSoldeAvant() {
+        return soldeAvant;
+    }
+
+    public void setSoldeAvant(BigDecimal soldeAvant) {
+        this.soldeAvant = soldeAvant;
+    }
+
+    public BigDecimal getSoldeApres() {
+        return soldeApres;
+    }
+
+    public void setSoldeApres(BigDecimal soldeApres) {
+        this.soldeApres = soldeApres;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public Instant getDateTransaction() {
+        return dateTransaction;
+    }
+
+    public void setDateTransaction(Instant dateTransaction) {
+        this.dateTransaction = dateTransaction;
+    }
+
+    public Instant getDateValidationCaisse() {
+        return dateValidationCaisse;
+    }
+
+    public void setDateValidationCaisse(Instant dateValidationCaisse) {
+        this.dateValidationCaisse = dateValidationCaisse;
+    }
+
+    public Instant getDateValidationSuperviseur() {
+        return dateValidationSuperviseur;
+    }
+
+    public void setDateValidationSuperviseur(Instant dateValidationSuperviseur) {
+        this.dateValidationSuperviseur = dateValidationSuperviseur;
+    }
+
+    public String getMotifRejet() {
+        return motifRejet;
+    }
+
+    public void setMotifRejet(String motifRejet) {
+        this.motifRejet = motifRejet;
+    }
+
+    public StatutTransaction getStatut() {
+        return statut;
+    }
+
+    public void setStatut(StatutTransaction statut) {
+        this.statut = statut;
+    }
+
+    public ModeTransaction getModeTransaction() {
+        return modeTransaction;
+    }
+
+    public void setModeTransaction(ModeTransaction modeTransaction) {
+        this.modeTransaction = modeTransaction;
+    }
+
+    public String getSignatureClient() {
+        return signatureClient;
+    }
+
+    public void setSignatureClient(String signatureClient) {
+        this.signatureClient = signatureClient;
+    }
+
+    public String getHashTransaction() {
+        return hashTransaction;
+    }
+
+    public void setHashTransaction(String hashTransaction) {
+        this.hashTransaction = hashTransaction;
+    }
+
+    public Transaction(String idTransaction, Compte compte, Employe initiateur, Employe caissierValidateur, Employe superviseurValidateur, Recu recu, Set<Notification> notifications, String reference, TypeTransaction typeTransaction, BigDecimal montant, BigDecimal soldeAvant, BigDecimal soldeApres, String description, Instant dateTransaction, Instant dateValidationCaisse, Instant dateValidationSuperviseur, String motifRejet, StatutTransaction statut, ModeTransaction modeTransaction, String signatureClient, String hashTransaction) {
+        this.idTransaction = idTransaction;
+        this.compte = compte;
+        this.initiateur = initiateur;
+        this.caissierValidateur = caissierValidateur;
+        this.superviseurValidateur = superviseurValidateur;
+        this.recu = recu;
+        this.notifications = notifications;
+        this.reference = reference;
+        this.typeTransaction = typeTransaction;
+        this.montant = montant;
+        this.soldeAvant = soldeAvant;
+        this.soldeApres = soldeApres;
+        this.description = description;
+        this.dateTransaction = dateTransaction;
+        this.dateValidationCaisse = dateValidationCaisse;
+        this.dateValidationSuperviseur = dateValidationSuperviseur;
+        this.motifRejet = motifRejet;
+        this.statut = statut;
+        this.modeTransaction = modeTransaction;
+        this.signatureClient = signatureClient;
+        this.hashTransaction = hashTransaction;
+    }
 
 }

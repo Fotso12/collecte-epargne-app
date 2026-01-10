@@ -6,16 +6,14 @@ import com.collecte_epargne.collecte_epargne.utils.TypeEmploye;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.Getter;
-import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Set;
 
-@Getter
-@Setter
+
 @Entity
+
 @Table(name = "employe")
 public class Employe {
     @Id
@@ -48,6 +46,7 @@ public class Employe {
     @JoinColumn(name = "LOGIN", referencedColumnName = "LOGIN", nullable = false, unique = true) // LOGIN est FK vers utilisateur.LOGIN
     private Utilisateur utilisateur;
 
+    @NotNull
     // Remplacer ID_AGENCE par la relation ManyToOne vers AgenceZone
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ID_AGENCE")
@@ -65,4 +64,102 @@ public class Employe {
     // Relation OneToMany pour les clients assignés (implémenté dans Client.java)
     @OneToMany(mappedBy = "collecteurAssigne")
     private Set<Client> clientsAssignes;
+
+    public Employe() {
+
+    }
+
+    public Integer getIdEmploye() {
+        return idEmploye;
+    }
+
+    public void setIdEmploye(Integer idEmploye) {
+        this.idEmploye = idEmploye;
+    }
+
+    public String getMatricule() {
+        return matricule;
+    }
+
+    public void setMatricule(String matricule) {
+        this.matricule = matricule;
+    }
+
+    public LocalDate getDateEmbauche() {
+        return dateEmbauche;
+    }
+
+    public void setDateEmbauche(LocalDate dateEmbauche) {
+        this.dateEmbauche = dateEmbauche;
+    }
+
+    public TypeEmploye getTypeEmploye() {
+        return typeEmploye;
+    }
+
+    public void setTypeEmploye(TypeEmploye typeEmploye) {
+        this.typeEmploye = typeEmploye;
+    }
+
+    public BigDecimal getCommissionTaux() {
+        return commissionTaux;
+    }
+
+    public void setCommissionTaux(BigDecimal commissionTaux) {
+        this.commissionTaux = commissionTaux;
+    }
+
+    public Utilisateur getUtilisateur() {
+        return utilisateur;
+    }
+
+    public void setUtilisateur(Utilisateur utilisateur) {
+        this.utilisateur = utilisateur;
+    }
+
+    public AgenceZone getAgenceZone() {
+        return agenceZone;
+    }
+
+    public void setAgenceZone(AgenceZone agenceZone) {
+        this.agenceZone = agenceZone;
+    }
+
+    public Employe getSuperviseur() {
+        return superviseur;
+    }
+
+    public void setSuperviseur(Employe superviseur) {
+        this.superviseur = superviseur;
+    }
+
+    public Set<Employe> getEquipeSupervisee() {
+        return equipeSupervisee;
+    }
+
+    public void setEquipeSupervisee(Set<Employe> equipeSupervisee) {
+        this.equipeSupervisee = equipeSupervisee;
+    }
+
+    public Set<Client> getClientsAssignes() {
+        return clientsAssignes;
+    }
+
+    public void setClientsAssignes(Set<Client> clientsAssignes) {
+        this.clientsAssignes = clientsAssignes;
+    }
+
+    public Employe(Integer idEmploye, String matricule, LocalDate dateEmbauche, TypeEmploye typeEmploye, BigDecimal commissionTaux, Utilisateur utilisateur, AgenceZone agenceZone, Employe superviseur, Set<Employe> equipeSupervisee, Set<Client> clientsAssignes) {
+        this.idEmploye = idEmploye;
+        this.matricule = matricule;
+        this.dateEmbauche = dateEmbauche;
+        this.typeEmploye = typeEmploye;
+        this.commissionTaux = commissionTaux;
+        this.utilisateur = utilisateur;
+        this.agenceZone = agenceZone;
+        this.superviseur = superviseur;
+        this.equipeSupervisee = equipeSupervisee;
+        this.clientsAssignes = clientsAssignes;
+    }
+
 }

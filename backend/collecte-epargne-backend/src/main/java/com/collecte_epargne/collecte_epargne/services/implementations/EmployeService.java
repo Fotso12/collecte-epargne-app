@@ -15,18 +15,13 @@ import com.collecte_epargne.collecte_epargne.repositories.ClientRepository;
 import com.collecte_epargne.collecte_epargne.services.interfaces.EmployeInterface;
 import com.collecte_epargne.collecte_epargne.utils.CodeGenerator;
 import com.collecte_epargne.collecte_epargne.utils.TypeEmploye;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
-@Setter
-@Getter
 @Service
-@AllArgsConstructor
 public class EmployeService implements EmployeInterface {
 
     private final EmployeRepository employeRepository;
@@ -37,19 +32,32 @@ public class EmployeService implements EmployeInterface {
     private final ClientMapper clientMapper;
     private final CodeGenerator codeGenerator;
 
+    public EmployeService(EmployeRepository employeRepository, EmployeMapper employeMapper, UtilisateurRepository utilisateurRepository, AgenceZoneRepository agenceZoneRepository, ClientRepository clientRepository, ClientMapper clientMapper, CodeGenerator codeGenerator) {
+        this.employeRepository = employeRepository;
+        this.employeMapper = employeMapper;
+        this.utilisateurRepository = utilisateurRepository;
+        this.agenceZoneRepository = agenceZoneRepository;
+        this.clientRepository = clientRepository;
+        this.clientMapper = clientMapper;
+        this.codeGenerator = codeGenerator;
+    }
+
+
     // --- CRUD Générique ---
 
     private void assignerRelations(Employe employe, EmployeDto dto) {
         // Utilisateur (LOGIN)
         if (dto.getLoginUtilisateur() != null) {
-            Utilisateur utilisateur = utilisateurRepository.findById(dto.getLoginUtilisateur())
+            String login = Objects.requireNonNull(dto.getLoginUtilisateur());
+            Utilisateur utilisateur = utilisateurRepository.findById(login)
                     .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé avec le login : " + dto.getLoginUtilisateur()));
             employe.setUtilisateur(utilisateur);
         }
 
         // AgenceZone (ID)
         if (dto.getIdAgence() != null) {
-            AgenceZone agenceZone = agenceZoneRepository.findById(dto.getIdAgence())
+            Integer idAgence = Objects.requireNonNull(dto.getIdAgence());
+            AgenceZone agenceZone = agenceZoneRepository.findById(idAgence)
                     .orElseThrow(() -> new RuntimeException("AgenceZone non trouvée"));
             employe.setAgenceZone(agenceZone);
         } else {
@@ -74,9 +82,11 @@ public class EmployeService implements EmployeInterface {
     }
 
     @Override
+    @SuppressWarnings("null")
     public EmployeDto save(EmployeDto employeDto) {
+        Objects.requireNonNull(employeDto, "employeDto ne doit pas être null");
         // Auto-générer le matricule si non fourni
-        if (employeDto.getMatricule() == null || employeDto.getMatricule().isEmpty() || employeDto.getMatricule() != null && !employeDto.getMatricule().isEmpty()) {
+        if (employeDto.getMatricule() == null || employeDto.getMatricule().isEmpty() || (employeDto.getMatricule() != null && !employeDto.getMatricule().isEmpty())) {
             employeDto.setMatricule(codeGenerator.generateMatricule(employeDto.getTypeEmploye()));
         }
 
@@ -94,6 +104,8 @@ public class EmployeService implements EmployeInterface {
 
     @Override
     public EmployeDto update(String  matricule, EmployeDto employeDto) {
+        Objects.requireNonNull(matricule, "matricule ne doit pas être null");
+        Objects.requireNonNull(employeDto, "employeDto ne doit pas être null");
         Employe existingEmploye = employeRepository.findByMatricule(matricule)
                 .orElseThrow(() -> new RuntimeException("Employé non trouvé : " + matricule));
 
@@ -111,6 +123,7 @@ public class EmployeService implements EmployeInterface {
 
     @Override
     public EmployeDto getById(String  matricule) {
+        Objects.requireNonNull(matricule, "matricule ne doit pas être null");
         Employe employe = employeRepository.findByMatricule(matricule)
                 .orElseThrow(() -> new RuntimeException("Employé non trouvé avec l'ID : " + matricule));
         return employeMapper.toDto(employe);
@@ -118,12 +131,13 @@ public class EmployeService implements EmployeInterface {
 
     @Override
     public void delete(String  matricule) {
+        Objects.requireNonNull(matricule, "matricule ne doit pas être null");
         // 1. Trouver l'Employé par son MATRICULE (String)
         Employe employe = employeRepository.findByMatricule(matricule)
                 .orElseThrow(() -> new RuntimeException("Employé inexistant : " + matricule));
 
         // 2. Supprimer par son ID PRIMAIRE (Integer)
-        employeRepository.deleteById(employe.getIdEmploye());
+        employeRepository.deleteById(Objects.requireNonNull(employe.getIdEmploye()));
     }
 
     @Override
@@ -174,6 +188,7 @@ public class EmployeService implements EmployeInterface {
     @Override
     public List<EmployeDto> getCollecteursBySuperviseur(String idSuperviseur) {
         // Vérification si le superviseur existe et est bien un SUPERVISEUR
+        Objects.requireNonNull(idSuperviseur, "idSuperviseur ne doit pas être null");
 
         // Correction : Convertir le String en Integer
         Integer idSuperviseurInt = Integer.parseInt(idSuperviseur);
@@ -193,6 +208,7 @@ public class EmployeService implements EmployeInterface {
     public List<ClientDto> getClientsByCollecteur(String idCollecteur) {
 
         // Correction : Convertir le String en Integer
+        Objects.requireNonNull(idCollecteur, "idCollecteur ne doit pas être null");
         Integer idCollecteurInt = Integer.parseInt(idCollecteur);
         Employe collecteur = employeRepository.findById(idCollecteurInt)
                 .orElseThrow(() -> new RuntimeException("Collecteur non trouvé : " + idCollecteur));

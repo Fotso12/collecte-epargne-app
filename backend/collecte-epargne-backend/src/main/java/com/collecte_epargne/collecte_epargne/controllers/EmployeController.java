@@ -3,7 +3,6 @@ package com.collecte_epargne.collecte_epargne.controllers;
 import com.collecte_epargne.collecte_epargne.dtos.ClientDto;
 import com.collecte_epargne.collecte_epargne.dtos.EmployeDto;
 import com.collecte_epargne.collecte_epargne.services.implementations.EmployeService;
-import com.collecte_epargne.collecte_epargne.services.interfaces.EmployeInterface;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -125,4 +124,6 @@ public class EmployeController {
     public ResponseEntity<List<EmployeDto>> getCollecteursByTotalClientScore() {
         return new ResponseEntity<>(employeService.getCollecteursOrderedByTotalClientScore(), HttpStatus.OK);
     }
+
+
 }

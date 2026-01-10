@@ -36,6 +36,7 @@ public interface UtilisateurMapper {
     @Mapping(target = "role", ignore = true)
     @Mapping(target = "employe", ignore = true)
     @Mapping(target = "client", ignore = true)
+    @Mapping(target = "password", ignore = true)
     // Le mot de passe (si présent dans l'entité) doit être géré par le service (hachage)
     Utilisateur toEntity(UtilisateurDto utilisateurDto);
 }

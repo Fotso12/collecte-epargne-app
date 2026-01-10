@@ -13,30 +13,39 @@ public class CorsConfig {
 
     @Bean
     public CorsFilter corsFilter() {
-        CorsConfiguration config = new CorsConfiguration();
-        
-        // Autoriser toutes les origines en développement (localhost sur n'importe quel port)
-        config.addAllowedOriginPattern("*");
-        
+        CorsConfiguration corsConfiguration = new CorsConfiguration();
+
+        // Autoriser les origines pour Angular (localhost:4200) et Flutter en développement
+        corsConfiguration.setAllowedOriginPatterns(Arrays.asList(
+            "http://localhost:4200",  // Port par défaut Angular
+            "http://localhost:3000",  // Port commun pour Flutter
+            "http://localhost:8080",  // Port alternatif
+            "http://127.0.0.1:4200", // Alternative localhost
+            "http://127.0.0.1:3000"  // Alternative localhost
+        ));
+
         // Autoriser toutes les méthodes HTTP
-        config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
-        
-        // Autoriser tous les headers
-        config.setAllowedHeaders(Arrays.asList("*"));
-        
-        // Autoriser les credentials (cookies, authorization headers)
-        config.setAllowCredentials(true);
-        
-        // Exposer tous les headers dans la réponse
-        config.setExposedHeaders(Arrays.asList("*"));
-        
-        // Durée de cache de la requête preflight (OPTIONS)
-        config.setMaxAge(3600L);
-        
+        corsConfiguration.setAllowedMethods(Arrays.asList(
+            "GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"
+        ));
+
+        // Autoriser tous les en-têtes
+        corsConfiguration.setAllowedHeaders(Arrays.asList("*"));
+
+        // Autoriser les credentials (important pour l'authentification)
+        corsConfiguration.setAllowCredentials(true);
+
+        // Exposer les en-têtes courants
+        corsConfiguration.setExposedHeaders(Arrays.asList(
+            "Authorization", "Content-Type", "Accept"
+        ));
+
+        // Mettre en cache la réponse preflight pendant 1 heure
+        corsConfiguration.setMaxAge(3600L);
+
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", config);
-        
+        source.registerCorsConfiguration("/**", corsConfiguration);
+
         return new CorsFilter(source);
     }
 }
-
