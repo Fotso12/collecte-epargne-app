@@ -30,13 +30,12 @@ public class Client {
     private String adresse;
 
     @NotNull
-    @Lob
-    @Column(name = "TYPE_CNI", nullable = false)
+    @Enumerated(EnumType.STRING)
+    @Column(name = "TYPE_CNI", nullable = false, length = 50)
     private TypeCNI typeCni;
 
     @Size(max = 50)
-    @NotNull
-    @Column(name = "NUM_CNI", nullable = false, length = 50)
+    @Column(name = "NUM_CNI", length = 50)
     private String numCni;
 
     @Size(max = 255)
@@ -66,8 +65,8 @@ public class Client {
     private Integer scoreEpargne;
 
     // Remplacer LOGIN brut par la relation OneToOne vers Utilisateur
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "LOGIN", nullable = false, unique = true) // LOGIN est FK
+    @OneToOne(fetch = FetchType.EAGER, optional = false) // EAGER pour éviter les problèmes de lazy loading
+    @JoinColumn(name = "LOGIN", referencedColumnName = "LOGIN", nullable = false, unique = true) // LOGIN est FK vers utilisateur.LOGIN
     private Utilisateur utilisateur;
 
     // Remplacer COLLECTEUR_ASSIGNE par la relation ManyToOne vers Employe
@@ -75,8 +74,17 @@ public class Client {
     @JoinColumn(name = "COLLECTEUR_ASSIGNE")
     private Employe collecteurAssigne; // Le collecteur affecté
 
+    // Relation ManyToOne vers AgenceZone (un client appartient à une agence)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "ID_AGENCE")
+    private AgenceZone agence; // L'agence à laquelle appartient le client
+
     // Relation OneToMany vers Compte (un client a plusieurs comptes)
     @OneToMany(mappedBy = "client")
     private Set<Compte> comptes;
+
+    // Relation OneToMany vers DemandeOuvertureCompte
+    @OneToMany(mappedBy = "client")
+    private Set<DemandeOuvertureCompte> demandesOuverture;
 
 }

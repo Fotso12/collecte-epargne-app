@@ -17,4 +17,7 @@ public interface ClientInterface {
 
     // Ajout de fonctions de recherche spécifiques si nécessaire
     ClientDto getByNumeroClient(String numeroClient);
+
+    // Récupérer un client par le login de l'utilisateur
+    ClientDto getByLogin(String login);
 }

@@ -2,7 +2,6 @@ package com.collecte_epargne.collecte_epargne.controllers;
 
 import com.collecte_epargne.collecte_epargne.dtos.ClientDto;
 import com.collecte_epargne.collecte_epargne.services.implementations.ClientService;
-import com.collecte_epargne.collecte_epargne.services.interfaces.ClientInterface;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -51,6 +50,15 @@ public class ClientController {
     public ResponseEntity<?> getByNumeroClient(@PathVariable String numeroClient) {
         try {
             return new ResponseEntity<>(clientService.getByNumeroClient(numeroClient), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @GetMapping("/login/{login}")
+    public ResponseEntity<?> getByLogin(@PathVariable String login) {
+        try {
+            return new ResponseEntity<>(clientService.getByLogin(login), HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
         }

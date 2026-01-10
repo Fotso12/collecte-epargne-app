@@ -128,4 +128,11 @@ public class ClientService implements ClientInterface {
                 .orElseThrow(() -> new RuntimeException("Client non trouvé avec le numéro : " + numeroClient));
         return clientMapper.toDto(client);
     }
+
+    @Override
+    public ClientDto getByLogin(String login) {
+        Client client = clientRepository.findByUtilisateurLogin(login)
+                .orElseThrow(() -> new RuntimeException("Client non trouvé avec le login : " + login));
+        return clientMapper.toDto(client);
+    }
 }

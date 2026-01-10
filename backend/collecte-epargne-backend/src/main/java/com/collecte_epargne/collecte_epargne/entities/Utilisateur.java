@@ -30,7 +30,7 @@ public class Utilisateur {
     private Employe employe;
 
     // Relation OneToOne vers Client (un client est un utilisateur du système)
-    @OneToOne(mappedBy = "utilisateur", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToOne(mappedBy = "utilisateur", fetch = FetchType.LAZY)
     private Client client;
 
     @Size(max = 50)
