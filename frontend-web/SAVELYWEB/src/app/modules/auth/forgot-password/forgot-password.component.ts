@@ -2,6 +2,8 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { PasswordService } from '../../../core/services/password.service';
+
 
 @Component({
   standalone: true,
@@ -12,12 +14,13 @@ import { Router } from '@angular/router';
 })
 export class ForgotPasswordComponent {
 
-  form!: FormGroup;
+  form: FormGroup;
   loading = false;
-  success = false;
+  error = '';
 
   constructor(
     private fb: FormBuilder,
+    private passwordService: PasswordService,
     private router: Router
   ) {
     this.form = this.fb.group({
@@ -29,13 +32,26 @@ export class ForgotPasswordComponent {
     if (this.form.invalid) return;
 
     this.loading = true;
+    this.error = '';
 
-    // Simulation appel backend
-    setTimeout(() => {
-      this.loading = false;
-      this.success = true;
+    const email = this.form.value.email;
 
-      this.router.navigate(['/verify-code']);
-    }, 1500);
+    this.passwordService.forgotPassword(email).subscribe({
+      next: () => {
+        this.loading = false;
+        this.router.navigate(['/verify-code'], {
+          queryParams: { email }
+        });
+      },
+      error: (err) => {
+        this.loading = false;
+        console.error('Erreur lors de la demande de mot de passe oublié :', err);
+        if (err.status === 0) {
+          this.error = 'Impossible de contacter le serveur. Vérifiez votre connexion ou contactez le support.';
+        } else {
+          this.error = err.error?.error || 'Une erreur est survenue (Email introuvable ou erreur serveur).';
+        }
+      }
+    });
   }
 }

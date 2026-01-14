@@ -9,3 +9,37 @@
     </form>
   </div>
 </div>
+<div class="login-container">
+  <div class="login-card">
+    <h2>Code de vérification</h2>
+    <p>Entrez le code reçu par mail pour : <br><strong>{{ email }}</strong></p>
+
+    <div *ngIf="error" class="alert-error">
+      {{ error }}
+    </div>
+
+    <div *ngIf="success" class="alert-success">
+      {{ success }}
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="submit()">
+      <div class="form-group">
+        <input
+          class="form-control"
+          formControlName="code"
+          placeholder="Entrez votre code"
+          type="text"
+          [readonly]="loading || success !== ''">
+      </div>
+
+      <button class="btn-login" type="submit" [disabled]="loading || form.invalid || success !== ''">
+        <span *ngIf="!loading">Valider le code</span>
+        <span *ngIf="loading">Vérification en cours...</span>
+      </button>
+    </form>
+
+    <div class="back-link">
+      <a routerLink="/forgot-password">Renvoyer un nouveau code</a>
+    </div>
+  </div>
+</div>
