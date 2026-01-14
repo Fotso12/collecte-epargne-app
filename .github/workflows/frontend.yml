@@ -1,12 +1,6 @@
 name: Frontend CI
 
-on:
-  push:
-    paths:
-      - "frontend-web/**"
-  pull_request:
-    paths:
-      - "frontend-web/**"
+on: [push, pull_request]
 
 jobs:
   frontend-build:
