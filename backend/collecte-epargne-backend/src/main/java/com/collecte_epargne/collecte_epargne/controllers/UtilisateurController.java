@@ -7,6 +7,7 @@ import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
@@ -34,12 +35,6 @@ public class UtilisateurController {
     public ResponseEntity<?> save(@Valid @RequestBody UtilisateurCreationRequestDto creationRequestDto) {
         logger.info("Création d'utilisateur avec login: {}", creationRequestDto.getLogin());
         try {
-            // Le DTO de requête a été validé par @Valid (login, idRole, nom, etc. non nulls).
-            String password = creationRequestDto.getPassword();
-
-            // 1. Créer le DTO standard (sans password, mais avec tous les champs de l'entité)
-            // Le constructeur par défaut (AllArgsConstructor) du DTO standard a 10 arguments.
-            // Utiliser les setters pour éviter les problèmes de signature du constructeur.
             UtilisateurDto utilisateurDto = new UtilisateurDto();
             utilisateurDto.setLogin(creationRequestDto.getLogin());
             utilisateurDto.setIdRole(creationRequestDto.getIdRole());
@@ -49,13 +44,9 @@ public class UtilisateurController {
             utilisateurDto.setEmail(creationRequestDto.getEmail());
             utilisateurDto.setStatut(creationRequestDto.getStatut());
 
-            // Note: idEmploye et codeClient sont laissés à null pour la création
-
-            // 2. Le service hache le mot de passe et sauve l'entité.
-            return new ResponseEntity<>(utilisateurService.save(utilisateurDto, password), HttpStatus.CREATED);
+            return new ResponseEntity<>(utilisateurService.save(utilisateurDto, creationRequestDto.getPassword()), HttpStatus.CREATED);
         } catch (Exception e) {
             logger.error("Erreur lors de la création d'utilisateur: {}", e.getMessage(), e);
-            // Pour le débogage, vous pouvez logger l'erreur réelle (e.printStackTrace())
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
@@ -82,10 +73,6 @@ public class UtilisateurController {
         }
     }
 
-    /**
-     * Endpoint de mise à jour (hors mot de passe).
-     * Utilise UtilisateurDto (qui n'a pas le mot de passe).
-     */
     @PutMapping("/{login}")
     public ResponseEntity<?> update(@PathVariable String login, @Valid @RequestBody UtilisateurDto utilisateurDto) {
         logger.info("Mise à jour d'utilisateur avec login: {}", login);
@@ -97,7 +84,6 @@ public class UtilisateurController {
         }
     }
 
-    // Endpoint spécifique pour la mise à jour du mot de passe
     @PutMapping("/{login}/password")
     public ResponseEntity<?> updatePassword(@PathVariable String login, @RequestBody Map<String, String> payload) {
         logger.info("Mise à jour du mot de passe pour utilisateur avec login: {}", login);
@@ -125,6 +111,7 @@ public class UtilisateurController {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
         }
     }
+
     @PutMapping("/{login}/statut")
     public ResponseEntity<UtilisateurDto> updateStatut(@PathVariable String login, @RequestBody Map<String, String> payload) {
         String nouveauStatut = payload.get("statut");
@@ -133,5 +120,17 @@ public class UtilisateurController {
         }
         UtilisateurDto updated = utilisateurService.updateStatut(login, nouveauStatut);
         return ResponseEntity.ok(updated);
+    }
+
+    @PutMapping(value = "/{login}/photo", consumes = "multipart/form-data")
+    public ResponseEntity<UtilisateurDto> updatePhoto(@PathVariable String login, @RequestParam("photo") MultipartFile photo) {
+        logger.info("Mise à jour de la photo pour utilisateur : {}", login);
+        try {
+            UtilisateurDto updated = utilisateurService.updatePhoto(login, photo);
+            return ResponseEntity.ok(updated);
+        } catch (Exception e) {
+            logger.error("Erreur lors de la mise à jour de la photo pour utilisateur {}: {}", login, e.getMessage(), e);
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        }
     }
 }

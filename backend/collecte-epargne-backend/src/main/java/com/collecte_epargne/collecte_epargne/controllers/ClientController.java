@@ -51,6 +51,31 @@ public class ClientController {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
+    
+    // --- NOUVELLE MÉTHODE : MISE À JOUR AVEC FICHIERS ---
+    @PutMapping(value = "/{codeClient}/with-files", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> updateWithFiles(
+            @PathVariable String codeClient,
+            @RequestPart("client") String clientJson,
+            @RequestPart(value = "photo", required = false) MultipartFile photo,
+            @RequestPart(value = "cniRecto", required = false) MultipartFile cniRecto,
+            @RequestPart(value = "cniVerso", required = false) MultipartFile cniVerso) {
+
+        log.info("PUT /api/clients/{}/with-files - Mise à jour client avec images", codeClient);
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            objectMapper.registerModule(new JavaTimeModule());
+            ClientDto clientDto = objectMapper.readValue(clientJson, ClientDto.class);
+
+            return new ResponseEntity<>(
+                    clientService.updateWithFiles(codeClient, clientDto, photo, cniRecto, cniVerso),
+                    HttpStatus.OK
+            );
+        } catch (Exception e) {
+            log.error("Erreur mise à jour client avec fichiers", e);
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
 
     // --- NOUVELLE MÉTHODE : IMPORTATION CSV ---
     @PostMapping("/import")
@@ -70,119 +95,66 @@ public class ClientController {
 
     @PostMapping
     public ResponseEntity<?> save(@RequestBody ClientDto clientDto) {
-        log.info("POST /api/clients - Création client");
-
         try {
             return new ResponseEntity<>(clientService.save(clientDto), HttpStatus.CREATED);
         } catch (Exception e) {
-            log.error("Erreur création client", e);
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
 
-    @GetMapping
+    @GetMapping()
     public ResponseEntity<List<ClientDto>> getAll() {
-        log.info("GET /api/clients - Liste des clients");
-
         try {
             return new ResponseEntity<>(clientService.getAll(), HttpStatus.OK);
         } catch (Exception e) {
-            log.error("Erreur récupération liste clients", e);
-            throw new ResponseStatusException(
-                    HttpStatus.INTERNAL_SERVER_ERROR,
-                    "Erreur lors de la récupération des clients",
-                    e
-            );
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Erreur lors de la récupération des clients", e);
         }
     }
 
-    @GetMapping("/{numeroClient}")
-    public ResponseEntity<?> getById(@PathVariable Long numeroClient) {
-        log.info("GET /api/clients/{}", numeroClient);
-
+    @GetMapping("/{codeClient}")
+    public ResponseEntity<?> getById(@PathVariable String codeClient) {
         try {
-            return new ResponseEntity<>(clientService.getById(numeroClient), HttpStatus.OK);
-        } catch (Exception e) {
-            log.error("Client non trouvé avec numero={}", numeroClient, e);
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
-        }
-    }
-
-    @GetMapping("/numero/{numeroClient}")
-    public ResponseEntity<?> getByNumeroClient(@PathVariable Long numeroClient) {
-        log.info("GET /api/clients/numero/{}", numeroClient);
-
-        try {
-            return new ResponseEntity<>(clientService.getByNumeroClient(numeroClient), HttpStatus.OK);
-        } catch (Exception e) {
-            log.error("Client non trouvé avec numero={}", numeroClient, e);
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
-        }
-    }
-
-    @GetMapping("/code/{codeClient}")
-    public ResponseEntity<?> getByCodeClient(@PathVariable String codeClient) {
-        log.info("GET /api/clients/code/{}", codeClient);
-
-        try {
+            // Using getByCodeClient since the path variable is codeClient
             return new ResponseEntity<>(clientService.getByCodeClient(codeClient), HttpStatus.OK);
         } catch (Exception e) {
-            log.error("Client non trouvé avec code={}", codeClient, e);
             return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
         }
     }
 
-    @PutMapping("/{numeroClient}")
-    public ResponseEntity<?> update(@PathVariable Long numeroClient,
-                                    @RequestBody ClientDto clientDto) {
-        log.info("PUT /api/clients/{} - Mise à jour client", numeroClient);
-
+    public ResponseEntity<?> getByNumeroClient(@PathVariable String numeroClient) {
         try {
-            return new ResponseEntity<>(clientService.update(numeroClient, clientDto), HttpStatus.OK);
+            return new ResponseEntity<>(clientService.getByNumeroClient(Long.parseLong(numeroClient)), HttpStatus.OK);
+        } catch (NumberFormatException e) {
+             return new ResponseEntity<>("Numéro client invalide", HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
-            log.error("Erreur mise à jour client numero={}", numeroClient, e);
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @GetMapping("/login/{login}")
+    public ResponseEntity<?> getByLogin(@PathVariable String login) {
+        try {
+            return new ResponseEntity<>(clientService.getByLogin(login), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @PutMapping("/{codeClient}")
+    public ResponseEntity<?> update(@PathVariable String codeClient, @RequestBody ClientDto clientDto) {
+        try {
+            return new ResponseEntity<>(clientService.updateByCodeClient(codeClient, clientDto), HttpStatus.OK);
+        } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
 
-    @PutMapping("/code/{codeClient}")
-    public ResponseEntity<?> updateByCodeClient(@PathVariable String codeClient,
-                                                @RequestBody ClientDto clientDto) {
-        log.info("PUT /api/clients/code/{} - Mise à jour client", codeClient);
-
-        try {
-            return new ResponseEntity<>(
-                    clientService.updateByCodeClient(codeClient, clientDto),
-                    HttpStatus.OK
-            );
-        } catch (Exception e) {
-            log.error("Erreur mise à jour client code={}", codeClient, e);
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-        }
-    }
-
-    @DeleteMapping("/code/{codeClient}")
-    public ResponseEntity<?> deleteByCodeClient(@PathVariable String codeClient) {
-        log.info("DELETE /api/clients/code/{}", codeClient);
-
+    @DeleteMapping("/{codeClient}")
+    public ResponseEntity<?> delete(@PathVariable String codeClient) {
         try {
             clientService.deleteByCodeClient(codeClient);
-            return new ResponseEntity<>("Client supprimé avec succès", HttpStatus.NO_CONTENT);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         } catch (Exception e) {
-            log.error("Erreur suppression client code={}", codeClient, e);
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-        }
-    }
-
-    @DeleteMapping("/{numeroClient}")
-    public ResponseEntity<?> delete(@PathVariable Long numeroClient) {
-        log.info("DELETE /api/clients/{}", numeroClient);
-
-        try {
-            clientService.delete(numeroClient);
-            return new ResponseEntity<>("Client supprimé avec succès", HttpStatus.NO_CONTENT);
-        } catch (Exception e) {
-            log.error("Erreur suppression client numero={}", numeroClient, e);
             return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
         }
     }

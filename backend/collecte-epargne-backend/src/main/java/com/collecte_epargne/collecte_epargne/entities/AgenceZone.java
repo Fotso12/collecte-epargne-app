@@ -166,7 +166,7 @@ public class AgenceZone {
     public AgenceZone() {
     }
 
-    public Throwable getId() {
-        return null;
+    public Integer getId() {
+        return idAgence;
     }
 }

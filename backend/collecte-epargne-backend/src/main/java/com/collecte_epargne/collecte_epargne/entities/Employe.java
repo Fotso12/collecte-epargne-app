@@ -42,8 +42,8 @@ public class Employe {
 
 
     // Remplacer le LOGIN brut par la relation OneToOne vers Utilisateur
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "LOGIN", nullable = false, unique = true) // LOGIN est PK/FK
+    @OneToOne(fetch = FetchType.EAGER, optional = false) // EAGER pour éviter les problèmes de lazy loading
+    @JoinColumn(name = "LOGIN", referencedColumnName = "LOGIN", nullable = false, unique = true) // LOGIN est FK vers utilisateur.LOGIN
     private Utilisateur utilisateur;
 
     @NotNull

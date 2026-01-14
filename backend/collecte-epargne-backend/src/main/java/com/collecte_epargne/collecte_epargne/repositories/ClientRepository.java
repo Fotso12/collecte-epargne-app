@@ -27,5 +27,7 @@ public interface ClientRepository extends JpaRepository<Client, Long> {
     //Trouver les clients en fonction de leur code
     Optional<Client> findByCodeClient(String codeClient);
     boolean existsByCodeClient(String codeClient);
+
+    Optional<Client> findByUtilisateurLogin(String login);
     
 }

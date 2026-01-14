@@ -50,6 +50,7 @@ public class AuthController {
         String token = jwtService.generateToken(request.getEmail());
 
         // 4️⃣ Retour du token avec les détails utilisateur
+        // 4️⃣ Retour du token avec les détails utilisateur
         return ResponseEntity.ok(new LoginResponse(
                 token,
                 "Bearer",
@@ -57,7 +58,10 @@ public class AuthController {
                 utilisateur.getEmail(),
                 utilisateur.getNom(),
                 utilisateur.getPrenom(),
-                utilisateur.getRole() != null ? utilisateur.getRole().getNom() : null
+                utilisateur.getRole() != null ? utilisateur.getRole().getNom() : null,
+                utilisateur.getTelephone(),
+                utilisateur.getRole() != null ? utilisateur.getRole().getId() : null,
+                utilisateur.getRole() != null ? utilisateur.getRole().getCode() : null
         ));
     }
 }

@@ -112,7 +112,7 @@ public class ClientServiceTest {
 
         @Test
         void delete_shouldDeleteClient_whenExists() {
-            when(clientRepository.existsById(1001L)).thenReturn(true);
+            when(clientRepository.findById(1001L)).thenReturn(Optional.of(client));
 
             clientService.delete(1001L);
 
@@ -121,7 +121,7 @@ public class ClientServiceTest {
 
         @Test
         void delete_shouldThrowException_whenNotExists() {
-            when(clientRepository.existsById(1001L)).thenReturn(false);
+            when(clientRepository.findById(1001L)).thenReturn(Optional.empty());
 
             assertThrows(RuntimeException.class, () -> clientService.delete(1001L));
         }
@@ -139,10 +139,11 @@ public class ClientServiceTest {
 
         @Test
         void deleteByCodeClient_shouldDeleteClient() {
-            when(clientRepository.existsByCodeClient("C001")).thenReturn(true);
+            when(clientRepository.findByCodeClient("C001")).thenReturn(Optional.of(client));
+            when(clientRepository.findById(1001L)).thenReturn(Optional.of(client));
 
             clientService.deleteByCodeClient("C001");
 
-            verify(clientRepository).deleteByCodeClient("C001");
+            verify(clientRepository).deleteById(1001L);
         }
 }

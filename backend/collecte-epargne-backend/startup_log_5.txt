@@ -1,0 +1,371 @@
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] ---------------< com.collecte-epargne:collecte-epargne >----------------
+[INFO] Building collecte-epargne 0.0.1-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] >>> spring-boot:3.2.5:run (default-cli) > test-compile @ collecte-epargne >>>
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ collecte-epargne ---
+[INFO] Copying 2 resources from src\main\resources to target\classes
+[INFO] Copying 1 resource from src\main\resources to target\classes
+[INFO] 
+[INFO] --- compiler:3.13.0:compile (default-compile) @ collecte-epargne ---
+[INFO] Recompiling the module because of changed source code.
+[INFO] Compiling 145 source files with javac [debug parameters release 17] to target\classes
+[INFO] 
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ collecte-epargne ---
+[INFO] skip non existing resourceDirectory C:\Users\Darryl\Documents\Cours_EADL\Développement_avancées\Projet2\collecte-epargne-app\backend\collecte-epargne-backend\src\test\resources
+[INFO] 
+[INFO] --- compiler:3.13.0:testCompile (default-testCompile) @ collecte-epargne ---
+[INFO] Recompiling the module because of changed dependency.
+[INFO] Compiling 23 source files with javac [debug parameters release 17] to target\test-classes
+[WARNING] The following options were not recognized by any processor: '[mapstruct.unmappedTargetPolicy, mapstruct.defaultComponentModel]'
+[INFO] 
+[INFO] <<< spring-boot:3.2.5:run (default-cli) < test-compile @ collecte-epargne <<<
+[INFO] 
+[INFO] 
+[INFO] --- spring-boot:3.2.5:run (default-cli) @ collecte-epargne ---
+[INFO] Attaching agents: []
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+ :: Spring Boot ::                (v3.2.5)
+
+2026-01-12 20:59:56 [restartedMain] INFO  c.c.c.CollecteEpargneApplication [User: Addr:] - Starting CollecteEpargneApplication using Java 17.0.15 with PID 28692 (C:\Users\Darryl\Documents\Cours_EADL\Développement_avancées\Projet2\collecte-epargne-app\backend\collecte-epargne-backend\target\classes started by Darryl in C:\Users\Darryl\Documents\Cours_EADL\Développement_avancées\Projet2\collecte-epargne-app\backend\collecte-epargne-backend)
+2026-01-12 20:59:56 [restartedMain] INFO  c.c.c.CollecteEpargneApplication [User: Addr:] - No active profile set, falling back to 1 default profile: "default"
+2026-01-12 20:59:56 [restartedMain] INFO  o.s.b.d.e.DevToolsPropertyDefaultsPostProcessor [User: Addr:] - Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
+2026-01-12 20:59:56 [restartedMain] INFO  o.s.b.d.e.DevToolsPropertyDefaultsPostProcessor [User: Addr:] - For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
+2026-01-12 20:59:59 [restartedMain] INFO  o.s.d.r.c.RepositoryConfigurationDelegate [User: Addr:] - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-01-12 20:59:59 [restartedMain] INFO  o.s.d.r.c.RepositoryConfigurationDelegate [User: Addr:] - Finished Spring Data repository scanning in 195 ms. Found 17 JPA repository interfaces.
+2026-01-12 21:00:00 [restartedMain] INFO  o.s.b.w.e.tomcat.TomcatWebServer [User: Addr:] - Tomcat initialized with port 8082 (http)
+2026-01-12 21:00:00 [restartedMain] INFO  o.a.catalina.core.StandardService [User: Addr:] - Starting service [Tomcat]
+2026-01-12 21:00:00 [restartedMain] INFO  o.a.catalina.core.StandardEngine [User: Addr:] - Starting Servlet engine: [Apache Tomcat/10.1.20]
+2026-01-12 21:00:00 [restartedMain] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] [User: Addr:] - Initializing Spring embedded WebApplicationContext
+2026-01-12 21:00:00 [restartedMain] INFO  o.s.b.w.s.c.ServletWebServerApplicationContext [User: Addr:] - Root WebApplicationContext: initialization completed in 3722 ms
+2026-01-12 21:00:01 [restartedMain] INFO  o.h.jpa.internal.util.LogHelper [User: Addr:] - HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-01-12 21:00:01 [restartedMain] INFO  org.hibernate.Version [User: Addr:] - HHH000412: Hibernate ORM core version 6.4.4.Final
+2026-01-12 21:00:01 [restartedMain] INFO  o.h.c.i.RegionFactoryInitiator [User: Addr:] - HHH000026: Second-level cache disabled
+2026-01-12 21:00:01 [restartedMain] INFO  o.s.o.j.p.SpringPersistenceUnitInfo [User: Addr:] - No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-01-12 21:00:01 [restartedMain] INFO  com.zaxxer.hikari.HikariDataSource [User: Addr:] - HikariPool-1 - Starting...
+2026-01-12 21:00:02 [restartedMain] INFO  com.zaxxer.hikari.pool.HikariPool [User: Addr:] - HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@240140f0
+2026-01-12 21:00:02 [restartedMain] INFO  com.zaxxer.hikari.HikariDataSource [User: Addr:] - HikariPool-1 - Start completed.
+2026-01-12 21:00:02 [restartedMain] WARN  org.hibernate.orm.deprecation [User: Addr:] - HHH90000025: MySQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-01-12 21:00:05 [restartedMain] INFO  o.h.e.t.j.p.i.JtaPlatformInitiator [User: Addr:] - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-01-12 21:00:06 [restartedMain] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean [User: Addr:] - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-01-12 21:00:06 [restartedMain] INFO  o.s.d.j.r.query.QueryEnhancerFactory [User: Addr:] - Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-01-12 21:00:08 [restartedMain] DEBUG org.hibernate.SQL [User: Addr:] - 
+    select
+        tc1_0.id_type,
+        tc1_0.autoriser_retrait,
+        tc1_0.code,
+        tc1_0.description,
+        tc1_0.duree_blocage_jours,
+        tc1_0.frais_cloture,
+        tc1_0.frais_ouverture,
+        tc1_0.nom,
+        tc1_0.solde_minimum,
+        tc1_0.taux_interet 
+    from
+        type_compte tc1_0 
+    where
+        tc1_0.code=?
+Hibernate: 
+    select
+        tc1_0.id_type,
+        tc1_0.autoriser_retrait,
+        tc1_0.code,
+        tc1_0.description,
+        tc1_0.duree_blocage_jours,
+        tc1_0.frais_cloture,
+        tc1_0.frais_ouverture,
+        tc1_0.nom,
+        tc1_0.solde_minimum,
+        tc1_0.taux_interet 
+    from
+        type_compte tc1_0 
+    where
+        tc1_0.code=?
+?? Type de compte 'EPARGNE' existe déjà
+2026-01-12 21:00:11 [restartedMain] WARN  o.s.b.a.o.j.JpaBaseConfiguration$JpaWebConfiguration [User: Addr:] - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-01-12 21:00:13 [restartedMain] INFO  o.s.b.a.e.web.EndpointLinksResolver [User: Addr:] - Exposing 1 endpoint(s) beneath base path '/actuator'
+2026-01-12 21:00:13 [restartedMain] INFO  o.s.s.web.DefaultSecurityFilterChain [User: Addr:] - Will secure any request with [org.springframework.security.web.session.DisableEncodeUrlFilter@19dbe46f, org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@ad4b260, org.springframework.security.web.context.SecurityContextHolderFilter@5138b9ab, org.springframework.security.web.header.HeaderWriterFilter@d4a4e01, org.springframework.web.filter.CorsFilter@7a24493d, org.springframework.security.web.authentication.logout.LogoutFilter@661f8f09, com.collecte_epargne.collecte_epargne.security.JwtAuthenticationFilter@69ce81d7, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@211fa20d, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@41ed46e9, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@16f3a930, org.springframework.security.web.session.SessionManagementFilter@77ff7a74, org.springframework.security.web.access.ExceptionTranslationFilter@32189f33, org.springframework.security.web.access.intercept.AuthorizationFilter@64d99e3f]
+2026-01-12 21:00:15 [restartedMain] INFO  o.s.b.d.a.OptionalLiveReloadServer [User: Addr:] - LiveReload server is running on port 35729
+2026-01-12 21:00:15 [restartedMain] INFO  o.s.b.w.e.tomcat.TomcatWebServer [User: Addr:] - Tomcat started on port 8082 (http) with context path ''
+2026-01-12 21:00:16 [restartedMain] INFO  c.c.c.CollecteEpargneApplication [User: Addr:] - Started CollecteEpargneApplication in 20.078 seconds (process running for 21.058)
+2026-01-12 21:00:16 [restartedMain] DEBUG org.hibernate.SQL [User: Addr:] - 
+    select
+        count(*) 
+    from
+        role r1_0
+Hibernate: 
+    select
+        count(*) 
+    from
+        role r1_0
+2026-01-12 21:00:16 [restartedMain] DEBUG org.hibernate.SQL [User: Addr:] - 
+    select
+        count(*) 
+    from
+        type_compte tc1_0
+Hibernate: 
+    select
+        count(*) 
+    from
+        type_compte tc1_0
+2026-01-12 21:00:16 [restartedMain] DEBUG org.hibernate.SQL [User: Addr:] - 
+    select
+        count(*) 
+    from
+        agence_zone az1_0
+Hibernate: 
+    select
+        count(*) 
+    from
+        agence_zone az1_0
+2026-01-12 21:00:16 [restartedMain] DEBUG org.hibernate.SQL [User: Addr:] - 
+    select
+        count(*) 
+    from
+        utilisateur u1_0
+Hibernate: 
+    select
+        count(*) 
+    from
+        utilisateur u1_0
+2026-01-12 21:00:16 [restartedMain] DEBUG org.hibernate.SQL [User: Addr:] - 
+    select
+        count(*) 
+    from
+        employe e1_0
+Hibernate: 
+    select
+        count(*) 
+    from
+        employe e1_0
+2026-01-12 21:00:16 [restartedMain] DEBUG org.hibernate.SQL [User: Addr:] - 
+    select
+        count(*) 
+    from
+        client c1_0
+Hibernate: 
+    select
+        count(*) 
+    from
+        client c1_0
+2026-01-12 21:00:16 [restartedMain] DEBUG org.hibernate.SQL [User: Addr:] - 
+    select
+        count(*) 
+    from
+        compte c1_0
+Hibernate: 
+    select
+        count(*) 
+    from
+        compte c1_0
+2026-01-12 21:00:16 [restartedMain] DEBUG org.hibernate.SQL [User: Addr:] - 
+    select
+        count(*) 
+    from
+        plan_cotisation pc1_0
+Hibernate: 
+    select
+        count(*) 
+    from
+        plan_cotisation pc1_0
+2026-01-12 21:00:16 [restartedMain] DEBUG org.hibernate.SQL [User: Addr:] - 
+    select
+        count(*) 
+    from
+        compte_cotisation cc1_0
+Hibernate: 
+    select
+        count(*) 
+    from
+        compte_cotisation cc1_0
+2026-01-12 21:00:16 [restartedMain] DEBUG org.hibernate.SQL [User: Addr:] - 
+    select
+        count(*) 
+    from
+        transaction t1_0
+Hibernate: 
+    select
+        count(*) 
+    from
+        transaction t1_0
+2026-01-12 21:00:16 [restartedMain] DEBUG org.hibernate.SQL [User: Addr:] - 
+    select
+        count(*) 
+    from
+        transaction_offline to1_0
+Hibernate: 
+    select
+        count(*) 
+    from
+        transaction_offline to1_0
+2026-01-12 21:00:16 [restartedMain] DEBUG org.hibernate.SQL [User: Addr:] - 
+    select
+        count(*) 
+    from
+        notification n1_0
+Hibernate: 
+    select
+        count(*) 
+    from
+        notification n1_0
+2026-01-12 21:00:16 [restartedMain] DEBUG org.hibernate.SQL [User: Addr:] - 
+    select
+        count(*) 
+    from
+        rapport_collecteur rc1_0
+Hibernate: 
+    select
+        count(*) 
+    from
+        rapport_collecteur rc1_0
+2026-01-12 21:00:16 [restartedMain] DEBUG org.hibernate.SQL [User: Addr:] - 
+    select
+        count(*) 
+    from
+        recu r1_0
+Hibernate: 
+    select
+        count(*) 
+    from
+        recu r1_0
+Database seeding completed successfully!
+2026-01-12 21:00:16 [restartedMain] DEBUG org.hibernate.SQL [User: Addr:] - 
+    select
+        count(*) 
+    from
+        institutions i1_0
+Hibernate: 
+    select
+        count(*) 
+    from
+        institutions i1_0
+2026-01-12 21:00:16 [restartedMain] DEBUG org.hibernate.SQL [User: Addr:] - 
+    select
+        count(*) 
+    from
+        role r1_0
+Hibernate: 
+    select
+        count(*) 
+    from
+        role r1_0
+2026-01-12 21:00:16 [restartedMain] DEBUG org.hibernate.SQL [User: Addr:] - 
+    select
+        count(*) 
+    from
+        role r1_0
+Hibernate: 
+    select
+        count(*) 
+    from
+        role r1_0
+? Rôles déjà présents : 4 rôle(s)
+2026-01-12 21:00:16 [restartedMain] DEBUG org.hibernate.SQL [User: Addr:] - 
+    select
+        u1_0.login,
+        u1_0.date_creation,
+        u1_0.email,
+        u1_0.nom,
+        u1_0.password,
+        u1_0.prenom,
+        u1_0.id_role,
+        u1_0.statut,
+        u1_0.telephone 
+    from
+        utilisateur u1_0 
+    where
+        u1_0.email=?
+Hibernate: 
+    select
+        u1_0.login,
+        u1_0.date_creation,
+        u1_0.email,
+        u1_0.nom,
+        u1_0.password,
+        u1_0.prenom,
+        u1_0.id_role,
+        u1_0.statut,
+        u1_0.telephone 
+    from
+        utilisateur u1_0 
+    where
+        u1_0.email=?
+2026-01-12 21:00:16 [restartedMain] DEBUG org.hibernate.SQL [User: Addr:] - 
+    select
+        r1_0.id_role,
+        r1_0.code,
+        r1_0.description,
+        r1_0.nom 
+    from
+        role r1_0 
+    where
+        r1_0.code=?
+Hibernate: 
+    select
+        r1_0.id_role,
+        r1_0.code,
+        r1_0.description,
+        r1_0.nom 
+    from
+        role r1_0 
+    where
+        r1_0.code=?
+2026-01-12 21:00:16 [restartedMain] INFO  o.s.b.a.l.ConditionEvaluationReportLogger [User: Addr:] - 
+
+Error starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled.
+2026-01-12 21:00:16 [restartedMain] ERROR o.s.boot.SpringApplication [User: Addr:] - Application run failed
+java.lang.RuntimeException: Rôle admin non trouvé
+	at com.collecte_epargne.collecte_epargne.config.DataInitializer.lambda$initDatabase$0(DataInitializer.java:82)
+	at java.base/java.util.Optional.orElseThrow(Optional.java:403)
+	at com.collecte_epargne.collecte_epargne.config.DataInitializer.lambda$initDatabase$1(DataInitializer.java:82)
+	at org.springframework.boot.SpringApplication.lambda$callRunner$5(SpringApplication.java:790)
+	at org.springframework.util.function.ThrowingConsumer$1.acceptWithException(ThrowingConsumer.java:83)
+	at org.springframework.util.function.ThrowingConsumer.accept(ThrowingConsumer.java:60)
+	at org.springframework.util.function.ThrowingConsumer$1.accept(ThrowingConsumer.java:88)
+	at org.springframework.boot.SpringApplication.callRunner(SpringApplication.java:798)
+	at org.springframework.boot.SpringApplication.callRunner(SpringApplication.java:789)
+	at org.springframework.boot.SpringApplication.lambda$callRunners$3(SpringApplication.java:774)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.accept(ForEachOps.java:183)
+	at java.base/java.util.stream.SortedOps$SizedRefSortingSink.end(SortedOps.java:357)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:510)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:499)
+	at java.base/java.util.stream.ForEachOps$ForEachOp.evaluateSequential(ForEachOps.java:150)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.evaluateSequential(ForEachOps.java:173)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:234)
+	at java.base/java.util.stream.ReferencePipeline.forEach(ReferencePipeline.java:596)
+	at org.springframework.boot.SpringApplication.callRunners(SpringApplication.java:774)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:341)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1354)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1343)
+	at com.collecte_epargne.collecte_epargne.CollecteEpargneApplication.main(CollecteEpargneApplication.java:17)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
+	at org.springframework.boot.devtools.restart.RestartLauncher.run(RestartLauncher.java:50)
+2026-01-12 21:00:16 [restartedMain] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean [User: Addr:] - Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-01-12 21:00:16 [restartedMain] INFO  com.zaxxer.hikari.HikariDataSource [User: Addr:] - HikariPool-1 - Shutdown initiated...
+2026-01-12 21:00:16 [restartedMain] INFO  com.zaxxer.hikari.HikariDataSource [User: Addr:] - HikariPool-1 - Shutdown completed.
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  48.214 s
+[INFO] Finished at: 2026-01-12T21:00:17+01:00
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal org.springframework.boot:spring-boot-maven-plugin:3.2.5:run (default-cli) on project collecte-epargne: Process terminated with exit code: 1 -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoExecutionException

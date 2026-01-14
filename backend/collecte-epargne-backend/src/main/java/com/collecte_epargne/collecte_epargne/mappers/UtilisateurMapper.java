@@ -17,6 +17,7 @@ public interface UtilisateurMapper {
     @Mapping(source = "role", target = "idRole")
     @Mapping(source = "employe", target = "idEmploye")
     @Mapping(source = "client", target = "codeClient")
+    @Mapping(source = "photoPath", target = "photoPath")
     UtilisateurDto toDto(Utilisateur utilisateur);
 
     // --- Conversion Helper (Entité -> ID)

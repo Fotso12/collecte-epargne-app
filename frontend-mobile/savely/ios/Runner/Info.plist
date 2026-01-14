@@ -45,5 +45,11 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>NSCameraUsageDescription</key>
+	<string>Cette application a besoin d'accéder à la caméra pour prendre des photos de profil et de documents d'identité.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Cette application a besoin d'accéder à votre galerie photo pour sélectionner des images de profil et de documents d'identité.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>Cette application a besoin d'accéder à votre galerie photo pour sauvegarder des images.</string>
 </dict>
 </plist>

@@ -138,9 +138,26 @@ public class ClientService implements ClientInterface {
             clientDto.setCniRectoPath(fileStorageService.save(recto, "cni_recto"));
         }
         if (verso != null && !verso.isEmpty()) {
-            clientDto.setCniVersoPath(fileStorageService.save(verso, "cni_verso"));
+            clientDto.setCniVersoPath(fileStorageService.save(verso, "cni_versos"));
         }
         return this.save(clientDto);
+    }
+
+    /**
+     * Met à jour un client avec ses fichiers physiques
+     */
+    @Transactional
+    public ClientDto updateWithFiles(String codeClient, ClientDto clientDto, MultipartFile photo, MultipartFile recto, MultipartFile verso) {
+        if (photo != null && !photo.isEmpty()) {
+            clientDto.setPhotoPath(fileStorageService.save(photo, "photos"));
+        }
+        if (recto != null && !recto.isEmpty()) {
+            clientDto.setCniRectoPath(fileStorageService.save(recto, "cni_recto"));
+        }
+        if (verso != null && !verso.isEmpty()) {
+            clientDto.setCniVersoPath(fileStorageService.save(verso, "cni_verso"));
+        }
+        return this.updateByCodeClient(codeClient, clientDto);
     }
 
     @Override
@@ -307,5 +324,12 @@ public class ClientService implements ClientInterface {
             log.error("Erreur critique lors de l'importation CSV", e);
             throw new RuntimeException("Erreur lors de la lecture du fichier CSV : " + e.getMessage());
         }
+    }
+
+    @Override
+    public ClientDto getByLogin(String login) {
+        Client client = clientRepository.findByUtilisateurLogin(login)
+                .orElseThrow(() -> new RuntimeException("Client non trouvé avec le login : " + login));
+        return clientMapper.toDto(client);
     }
 }

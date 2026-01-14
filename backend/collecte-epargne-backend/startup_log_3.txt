@@ -1,0 +1,52 @@
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] ---------------< com.collecte-epargne:collecte-epargne >----------------
+[INFO] Building collecte-epargne 0.0.1-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] >>> spring-boot:3.2.5:run (default-cli) > test-compile @ collecte-epargne >>>
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ collecte-epargne ---
+[INFO] Copying 2 resources from src\main\resources to target\classes
+[INFO] Copying 1 resource from src\main\resources to target\classes
+[INFO] 
+[INFO] --- compiler:3.13.0:compile (default-compile) @ collecte-epargne ---
+[INFO] Recompiling the module because of changed source code.
+[INFO] Compiling 145 source files with javac [debug parameters release 17] to target\classes
+[INFO] 
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ collecte-epargne ---
+[INFO] skip non existing resourceDirectory C:\Users\Darryl\Documents\Cours_EADL\Développement_avancées\Projet2\collecte-epargne-app\backend\collecte-epargne-backend\src\test\resources
+[INFO] 
+[INFO] --- compiler:3.13.0:testCompile (default-testCompile) @ collecte-epargne ---
+[INFO] Recompiling the module because of changed dependency.
+[INFO] Compiling 23 source files with javac [debug parameters release 17] to target\test-classes
+[INFO] Some messages have been simplified; recompile with -Xdiags:verbose to get full output
+[INFO] -------------------------------------------------------------
+[WARNING] COMPILATION WARNING : 
+[INFO] -------------------------------------------------------------
+[WARNING] The following options were not recognized by any processor: '[mapstruct.unmappedTargetPolicy, mapstruct.defaultComponentModel]'
+[INFO] 1 warning
+[INFO] -------------------------------------------------------------
+[INFO] -------------------------------------------------------------
+[ERROR] COMPILATION ERROR : 
+[INFO] -------------------------------------------------------------
+[ERROR] /C:/Users/Darryl/Documents/Cours_EADL/Développement_avancées/Projet2/collecte-epargne-app/backend/collecte-epargne-backend/src/test/java/com/collecte_epargne/collecte_epargne/controller_test/EmployeControllerTest.java:[303,35] incompatible types: java.lang.String cannot be converted to java.lang.Long
+[INFO] 1 error
+[INFO] -------------------------------------------------------------
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  43.078 s
+[INFO] Finished at: 2026-01-12T20:30:55+01:00
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-compiler-plugin:3.13.0:testCompile (default-testCompile) on project collecte-epargne: Compilation failure
+[ERROR] /C:/Users/Darryl/Documents/Cours_EADL/Développement_avancées/Projet2/collecte-epargne-app/backend/collecte-epargne-backend/src/test/java/com/collecte_epargne/collecte_epargne/controller_test/EmployeControllerTest.java:[303,35] incompatible types: java.lang.String cannot be converted to java.lang.Long
+[ERROR] 
+[ERROR] -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoFailureException

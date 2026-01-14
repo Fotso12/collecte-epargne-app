@@ -8,6 +8,7 @@ import com.collecte_epargne.collecte_epargne.repositories.RoleRepository;
 import com.collecte_epargne.collecte_epargne.repositories.UtilisateurRepository;
 import com.collecte_epargne.collecte_epargne.services.interfaces.UtilisateurInterface;
 import com.collecte_epargne.collecte_epargne.utils.StatutGenerique;
+import org.springframework.web.multipart.MultipartFile;
 
 import jakarta.persistence.EntityNotFoundException;
 
@@ -32,17 +33,19 @@ public class UtilisateurService implements UtilisateurInterface {
     // Injection du service d'envoi d'emails pour notifier les nouveaux utilisateurs
     private final EmailService emailService;
     private final PasswordEncoder passwordEncoder;
+    private final FileStorageService fileStorageService;
 
     private static final Logger log = LoggerFactory.getLogger(UtilisateurService.class);
 
     // Pour la relation Role
 
-    public UtilisateurService(UtilisateurRepository utilisateurRepository, UtilisateurMapper utilisateurMapper, RoleRepository roleRepository, EmailService emailService, PasswordEncoder passwordEncoder) {
+    public UtilisateurService(UtilisateurRepository utilisateurRepository, UtilisateurMapper utilisateurMapper, RoleRepository roleRepository, EmailService emailService, PasswordEncoder passwordEncoder, FileStorageService fileStorageService) {
         this.utilisateurRepository = utilisateurRepository;
         this.utilisateurMapper = utilisateurMapper;
         this.roleRepository = roleRepository;
         this.emailService = emailService;
         this.passwordEncoder = passwordEncoder;
+        this.fileStorageService = fileStorageService;
     }
 
     // Méthode utilitaire pour attacher l'entité Role (inchangée)
@@ -164,27 +167,6 @@ public class UtilisateurService implements UtilisateurInterface {
         log.info("Mot de passe mis à jour pour l'utilisateur avec login: {}", login);
     }
 
-//    @Override
-//    public UtilisateurDto updateStatut(String login, String statut) {
-//        Objects.requireNonNull(login, "login ne doit pas être null");
-//        Objects.requireNonNull(statut, "statut ne doit pas être null");
-//        log.info("Mise à jour du statut pour l'utilisateur avec login: {}", login);
-//        Utilisateur existingUtilisateur = utilisateurRepository.findById(login)
-//                .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé : " + login));
-//
-//        try {
-//            StatutGenerique statutEnum = StatutGenerique.valueOf(statut.toUpperCase());
-//            existingUtilisateur.setStatut(statutEnum);
-//        } catch (IllegalArgumentException e) {
-//            throw new IllegalArgumentException("Statut invalide : " + statut + ". Valeurs possibles : " +
-//                    java.util.Arrays.toString(StatutGenerique.values()));
-//        }
-//
-//        Utilisateur updatedUtilisateur = utilisateurRepository.save(existingUtilisateur);
-//        log.info("Statut mis à jour pour l'utilisateur avec login: {}", login);
-//        return utilisateurMapper.toDto(updatedUtilisateur);
-//    }
-
     @Override
     public void delete(String login) {
         Objects.requireNonNull(login, "login ne doit pas être null");
@@ -210,5 +192,19 @@ public class UtilisateurService implements UtilisateurInterface {
 
         // 3. Sauvegarde et retour via Mapper
         return utilisateurMapper.toDto(utilisateurRepository.save(utilisateur));
+    }
+
+    @Transactional
+    public UtilisateurDto updatePhoto(String login, MultipartFile photo) {
+        Utilisateur utilisateur = utilisateurRepository.findById(login)
+                .orElseThrow(() -> new EntityNotFoundException("Utilisateur non trouvé avec le login : " + login));
+
+        if (photo != null && !photo.isEmpty()) {
+            String path = fileStorageService.save(photo, "profiles/" + login);
+            utilisateur.setPhotoPath(path);
+            utilisateur = utilisateurRepository.save(utilisateur);
+        }
+
+        return utilisateurMapper.toDto(utilisateur);
     }
 }

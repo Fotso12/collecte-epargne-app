@@ -21,6 +21,7 @@ public interface ClientMapper {
     @Mapping(source = "utilisateur.nom", target = "nom")
     @Mapping(source = "utilisateur.prenom", target = "prenom")
     @Mapping(source = "utilisateur.telephone", target = "telephone")
+    @Mapping(source = "utilisateur.email", target = "email")
     @Mapping(source = "utilisateur.statut", target = "statut")
     @Mapping(source = "utilisateur.dateCreation", target = "dateCreation")
     ClientDto toDto(Client client);
