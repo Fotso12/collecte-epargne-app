@@ -38,7 +38,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         // 1. NE PAS FILTRER les requêtes d'authentification ou les pré-vérifications CORS (OPTIONS)
         // Cela évite les erreurs 403 Forbidden sur le login
-        if (request.getServletPath().contains("/api/auth") || "OPTIONS".equalsIgnoreCase(request.getMethod())) {
+        if (request.getServletPath().contains("/api/auth") || request.getServletPath().contains("/password") || "OPTIONS".equalsIgnoreCase(request.getMethod())) {
             filterChain.doFilter(request, response);
             return;
         }

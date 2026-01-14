@@ -42,4 +42,25 @@ public class EmailService {
         // Envoi de l'email via JavaMailSender
         mailSender.send(message);
     }
+
+    /**
+     * Envoie un email avec le code de vérification pour la réinitialisation du mot de passe.
+     *
+     * @param toEmail Adresse email du destinataire
+     * @param code    Code de vérification (6 chiffres)
+     */
+    public void sendVerificationCode(String toEmail, String code) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(toEmail);
+        message.setSubject("Réinitialisation de votre mot de passe");
+        message.setText("Bonjour,\n\n" +
+                "Vous avez demandé la réinitialisation de votre mot de passe.\n" +
+                "Votre code de vérification est : " + code + "\n\n" +
+                "Ce code est valable 10 minutes.\n\n" +
+                "Si vous n'êtes pas à l'origine de cette demande, veuillez ignorer cet email.\n\n" +
+                "Cordialement,\n" +
+                "L'équipe Collecte Épargne");
+
+        mailSender.send(message);
+    }
 }

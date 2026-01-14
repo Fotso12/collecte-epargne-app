@@ -171,4 +171,6 @@ public class Utilisateur {
     }
 
 
+    public void setMotDePasse(String encode) {
+    }
 }
