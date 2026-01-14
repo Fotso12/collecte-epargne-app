@@ -23,5 +23,5 @@ jobs:
           distribution: 'temurin'
 
       - name: Build backend
-        working-directory: backend
+        working-directory: backend/collecte-epargne-backend
         run: mvn clean install
