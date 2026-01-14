@@ -1,0 +1,30 @@
+name: Frontend CI
+
+on:
+  push:
+    paths:
+      - "frontend-web/**"
+  pull_request:
+    paths:
+      - "frontend-web/**"
+
+jobs:
+  frontend-build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Récupérer le code
+        uses: actions/checkout@v4
+
+      - name: Installer Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Installer dépendances
+        working-directory: frontend-web
+        run: npm install
+
+      - name: Build Angular
+        working-directory: frontend-web
+        run: npm run build
