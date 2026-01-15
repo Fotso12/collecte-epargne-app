@@ -1,5 +1,7 @@
 package com.collecte_epargne.collecte_epargne.mappers;
 
+import java.time.Instant;
+
 import com.collecte_epargne.collecte_epargne.dtos.TransactionOfflineDto;
 import com.collecte_epargne.collecte_epargne.entities.Client;
 import com.collecte_epargne.collecte_epargne.entities.Compte;
@@ -19,6 +21,7 @@ public interface TransactionOfflineMapper {
     @Mapping(source = "client", target = "codeClient")
     @Mapping(source = "compte", target = "idCompte")
     @Mapping(source = "transactionFinale", target = "idTransactionFinale")
+    @Mapping(target = "dateTransaction", ignore = true)
     TransactionOfflineDto toDto(TransactionOffline transactionOffline);
 
     // --- Conversion Helper (Entité -> ID)
@@ -43,5 +46,6 @@ public interface TransactionOfflineMapper {
     @Mapping(target = "client", ignore = true)
     @Mapping(target = "compte", ignore = true)
     @Mapping(target = "transactionFinale", ignore = true)
+    @Mapping(target = "dateTransaction", ignore = true)
     TransactionOffline toEntity(TransactionOfflineDto transactionOfflineDto);
 }

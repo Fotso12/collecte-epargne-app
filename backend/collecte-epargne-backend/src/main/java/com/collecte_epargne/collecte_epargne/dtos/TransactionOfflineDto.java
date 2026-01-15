@@ -14,14 +14,12 @@ public class TransactionOfflineDto implements Serializable {
     @Size(max = 50)
     String idOffline;
 
-    @NotNull
     BigDecimal montant;
 
-    @NotNull
     TypeTransaction typeTransaction;
 
     @NotNull
-    Instant dateTransaction;
+    String dateTransaction;
 
     String description;
 
@@ -38,21 +36,18 @@ public class TransactionOfflineDto implements Serializable {
     String erreurSynchro;
 
     // Remplacer Employe par son ID_EMPLOYE
-    @NotNull
     String idEmploye;
 
     // Remplacer Client par son CODE_CLIENT
-    @NotNull
     String codeClient;
 
     // Remplacer Compte par son ID_COMPTE
-    @NotNull
     String idCompte;
 
     // Remplacer Transaction par son ID_TRANSACTION
     String idTransactionFinale;
 
-    public TransactionOfflineDto(String idOffline, BigDecimal montant, TypeTransaction typeTransaction, Instant dateTransaction, String description, String signatureClient, BigDecimal latitude, BigDecimal longitude, StatutSynchroOffline statutSynchro, Instant dateSynchro, String erreurSynchro, String idEmploye, String codeClient, String idCompte, String idTransactionFinale) {
+    public TransactionOfflineDto(String idOffline, BigDecimal montant, TypeTransaction typeTransaction, String dateTransaction, String description, String signatureClient, BigDecimal latitude, BigDecimal longitude, StatutSynchroOffline statutSynchro, Instant dateSynchro, String erreurSynchro, String idEmploye, String codeClient, String idCompte, String idTransactionFinale) {
         this.idOffline = idOffline;
         this.montant = montant;
         this.typeTransaction = typeTransaction;
@@ -97,11 +92,11 @@ public class TransactionOfflineDto implements Serializable {
         this.typeTransaction = typeTransaction;
     }
 
-    public Instant getDateTransaction() {
+    public String getDateTransaction() {
         return dateTransaction;
     }
-
-    public void setDateTransaction(Instant dateTransaction) {
+ 
+    public void setDateTransaction(String dateTransaction) {
         this.dateTransaction = dateTransaction;
     }
 

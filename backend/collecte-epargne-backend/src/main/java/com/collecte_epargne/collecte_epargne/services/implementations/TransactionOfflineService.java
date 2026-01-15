@@ -56,10 +56,21 @@ public class TransactionOfflineService implements TransactionOfflineInterface {
 
         entity.setIdOffline(dto.getIdOffline());
         
-        if (dto.getDateTransaction() == null) {
+        if (dto.getDateTransaction() == null || dto.getDateTransaction().isEmpty()) {
             entity.setDateTransaction(Instant.now());
         } else {
-            entity.setDateTransaction(dto.getDateTransaction());
+            try {
+                String dateStr = dto.getDateTransaction();
+                // Si la date ne finit pas par Z et n'a pas d'offset, on ajoute Z pour Instant.parse
+                if (!dateStr.endsWith("Z") && !dateStr.contains("+") && dateStr.contains("T")) {
+                    dateStr += "Z";
+                }
+                entity.setDateTransaction(Instant.parse(dateStr));
+            } catch (Exception e) {
+                log.warn("Format de date invalide: [{}]. Utilisation de Instant.now(). Erreur: {}", 
+                        dto.getDateTransaction(), e.getMessage());
+                entity.setDateTransaction(Instant.now());
+            }
         }
         
         entity.setStatutSynchro(StatutSynchroOffline.EN_ATTENTE);

@@ -53,7 +53,7 @@ public class TransactionOfflineServiceTest {
         dto.setIdEmploye("1");
         dto.setCodeClient("CL1");
         dto.setIdCompte("C1");
-        dto.setDateTransaction(Instant.now());
+        dto.setDateTransaction(Instant.now().toString());
         dto.setMontant(BigDecimal.valueOf(500));
 
         TransactionOffline entity = new TransactionOffline();
