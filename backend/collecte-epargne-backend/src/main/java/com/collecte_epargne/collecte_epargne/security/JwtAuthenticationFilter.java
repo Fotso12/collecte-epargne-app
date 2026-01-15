@@ -49,6 +49,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         // 2. Pas de token ou format invalide
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            log.warn("⛔ Header Authorization manquant ou invalide pour : {}", request.getServletPath());
             filterChain.doFilter(request, response);
             return;
         }

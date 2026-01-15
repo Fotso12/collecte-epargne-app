@@ -13,4 +13,7 @@ public interface TransactionOfflineRepository extends JpaRepository<TransactionO
 
     // Transactions offline d’un employé
     List<TransactionOffline> findByEmploye_IdEmploye(Integer idEmploye);
+
+    // Transactions offline d'un employé sur une période (ex: aujourd'hui)
+    List<TransactionOffline> findByEmploye_IdEmployeAndDateTransactionBetween(Integer idEmploye, java.time.Instant start, java.time.Instant end);
 }

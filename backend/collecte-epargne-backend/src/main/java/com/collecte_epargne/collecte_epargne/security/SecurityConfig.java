@@ -51,6 +51,8 @@ public class SecurityConfig {
                                 "/v3/api-docs/**",
                                 "/swagger-ui/**",
                                 "/api/utilisateurs",
+                                "/api/employes",
+                                "/error",
                                 "/swagger-ui.html").permitAll()
                         // On autorise l'accès aux transactions à tout utilisateur authentifié.
                         // Le contrôle précis (hasAuthority) se fait dans le Controller via @PreAuthorize
@@ -98,11 +100,14 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
+        // Autoriser toutes les origines (ngrok change l'origine à chaque redémarrage)
         configuration.setAllowedOriginPatterns(Arrays.asList("*"));
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        // Utilisation de "*" pour les headers afin d'être sûr de ne rien bloquer (Authorization, Content-Type, etc.)
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
+        // Autoriser tous les en-têtes
         configuration.setAllowedHeaders(Arrays.asList("*"));
         configuration.setAllowCredentials(true);
+        // Autoriser les méthodes OPTIONS (pré-flight CORS)
+        configuration.setMaxAge(3600L);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);

@@ -142,6 +142,25 @@ public class TransactionOfflineService implements TransactionOfflineInterface {
     }
 
     // ----------------------------------------------------
+    // Filtrer par employé (Aujourd'hui)
+    // ----------------------------------------------------
+    @Override
+    public List<TransactionOfflineDto> getByEmployeToday(Integer idEmploye) {
+        log.info("Recherche transactions offline par employé ID={} pour AUJOURD'HUI", idEmploye);
+
+        Instant now = Instant.now();
+        // Début de journée (UTC approximatif pour l'instant, à affiner selon TZ)
+        Instant start = now.truncatedTo(java.time.temporal.ChronoUnit.DAYS);
+        // Fin de journée
+        Instant end = start.plus(1, java.time.temporal.ChronoUnit.DAYS);
+
+        return repository.findByEmploye_IdEmployeAndDateTransactionBetween(idEmploye, start, end)
+                .stream()
+                .map(mapper::toDto)
+                .collect(Collectors.toList());
+    }
+
+    // ----------------------------------------------------
     // Synchronisation transaction offline → transaction finale
     // ----------------------------------------------------
     @Override
