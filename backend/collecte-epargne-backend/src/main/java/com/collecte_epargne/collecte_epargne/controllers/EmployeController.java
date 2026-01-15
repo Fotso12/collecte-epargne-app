@@ -127,5 +127,13 @@ public class EmployeController {
         return new ResponseEntity<>(employeService.getCollecteursOrderedByTotalClientScore(), HttpStatus.OK);
     }
 
+    @GetMapping("/agence/{idAgence}/collecteurs")
+    public ResponseEntity<List<EmployeDto>> getCollecteursByAgence(@PathVariable Integer idAgence) {
+        return new ResponseEntity<>(employeService.getCollecteursByAgence(idAgence), HttpStatus.OK);
+    }
 
+    @GetMapping("/agence/{idAgence}/caissiers")
+    public ResponseEntity<List<EmployeDto>> getCaissiersByAgence(@PathVariable Integer idAgence) {
+        return new ResponseEntity<>(employeService.getCaissiersByAgence(idAgence), HttpStatus.OK);
+    }
 }

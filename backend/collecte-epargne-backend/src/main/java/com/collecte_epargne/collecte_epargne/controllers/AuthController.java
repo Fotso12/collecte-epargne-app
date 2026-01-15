@@ -50,7 +50,11 @@ public class AuthController {
         String token = jwtService.generateToken(request.getEmail());
 
         // 4️⃣ Retour du token avec les détails utilisateur
-        // 4️⃣ Retour du token avec les détails utilisateur
+        Integer idAgence = null;
+        if (utilisateur.getEmploye() != null && utilisateur.getEmploye().getAgenceZone() != null) {
+            idAgence = utilisateur.getEmploye().getAgenceZone().getIdAgence();
+        }
+
         return ResponseEntity.ok(new LoginResponse(
                 token,
                 "Bearer",
@@ -61,7 +65,8 @@ public class AuthController {
                 utilisateur.getRole() != null ? utilisateur.getRole().getNom() : null,
                 utilisateur.getTelephone(),
                 utilisateur.getRole() != null ? utilisateur.getRole().getId() : null,
-                utilisateur.getRole() != null ? utilisateur.getRole().getCode() : null
+                utilisateur.getRole() != null ? utilisateur.getRole().getCode() : null,
+                idAgence
         ));
     }
 }

@@ -21,11 +21,14 @@ public class ReportingService {
     }
 
     public List<TransactionDto> getTransactionsByDateRange(Instant startDate, Instant endDate) {
-        return transactionRepository.findAll().stream() // Optimisation: use findByDateTransactionBetween in repo
-                .filter(t -> {
-                    if (t.getDateTransaction() == null) return false;
-                    return t.getDateTransaction().isAfter(startDate) && t.getDateTransaction().isBefore(endDate);
-                })
+        return transactionRepository.findByDateTransactionBetween(startDate, endDate).stream()
+                .map(transactionMapper::toDto)
+                .collect(Collectors.toList());
+    }
+
+    public List<TransactionDto> getTransactionsByDateRangeAndAgence(Instant startDate, Instant endDate, Integer idAgence) {
+        if (idAgence == null) return getTransactionsByDateRange(startDate, endDate);
+        return transactionRepository.findByDateTransactionBetweenAndInitiateur_AgenceZone_IdAgence(startDate, endDate, idAgence).stream()
                 .map(transactionMapper::toDto)
                 .collect(Collectors.toList());
     }

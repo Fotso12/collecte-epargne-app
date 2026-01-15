@@ -27,11 +27,12 @@ public class ReportingController {
     @GetMapping("/transactions")
     public ResponseEntity<List<TransactionDto>> getTransactionsByDate(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
+            @RequestParam(required = false) Integer idAgence) {
         
         Instant start = startDate.atStartOfDay(ZoneId.systemDefault()).toInstant();
         Instant end = endDate.atStartOfDay(ZoneId.systemDefault()).plusDays(1).toInstant();
 
-        return ResponseEntity.ok(reportingService.getTransactionsByDateRange(start, end));
+        return ResponseEntity.ok(reportingService.getTransactionsByDateRangeAndAgence(start, end, idAgence));
     }
 }

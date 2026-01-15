@@ -256,5 +256,17 @@ public EmployeDto update(String matricule, EmployeDto employeDto) {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public List<EmployeDto> getCollecteursByAgence(Integer idAgence) {
+        return employeRepository.findByAgenceZoneIdAgenceAndTypeEmploye(idAgence, TypeEmploye.COLLECTEUR).stream()
+                .map(employeMapper::toDto)
+                .collect(Collectors.toList());
+    }
 
+    @Override
+    public List<EmployeDto> getCaissiersByAgence(Integer idAgence) {
+        return employeRepository.findByAgenceZoneIdAgenceAndTypeEmploye(idAgence, TypeEmploye.CAISSIER).stream()
+                .map(employeMapper::toDto)
+                .collect(Collectors.toList());
+    }
 }

@@ -29,5 +29,9 @@ public interface ClientRepository extends JpaRepository<Client, Long> {
     boolean existsByCodeClient(String codeClient);
 
     Optional<Client> findByUtilisateurLogin(String login);
+
+    List<Client> findByCollecteurAssigne_AgenceZone_IdAgence(Integer idAgence);
+
+    long countByCollecteurAssigne_AgenceZone_IdAgence(Integer idAgence);
     
 }

@@ -346,4 +346,11 @@ public class ClientService implements ClientInterface {
                 .orElseThrow(() -> new RuntimeException("Client non trouvé avec le login : " + login));
         return clientMapper.toDto(client);
     }
+
+    @Override
+    public List<ClientDto> getClientsByAgence(Integer idAgence) {
+        return clientRepository.findByCollecteurAssigne_AgenceZone_IdAgence(idAgence).stream()
+                .map(clientMapper::toDto)
+                .collect(Collectors.toList());
+    }
 }

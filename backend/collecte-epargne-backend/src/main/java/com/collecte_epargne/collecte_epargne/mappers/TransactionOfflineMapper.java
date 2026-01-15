@@ -21,6 +21,7 @@ public interface TransactionOfflineMapper {
     @Mapping(source = "client", target = "codeClient")
     @Mapping(source = "compte", target = "idCompte")
     @Mapping(source = "transactionFinale", target = "idTransactionFinale")
+    @Mapping(source = "caissierChoisi", target = "idCaissierValidation")
     @Mapping(target = "dateTransaction", ignore = true)
     TransactionOfflineDto toDto(TransactionOffline transactionOffline);
 
@@ -46,6 +47,7 @@ public interface TransactionOfflineMapper {
     @Mapping(target = "client", ignore = true)
     @Mapping(target = "compte", ignore = true)
     @Mapping(target = "transactionFinale", ignore = true)
+    @Mapping(target = "caissierChoisi", ignore = true)
     @Mapping(target = "dateTransaction", ignore = true)
     TransactionOffline toEntity(TransactionOfflineDto transactionOfflineDto);
 }

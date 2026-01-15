@@ -45,4 +45,7 @@ public interface EmployeInterface {
      */
     List<ClientDto> getClientsByCollecteur(String idCollecteur);
 
+    List<EmployeDto> getCollecteursByAgence(Integer idAgence);
+
+    List<EmployeDto> getCaissiersByAgence(Integer idAgence);
 }

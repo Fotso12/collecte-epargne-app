@@ -16,11 +16,12 @@ public class LoginResponse {
     private String telephone;
     private Integer idRole;
     private String codeRole;
+    private Integer idAgence;
 
     public LoginResponse() {
     }
 
-    public LoginResponse(String token, String type, String login, String email, String nom, String prenom, String role, String telephone, Integer idRole, String codeRole) {
+    public LoginResponse(String token, String type, String login, String email, String nom, String prenom, String role, String telephone, Integer idRole, String codeRole, Integer idAgence) {
         this.token = token;
         this.type = type;
         this.login = login;
@@ -31,13 +32,14 @@ public class LoginResponse {
         this.telephone = telephone;
         this.idRole = idRole;
         this.codeRole = codeRole;
+        this.idAgence = idAgence;
     }
     
     // Constructor matching AuthController usage (legacy/current) but fixed?
     // AuthController line 53: new LoginResponse(token, "Bearer", login, email, nom, prenom, roleName)
     // Adding separate constructor for backward compatibility or updating AuthController
     public LoginResponse(String token, String type, String login, String email, String nom, String prenom, String role) {
-         this(token, type, login, email, nom, prenom, role, null, null, null);
+         this(token, type, login, email, nom, prenom, role, null, null, null, null);
     }
 
     public void setType(String type) {
@@ -76,4 +78,7 @@ public class LoginResponse {
 
     public String getCodeRole() { return codeRole; }
     public void setCodeRole(String codeRole) { this.codeRole = codeRole; }
+
+    public Integer getIdAgence() { return idAgence; }
+    public void setIdAgence(Integer idAgence) { this.idAgence = idAgence; }
 }

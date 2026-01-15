@@ -76,6 +76,11 @@ public class TransactionOffline {
     @JoinColumn(name = "ID_TRANSACTION_FINALE")
     private Transaction transactionFinale;
 
+    // Caissier choisi pour la validation (nullable pour ne pas casser l'existant)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "ID_CAISSIER_VALIDATION")
+    private Employe caissierChoisi;
+
     public TransactionOffline() {
 
     }
@@ -198,6 +203,14 @@ public class TransactionOffline {
 
     public void setTransactionFinale(Transaction transactionFinale) {
         this.transactionFinale = transactionFinale;
+    }
+
+    public Employe getCaissierChoisi() {
+        return caissierChoisi;
+    }
+
+    public void setCaissierChoisi(Employe caissierChoisi) {
+        this.caissierChoisi = caissierChoisi;
     }
 
     public TransactionOffline(String idOffline, BigDecimal montant, TypeTransaction typeTransaction, Instant dateTransaction, String description, String signatureClient, BigDecimal latitude, BigDecimal longitude, StatutSynchroOffline statutSynchro, Instant dateSynchro, String erreurSynchro, Employe employe, Client client, Compte compte, Transaction transactionFinale) {

@@ -150,6 +150,88 @@ public class DashboardService {
         );
     }
 
+    public DashboardStatsDto getStatsByAgence(Integer idAgence) {
+        if (idAgence == null) return getStats();
+
+        // 1. Comptages de base
+        long clients = clientRepository.countByCollecteurAssigne_AgenceZone_IdAgence(idAgence);
+        long collecteurs = employeRepository.countByTypeEmployeAndAgenceZone_IdAgence(com.collecte_epargne.collecte_epargne.utils.TypeEmploye.COLLECTEUR, idAgence);
+        long caissiers = employeRepository.countByTypeEmployeAndAgenceZone_IdAgence(com.collecte_epargne.collecte_epargne.utils.TypeEmploye.CAISSIER, idAgence);
+
+        List<StatutTransaction> activeStatuts = List.of(StatutTransaction.EN_ATTENTE, StatutTransaction.TERMINEE);
+
+        // 2. Volumes financiers
+        BigDecimal volumeDepot = transactionRepository.sumMontantByStatutsTypeAndAgence(activeStatuts, TypeTransaction.DEPOT, idAgence);
+        if (volumeDepot == null) volumeDepot = BigDecimal.ZERO;
+
+        BigDecimal volumeRetraits = transactionRepository.sumMontantByStatutsTypeAndAgence(activeStatuts, TypeTransaction.RETRAIT, idAgence);
+        if (volumeRetraits == null) volumeRetraits = BigDecimal.ZERO;
+
+        // 3. Comptes & Soldes
+        long totalComptesActifs = compteRepository.countByClient_CollecteurAssigne_AgenceZone_IdAgence(idAgence);
+        BigDecimal soldeTotalEpargne = compteRepository.sumAllSoldesByAgence(idAgence);
+        if (soldeTotalEpargne == null) soldeTotalEpargne = BigDecimal.ZERO;
+
+        // 4. Efficacité & Attentes
+        long totalTx = transactionRepository.countByInitiateur_AgenceZone_IdAgence(idAgence);
+        long validatedTx = transactionRepository.countByStatutAndInitiateur_AgenceZone_IdAgence(StatutTransaction.TERMINEE, idAgence);
+        double pourcentage = totalTx > 0 ? ((double) validatedTx / totalTx) * 100 : 0;
+        long transactionsEnAttente = transactionRepository.countByStatutAndInitiateur_AgenceZone_IdAgence(StatutTransaction.EN_ATTENTE, idAgence);
+
+        // 5. Moyennes
+        double tauxPenalites = 0.0;
+        BigDecimal epargneParClient = BigDecimal.ZERO;
+        if (clients > 0) {
+            epargneParClient = soldeTotalEpargne.divide(BigDecimal.valueOf(clients), 2, RoundingMode.HALF_UP);
+        }
+
+        // 6. Top Collecteurs par agence
+        String topCollectorClientsNom = "Aucun";
+        long topCollectorClientsCount = 0;
+        List<Employe> topCollectorsByClients = employeRepository.findCollecteursOrderByClientCountDescByAgence(idAgence);
+        if (!topCollectorsByClients.isEmpty()) {
+            Employe topE = topCollectorsByClients.get(0);
+            topCollectorClientsNom = topE.getUtilisateur().getNom();
+            topCollectorClientsCount = clientRepository.findByCollecteurAssigneIdEmploye(topE.getIdEmploye()).size();
+        }
+
+        String topCollectorCollecteNom = "Aucun";
+        BigDecimal topCollectorCollecteMontant = BigDecimal.ZERO;
+        List<Object[]> topCollectorsByCollecte = transactionRepository.findCollectorsOrderBySumMontantDescByAgence(StatutTransaction.TERMINEE, TypeTransaction.DEPOT, idAgence);
+        if (!topCollectorsByCollecte.isEmpty()) {
+            Object[] row = topCollectorsByCollecte.get(0);
+            topCollectorCollecteNom = (String) row[1];
+            topCollectorCollecteMontant = (BigDecimal) row[2];
+        }
+
+        // 7. Périodes par agence
+        Instant now = Instant.now();
+        Instant todayStart = now.truncatedTo(ChronoUnit.DAYS);
+        Instant weekStart = now.minus(7, ChronoUnit.DAYS).truncatedTo(ChronoUnit.DAYS);
+        Instant monthStart = now.minus(30, ChronoUnit.DAYS).truncatedTo(ChronoUnit.DAYS);
+
+        BigDecimal d1 = transactionRepository.sumMontantByStatutTypeDateAfterAndAgence(StatutTransaction.TERMINEE, TypeTransaction.DEPOT, todayStart, idAgence);
+        BigDecimal d1a = transactionRepository.sumMontantByStatutTypeDateAfterAndAgence(StatutTransaction.EN_ATTENTE, TypeTransaction.DEPOT, todayStart, idAgence);
+        BigDecimal collJournaliere = safeAdd(d1, d1a);
+
+        BigDecimal w1 = transactionRepository.sumMontantByStatutTypeDateAfterAndAgence(StatutTransaction.TERMINEE, TypeTransaction.DEPOT, weekStart, idAgence);
+        BigDecimal w1a = transactionRepository.sumMontantByStatutTypeDateAfterAndAgence(StatutTransaction.EN_ATTENTE, TypeTransaction.DEPOT, weekStart, idAgence);
+        BigDecimal collHebdomadaire = safeAdd(w1, w1a);
+
+        BigDecimal m1 = transactionRepository.sumMontantByStatutTypeDateAfterAndAgence(StatutTransaction.TERMINEE, TypeTransaction.DEPOT, monthStart, idAgence);
+        BigDecimal m1a = transactionRepository.sumMontantByStatutTypeDateAfterAndAgence(StatutTransaction.EN_ATTENTE, TypeTransaction.DEPOT, monthStart, idAgence);
+        BigDecimal collMensuelle = safeAdd(m1, m1a);
+
+        return new DashboardStatsDto(
+            clients, collecteurs, caissiers, volumeDepot, pourcentage,
+            totalComptesActifs, soldeTotalEpargne, volumeRetraits, transactionsEnAttente,
+            tauxPenalites, epargneParClient,
+            topCollectorClientsNom, topCollectorClientsCount,
+            topCollectorCollecteNom, topCollectorCollecteMontant,
+            collJournaliere, collHebdomadaire, collMensuelle
+        );
+    }
+
     private BigDecimal safeAdd(BigDecimal b1, BigDecimal b2) {
         if (b1 == null) b1 = BigDecimal.ZERO;
         if (b2 == null) b2 = BigDecimal.ZERO;

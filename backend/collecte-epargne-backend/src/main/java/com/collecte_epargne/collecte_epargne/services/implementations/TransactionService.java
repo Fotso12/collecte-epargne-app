@@ -17,6 +17,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.ByteArrayInputStream;
 import java.time.Instant;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -32,19 +33,22 @@ public class TransactionService implements TransactionInterface {
     private final CompteRepository compteRepository;
     private final EmployeRepository employeRepository;
     private final CodeGenerator codeGenerator;
+    private final PdfService pdfService;
 
     public TransactionService(
             TransactionRepository transactionRepository,
             TransactionMapper transactionMapper,
             CompteRepository compteRepository,
             EmployeRepository employeRepository,
-            CodeGenerator codeGenerator
+            CodeGenerator codeGenerator,
+            PdfService pdfService
     ) {
         this.transactionRepository = transactionRepository;
         this.transactionMapper = transactionMapper;
         this.compteRepository = compteRepository;
         this.employeRepository = employeRepository;
         this.codeGenerator = codeGenerator;
+        this.pdfService = pdfService;
     }
 
     @Override
@@ -182,5 +186,26 @@ public class TransactionService implements TransactionInterface {
         transaction.setMotifRejet(motifRejet);
         transaction.setStatut(StatutTransaction.REJETEE);
         transactionRepository.save(transaction);
+    }
+
+    @Override
+    public List<TransactionDto> getTransactionsByAgence(Integer idAgence) {
+        return transactionRepository.findByInitiateur_AgenceZone_IdAgence(idAgence).stream()
+                .map(transactionMapper::toDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<TransactionDto> getTransactionsAValiderByAgence(Integer idAgence) {
+        return transactionRepository.findByInitiateur_AgenceZone_IdAgenceAndStatut(idAgence, StatutTransaction.EN_ATTENTE).stream()
+                .map(transactionMapper::toDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public ByteArrayInputStream generateReceipt(String idTransaction) {
+        Transaction transaction = transactionRepository.findById(idTransaction)
+                .orElseThrow(() -> new RuntimeException("Transaction introuvable"));
+        return pdfService.generateTransactionReceipt(transaction);
     }
 }

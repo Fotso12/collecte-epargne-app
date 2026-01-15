@@ -158,4 +158,9 @@ public class ClientController {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
         }
     }
+
+    @GetMapping("/agence/{idAgence}")
+    public ResponseEntity<List<ClientDto>> getClientsByAgence(@PathVariable Integer idAgence) {
+        return new ResponseEntity<>(clientService.getClientsByAgence(idAgence), HttpStatus.OK);
+    }
 }

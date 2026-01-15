@@ -118,6 +118,16 @@ public class TransactionOfflineService implements TransactionOfflineInterface {
                         })
         );
 
+        // Validation par Caissier (Nouveau Flux)
+        if (dto.getIdCaissierValidation() != null && !dto.getIdCaissierValidation().isEmpty()) {
+            Employe caissier = employeRepository.findById(Integer.valueOf(dto.getIdCaissierValidation()))
+                    .orElse(null);
+            if (caissier != null) {
+                entity.setCaissierChoisi(caissier);
+                log.info("Caissier valideur assigné : ID={}", dto.getIdCaissierValidation());
+            }
+        }
+
         TransactionOffline saved = repository.save(entity);
 
         log.info("Transaction offline sauvegardée avec succès ID={}", saved.getIdOffline());

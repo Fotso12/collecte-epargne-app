@@ -26,4 +26,6 @@ public interface ClientInterface {
     ClientDto getByLogin(String login);
 
     ClientDto getByCodeClient(String codeClient);
+
+    List<ClientDto> getClientsByAgence(Integer idAgence);
 }

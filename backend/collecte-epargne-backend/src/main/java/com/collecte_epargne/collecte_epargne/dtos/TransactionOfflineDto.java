@@ -47,6 +47,8 @@ public class TransactionOfflineDto implements Serializable {
     // Remplacer Transaction par son ID_TRANSACTION
     String idTransactionFinale;
 
+    String idCaissierValidation;
+
     public TransactionOfflineDto(String idOffline, BigDecimal montant, TypeTransaction typeTransaction, String dateTransaction, String description, String signatureClient, BigDecimal latitude, BigDecimal longitude, StatutSynchroOffline statutSynchro, Instant dateSynchro, String erreurSynchro, String idEmploye, String codeClient, String idCompte, String idTransactionFinale) {
         this.idOffline = idOffline;
         this.montant = montant;
@@ -186,5 +188,13 @@ public class TransactionOfflineDto implements Serializable {
 
     public void setIdTransactionFinale(String idTransactionFinale) {
         this.idTransactionFinale = idTransactionFinale;
+    }
+
+    public String getIdCaissierValidation() {
+        return idCaissierValidation;
+    }
+
+    public void setIdCaissierValidation(String idCaissierValidation) {
+        this.idCaissierValidation = idCaissierValidation;
     }
 }
