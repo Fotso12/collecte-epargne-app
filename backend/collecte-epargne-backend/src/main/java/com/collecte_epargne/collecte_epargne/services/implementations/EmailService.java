@@ -2,6 +2,7 @@ package com.collecte_epargne.collecte_epargne.services.implementations;
 
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 /**
@@ -26,6 +27,7 @@ public class EmailService {
      * @param login   Login de l'utilisateur
      * @param password Mot de passe en clair de l'utilisateur
      */
+    @Async
     public void sendUserCredentialsEmail(String toEmail, String login, String password) {
         // Création d'un message email simple
         SimpleMailMessage message = new SimpleMailMessage();
@@ -49,6 +51,7 @@ public class EmailService {
      * @param toEmail Adresse email du destinataire
      * @param code    Code de vérification (6 chiffres)
      */
+    @Async
     public void sendVerificationCode(String toEmail, String code) {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(toEmail);
