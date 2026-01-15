@@ -1,5 +1,7 @@
 package com.collecte_epargne.collecte_epargne.services.implementations;
 
+import java.util.UUID;
+
 import com.collecte_epargne.collecte_epargne.dtos.TransactionOfflineDto;
 import com.collecte_epargne.collecte_epargne.entities.*;
 import com.collecte_epargne.collecte_epargne.mappers.TransactionOfflineMapper;
@@ -44,21 +46,50 @@ public class TransactionOfflineService implements TransactionOfflineInterface {
     @Override
     public TransactionOfflineDto save(TransactionOfflineDto dto) {
 
+        if (dto.getIdOffline() == null || dto.getIdOffline().isEmpty()) {
+            dto.setIdOffline("OFF-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase());
+        }
+
         log.info("Début sauvegarde transaction offline ID={}", dto.getIdOffline());
 
         TransactionOffline entity = mapper.toEntity(dto);
 
         entity.setIdOffline(dto.getIdOffline());
-        entity.setDateTransaction(dto.getDateTransaction());
+        
+        if (dto.getDateTransaction() == null) {
+            entity.setDateTransaction(Instant.now());
+        } else {
+            entity.setDateTransaction(dto.getDateTransaction());
+        }
+        
         entity.setStatutSynchro(StatutSynchroOffline.EN_ATTENTE);
 
-        entity.setEmploye(
-                employeRepository.findById(Integer.valueOf(dto.getIdEmploye()))
-                        .orElseThrow(() -> {
-                            log.error("Employé introuvable ID={}", dto.getIdEmploye());
-                            return new RuntimeException("Employé introuvable");
-                        })
-        );
+        // Tentative de récupération de l'employé avec gestion d'erreur plus robuste
+        Employe initiateur = null;
+        try {
+            initiateur = employeRepository.findById(Integer.valueOf(dto.getIdEmploye()))
+                    .orElse(null);
+            
+            if (initiateur == null) {
+                // Essayer de trouver par login si l'ID n'est pas trouvé (cas où le mobile envoie le login)
+                initiateur = employeRepository.findAll().stream()
+                        .filter(e -> e.getUtilisateur() != null && dto.getIdEmploye().equalsIgnoreCase(e.getUtilisateur().getLogin()))
+                        .findFirst()
+                        .orElse(null);
+            }
+        } catch (NumberFormatException e) {
+            log.warn("L'ID initiateur n'est pas numérique, recherche par login: {}", dto.getIdEmploye());
+            initiateur = employeRepository.findAll().stream()
+                    .filter(emp -> emp.getUtilisateur() != null && dto.getIdEmploye().equalsIgnoreCase(emp.getUtilisateur().getLogin()))
+                    .findFirst()
+                    .orElse(null);
+        }
+
+        if (initiateur == null) {
+            log.error("Employé initiateur introuvable pour l'identifiant: {}", dto.getIdEmploye());
+            throw new RuntimeException("Employé introuvable : " + dto.getIdEmploye());
+        }
+        entity.setEmploye(initiateur);
 
         entity.setClient(
                 clientRepository.findByCodeClient(dto.getCodeClient())

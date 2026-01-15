@@ -1,5 +1,6 @@
 package com.collecte_epargne.collecte_epargne.dtos;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
@@ -43,6 +44,19 @@ public class ClientRegistrationRequest {
 
     // Institution par défaut (id=1)
     private Long institutionId = 1L;
+
+    // Nouveaux champs pour KYC
+    @NotNull
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private java.time.LocalDate dateNaissance;
+
+    @Size(max = 100)
+    @NotNull
+    private String lieuNaissance;
+
+    @Size(max = 100)
+    @NotNull
+    private String profession;
 
     public String getFullName() {
         return fullName;
@@ -122,6 +136,30 @@ public class ClientRegistrationRequest {
 
     public void setInstitutionId(Long institutionId) {
         this.institutionId = institutionId;
+    }
+
+    public java.time.LocalDate getDateNaissance() {
+        return dateNaissance;
+    }
+
+    public void setDateNaissance(java.time.LocalDate dateNaissance) {
+        this.dateNaissance = dateNaissance;
+    }
+
+    public String getLieuNaissance() {
+        return lieuNaissance;
+    }
+
+    public void setLieuNaissance(String lieuNaissance) {
+        this.lieuNaissance = lieuNaissance;
+    }
+
+    public String getProfession() {
+        return profession;
+    }
+
+    public void setProfession(String profession) {
+        this.profession = profession;
     }
 }
 

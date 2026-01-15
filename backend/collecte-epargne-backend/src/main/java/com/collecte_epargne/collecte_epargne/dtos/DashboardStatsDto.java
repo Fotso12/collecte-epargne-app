@@ -17,13 +17,26 @@ public class DashboardStatsDto {
     private double tauxPenalites;
     private BigDecimal epargneParClient;
 
+    // Nouveaux KPIs demandés
+    private String nomCollecteurPlusClients;
+    private long nombreClientsCollecteurPlus;
+    private String nomCollecteurPlusCollectes;
+    private BigDecimal montantCollecteurPlus;
+    private BigDecimal collecteJournaliere;
+    private BigDecimal collecteHebdomadaire;
+    private BigDecimal collecteMensuelle;
+
     public DashboardStatsDto() {}
 
     public DashboardStatsDto(long totalClients, long totalCollecteurs, long totalCaissiers, 
                              BigDecimal volumeCotisation, double pourcentageTransactionsValidees,
                              long totalComptesActifs, BigDecimal soldeTotalEpargne,
                              BigDecimal volumeRetraits, long transactionsEnAttente,
-                             double tauxPenalites, BigDecimal epargneParClient) {
+                             double tauxPenalites, BigDecimal epargneParClient,
+                             String nomCollecteurPlusClients, long nombreClientsCollecteurPlus,
+                             String nomCollecteurPlusCollectes, BigDecimal montantCollecteurPlus,
+                             BigDecimal collecteJournaliere, BigDecimal collecteHebdomadaire,
+                             BigDecimal collecteMensuelle) {
         this.totalClients = totalClients;
         this.totalCollecteurs = totalCollecteurs;
         this.totalCaissiers = totalCaissiers;
@@ -35,6 +48,13 @@ public class DashboardStatsDto {
         this.transactionsEnAttente = transactionsEnAttente;
         this.tauxPenalites = tauxPenalites;
         this.epargneParClient = epargneParClient;
+        this.nomCollecteurPlusClients = nomCollecteurPlusClients;
+        this.nombreClientsCollecteurPlus = nombreClientsCollecteurPlus;
+        this.nomCollecteurPlusCollectes = nomCollecteurPlusCollectes;
+        this.montantCollecteurPlus = montantCollecteurPlus;
+        this.collecteJournaliere = collecteJournaliere;
+        this.collecteHebdomadaire = collecteHebdomadaire;
+        this.collecteMensuelle = collecteMensuelle;
     }
 
     public long getTotalClients() {
@@ -123,5 +143,61 @@ public class DashboardStatsDto {
 
     public void setEpargneParClient(BigDecimal epargneParClient) {
         this.epargneParClient = epargneParClient;
+    }
+
+    public String getNomCollecteurPlusClients() {
+        return nomCollecteurPlusClients;
+    }
+
+    public void setNomCollecteurPlusClients(String nomCollecteurPlusClients) {
+        this.nomCollecteurPlusClients = nomCollecteurPlusClients;
+    }
+
+    public long getNombreClientsCollecteurPlus() {
+        return nombreClientsCollecteurPlus;
+    }
+
+    public void setNombreClientsCollecteurPlus(long nombreClientsCollecteurPlus) {
+        this.nombreClientsCollecteurPlus = nombreClientsCollecteurPlus;
+    }
+
+    public String getNomCollecteurPlusCollectes() {
+        return nomCollecteurPlusCollectes;
+    }
+
+    public void setNomCollecteurPlusCollectes(String nomCollecteurPlusCollectes) {
+        this.nomCollecteurPlusCollectes = nomCollecteurPlusCollectes;
+    }
+
+    public BigDecimal getMontantCollecteurPlus() {
+        return montantCollecteurPlus;
+    }
+
+    public void setMontantCollecteurPlus(BigDecimal montantCollecteurPlus) {
+        this.montantCollecteurPlus = montantCollecteurPlus;
+    }
+
+    public BigDecimal getCollecteJournaliere() {
+        return collecteJournaliere;
+    }
+
+    public void setCollecteJournaliere(BigDecimal collecteJournaliere) {
+        this.collecteJournaliere = collecteJournaliere;
+    }
+
+    public BigDecimal getCollecteHebdomadaire() {
+        return collecteHebdomadaire;
+    }
+
+    public void setCollecteHebdomadaire(BigDecimal collecteHebdomadaire) {
+        this.collecteHebdomadaire = collecteHebdomadaire;
+    }
+
+    public BigDecimal getCollecteMensuelle() {
+        return collecteMensuelle;
+    }
+
+    public void setCollecteMensuelle(BigDecimal collecteMensuelle) {
+        this.collecteMensuelle = collecteMensuelle;
     }
 }

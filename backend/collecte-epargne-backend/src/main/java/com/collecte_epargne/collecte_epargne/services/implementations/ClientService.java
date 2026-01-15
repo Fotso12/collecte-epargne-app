@@ -90,9 +90,8 @@ public class ClientService implements ClientInterface {
                 log.error("Format d'ID collecteur invalide : {}", dto.getCodeCollecteurAssigne());
                 throw new IllegalArgumentException("L'ID du collecteur doit être un nombre valide.");
             }
-        } else {
-            client.setCollecteurAssigne(null);
         }
+        // Si codeCollecteurAssigne n'est pas fourni, on ne modifie pas le collecteur existant
     }
 
     @Override
@@ -148,15 +147,30 @@ public class ClientService implements ClientInterface {
      */
     @Transactional
     public ClientDto updateWithFiles(String codeClient, ClientDto clientDto, MultipartFile photo, MultipartFile recto, MultipartFile verso) {
+        // Charger le client existant pour préserver les chemins non mis à jour
+        Client existingClient = clientRepository.findByCodeClient(codeClient)
+                .orElseThrow(() -> new RuntimeException("Client non trouvé avec le code : " + codeClient));
+        
+        // Sauvegarder les nouveaux fichiers et mettre à jour les chemins dans le DTO
         if (photo != null && !photo.isEmpty()) {
             clientDto.setPhotoPath(fileStorageService.save(photo, "photos"));
+        } else {
+            // Préserver le chemin existant si aucun nouveau fichier n'est fourni
+            clientDto.setPhotoPath(existingClient.getPhotoPath());
         }
+        
         if (recto != null && !recto.isEmpty()) {
             clientDto.setCniRectoPath(fileStorageService.save(recto, "cni_recto"));
+        } else {
+            clientDto.setCniRectoPath(existingClient.getCniRectoPath());
         }
+        
         if (verso != null && !verso.isEmpty()) {
             clientDto.setCniVersoPath(fileStorageService.save(verso, "cni_verso"));
+        } else {
+            clientDto.setCniVersoPath(existingClient.getCniVersoPath());
         }
+        
         return this.updateByCodeClient(codeClient, clientDto);
     }
 

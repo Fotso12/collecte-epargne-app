@@ -85,9 +85,11 @@ public class RegistrationController {
                         .body(Map.of("error", "Votre ville (" + request.getVille() + ") n'est pas encore prise en compte par nos services."));
             }
 
-            // Récupérer le rôle client
-            Role clientRole = roleRepository.findByCode("client")
-                    .orElseThrow(() -> new RuntimeException("Rôle client non trouvé"));
+            // Récupérer le rôle client (Essaie 'CLI' puis 'client' puis 'CLIENT')
+            Role clientRole = roleRepository.findByCode("CLI")
+                    .or(() -> roleRepository.findByCode("client"))
+                    .or(() -> roleRepository.findByNom("CLIENT")) // Fallback sur le nom
+                    .orElseThrow(() -> new RuntimeException("Rôle 'CLI'/'client' introuvable en base de données."));
 
             // Séparer nom et prénom
             String[] nameParts = request.getFullName().split(" ", 2);
@@ -97,7 +99,10 @@ public class RegistrationController {
             // Générer un login unique basé sur l'email
             String emailPrefix = request.getEmail().split("@")[0];
             String timestamp = String.valueOf(System.currentTimeMillis()).substring(7);
-            String generatedLogin = "CLI_" + emailPrefix + "_" + timestamp;
+            String generatedLogin = ("CLI_" + emailPrefix + "_" + timestamp);
+            if (generatedLogin.length() > 50) {
+                generatedLogin = generatedLogin.substring(0, 50);
+            }
 
             // Créer l'utilisateur
             Utilisateur user = new Utilisateur();
@@ -111,7 +116,7 @@ public class RegistrationController {
             user.setStatut(StatutGenerique.ACTIF);
             user.setDateCreation(Instant.now());
 
-            Utilisateur savedUser = utilisateurRepository.save(user);
+            Utilisateur savedUser = utilisateurRepository.saveAndFlush(user);
 
             // Générer un code client unique
             String codeClient = "CLI" + System.currentTimeMillis();
@@ -119,47 +124,68 @@ public class RegistrationController {
                 codeClient = "CLI" + System.currentTimeMillis();
             }
 
-            // Le numeroClient est auto-généré par la BDD (IDENTITY)
-            // On ne le définit pas ici.
-
             // Créer l'entité Client
             Client client = new Client();
             client.setCodeClient(codeClient);
-            // client.setNumeroClient(numeroClient); // Auto-generated
             client.setUtilisateur(savedUser);
-            client.setAdresse(request.getAddress());
+            client.setAdresse(request.getAddress() != null ? request.getAddress() : "Adresse inconnue");
             client.setVille(request.getVille());
-            // Définir le type CNI par défaut (CARTE_IDENTITE si non spécifié)
+            
+            // Définir le type CNI par défaut
             if (request.getIdentityType() != null && request.getIdentityType().equalsIgnoreCase("PASSPORT")) {
                 client.setTypeCni(com.collecte_epargne.collecte_epargne.utils.TypeCNI.PASSEPORT);
             } else {
                 client.setTypeCni(com.collecte_epargne.collecte_epargne.utils.TypeCNI.CARTE_IDENTITE);
             }
+            
+            // Champs obligatoires avec valeurs par défaut si manquants
             client.setNumCni(request.getIdentityNumber() != null && !request.getIdentityNumber().trim().isEmpty() 
-                    ? request.getIdentityNumber() : null);
+                    ? request.getIdentityNumber() : "NON_RENSEIGNE_" + timestamp);
+            
+            // Utilisation des champs fournis par le DTO
+            client.setDateNaissance(request.getDateNaissance());
+            client.setLieuNaissance(request.getLieuNaissance());
+            client.setProfession(request.getProfession());
+
+            // Valeurs par défaut pour satisfaire les contraintes NOT NULL de la BDD
+            // (Même si l'entité JPA dit @Column(nullable=true), la BDD semble stricte)
+            client.setCniRectoPath("PENDING_UPLOAD");
+            client.setCniVersoPath("PENDING_UPLOAD");
+            client.setPhotoPath("PENDING_UPLOAD");
+            
             client.setScoreEpargne(0);
 
             // Gérer l'affiliation au collecteur parrain
-            if (request.getCollectorMatricule() != null && 
-                !request.getCollectorMatricule().trim().isEmpty() && 
-                !request.getCollectorMatricule().equals("0000")) {
-                
-                // Chercher l'employé par son matricule
-                Employe collecteurEmploye = employeRepository.findByMatricule(request.getCollectorMatricule().trim())
-                        .orElseThrow(() -> new RuntimeException("Aucun collecteur trouvé avec le matricule: " + request.getCollectorMatricule()));
-                
-                // Vérifier que l'employé est bien un collecteur
-                if (collecteurEmploye.getTypeEmploye() != com.collecte_epargne.collecte_epargne.utils.TypeEmploye.COLLECTEUR) {
-                    throw new RuntimeException("Le matricule fourni ne correspond pas à un collecteur");
-                }
-                
-                // Assigner le collecteur au client
-                client.setCollecteurAssigne(collecteurEmploye);
+            String matricule = "0000";
+            if (request.getCollectorMatricule() != null && !request.getCollectorMatricule().trim().isEmpty()) {
+                matricule = request.getCollectorMatricule().trim();
             }
 
-            clientRepository.save(client);
+            if (!matricule.equals("0000")) {
+                // Cas standard : Matricule fourni
+                final String finalMatricule = matricule;
+                Employe collecteurEmploye = employeRepository.findByMatricule(finalMatricule)
+                        .orElseThrow(() -> new RuntimeException("Aucun collecteur trouvé avec le matricule: " + finalMatricule));
+                
+                if (collecteurEmploye.getTypeEmploye() != com.collecte_epargne.collecte_epargne.utils.TypeEmploye.COLLECTEUR) {
+                    throw new RuntimeException("Le matricule fourni (" + finalMatricule + ") ne correspond pas à un collecteur");
+                }
+                client.setCollecteurAssigne(collecteurEmploye);
+            } else {
+                // Cas défaut (0000 ou vide) : Assigner au collecteur par défaut "COL001" pour éviter l'erreur NOT NULL
+                // Si COL001 n'existe pas, on prend le premier collecteur trouvé en base
+                Employe defaultCollector = employeRepository.findByMatricule("COL001")
+                        .orElse(employeRepository.findAll().stream()
+                                .filter(e -> e.getTypeEmploye() == com.collecte_epargne.collecte_epargne.utils.TypeEmploye.COLLECTEUR)
+                                .findFirst()
+                                .orElseThrow(() -> new RuntimeException("Aucun collecteur disponible en base pour l'affiliation par défaut.")));
+                
+                client.setCollecteurAssigne(defaultCollector);
+            }
 
-            // Créer aussi un ClientSavings pour compatibilité
+            clientRepository.saveAndFlush(client);
+
+            // Créer aussi un ClientSavings pour compatibilité (optionnel mais conservé)
             Long institutionId = request.getInstitutionId() != null ? request.getInstitutionId() : 1L;
             Institution institution = institutionRepository.findById(institutionId)
                     .orElseGet(() -> {
@@ -167,7 +193,7 @@ public class RegistrationController {
                         defInst.setName("Institution par Défaut");
                         defInst.setCode("DEF001");
                         defInst.setContactEmail("contact@institution.com");
-                        return institutionRepository.save(defInst);
+                        return institutionRepository.saveAndFlush(defInst);
                     });
 
             ClientSavings clientSavings = new ClientSavings();
@@ -178,21 +204,13 @@ public class RegistrationController {
             clientSavings.setIdentityNumber(request.getIdentityNumber());
             clientSavings.setAddress(request.getAddress());
             clientSavings.setStatus(ClientSavings.ClientStatus.ACTIVE);
+            
             // Assigner le collecteur parrain si disponible, sinon null
-            if (request.getCollectorMatricule() != null && 
-                !request.getCollectorMatricule().trim().isEmpty() && 
-                !request.getCollectorMatricule().equals("0000")) {
-                try {
-                    Employe collecteurEmploye = employeRepository.findByMatricule(request.getCollectorMatricule().trim())
-                            .orElse(null);
-                    if (collecteurEmploye != null && collecteurEmploye.getUtilisateur() != null) {
-                        clientSavings.setCollector(collecteurEmploye.getUtilisateur());
-                    }
-                } catch (Exception e) {
-                    // Si le collecteur n'est pas trouvé, on continue sans assigner de collecteur
-                }
+            if (client.getCollecteurAssigne() != null && client.getCollecteurAssigne().getUtilisateur() != null) {
+                clientSavings.setCollector(client.getCollecteurAssigne().getUtilisateur());
             }
-            clientSavingsRepository.save(clientSavings);
+
+            clientSavingsRepository.saveAndFlush(clientSavings);
 
             return ResponseEntity.status(HttpStatus.CREATED)
                     .body(Map.of(
@@ -202,9 +220,11 @@ public class RegistrationController {
                             "fullName", request.getFullName()
                     ));
         } catch (Exception e) {
-            e.printStackTrace(); // Log l'erreur pour le débogage
+            System.err.println("ERREUR INSCRIPTION CLIENT: " + e.getMessage());
+            e.printStackTrace();
+            String errorMessage = e.getMessage() != null ? e.getMessage() : e.getClass().getName();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("error", "Erreur lors de la création du client: " + e.getMessage()));
+                    .body(Map.of("error", "Erreur serveur : " + errorMessage));
         }
     }
 
@@ -221,8 +241,10 @@ public class RegistrationController {
             }
 
             // Récupérer le rôle collector
-            Role collectorRole = roleRepository.findByCode("collector")
-                    .orElseThrow(() -> new RuntimeException("Rôle collector non trouvé"));
+            Role collectorRole = roleRepository.findByCode("COLL")
+                    .or(() -> roleRepository.findByCode("collector"))
+                    .or(() -> roleRepository.findByCode("COLLECTEUR"))
+                    .orElseThrow(() -> new RuntimeException("Rôle 'COLL'/'collector' introuvable en base de données"));
 
             // Générer login basé sur email
             String emailPrefix = request.getEmail().split("@")[0];
