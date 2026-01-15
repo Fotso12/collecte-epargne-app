@@ -98,6 +98,28 @@ public class TransactionOfflineController {
     }
 
     // ----------------------------------------------------
+    // Transactions à valider pour un caissier
+    // ----------------------------------------------------
+    @GetMapping("/caissier/{id}/a-valider")
+    public ResponseEntity<List<TransactionOfflineDto>> getByCaissier(@PathVariable Integer id) {
+        log.info("Récupération transactions offline à valider pour caissier ID={}", id);
+        return ResponseEntity.ok(service.getByCaissier(id));
+    }
+
+    @PutMapping("/{id}/valider/{idCaissier}")
+    public ResponseEntity<TransactionOfflineDto> valider(@PathVariable String id, @PathVariable Integer idCaissier) {
+        log.info("Validation transaction offline ID={} par caissier ID={}", id, idCaissier);
+        return ResponseEntity.ok(service.valider(id, idCaissier));
+    }
+
+    @PutMapping("/{id}/rejeter")
+    public ResponseEntity<Void> rejeter(@PathVariable String id, @RequestBody(required = false) String motif) {
+        log.info("Rejet transaction offline ID={} pour motif: {}", id, motif);
+        service.rejeter(id, motif);
+        return ResponseEntity.ok().build();
+    }
+
+    // ----------------------------------------------------
     // Synchronisation avec transaction finale
     // ----------------------------------------------------
     @PutMapping("/{id}/synchroniser/{idTransaction}")

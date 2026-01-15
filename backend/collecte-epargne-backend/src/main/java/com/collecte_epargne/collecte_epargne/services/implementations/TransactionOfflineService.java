@@ -8,11 +8,17 @@ import com.collecte_epargne.collecte_epargne.mappers.TransactionOfflineMapper;
 import com.collecte_epargne.collecte_epargne.repositories.*;
 import com.collecte_epargne.collecte_epargne.services.interfaces.TransactionOfflineInterface;
 import com.collecte_epargne.collecte_epargne.utils.StatutSynchroOffline;
+import com.collecte_epargne.collecte_epargne.utils.StatutTransaction;
+import com.collecte_epargne.collecte_epargne.utils.TypeTransaction;
+import com.collecte_epargne.collecte_epargne.utils.CodeGenerator;
+import com.collecte_epargne.collecte_epargne.services.interfaces.TransactionInterface;
+import com.collecte_epargne.collecte_epargne.dtos.TransactionDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -30,14 +36,18 @@ public class TransactionOfflineService implements TransactionOfflineInterface {
     private final ClientRepository clientRepository;
     private final CompteRepository compteRepository;
     private final TransactionRepository transactionRepository;
+    private final TransactionInterface transactionService;
+    private final CodeGenerator codeGenerator;
 
-    public TransactionOfflineService(TransactionOfflineRepository repository, TransactionOfflineMapper mapper, EmployeRepository employeRepository, ClientRepository clientRepository, CompteRepository compteRepository, TransactionRepository transactionRepository) {
+    public TransactionOfflineService(TransactionOfflineRepository repository, TransactionOfflineMapper mapper, EmployeRepository employeRepository, ClientRepository clientRepository, CompteRepository compteRepository, TransactionRepository transactionRepository, TransactionInterface transactionService, CodeGenerator codeGenerator) {
         this.repository = repository;
         this.mapper = mapper;
         this.employeRepository = employeRepository;
         this.clientRepository = clientRepository;
         this.compteRepository = compteRepository;
         this.transactionRepository = transactionRepository;
+        this.transactionService = transactionService;
+        this.codeGenerator = codeGenerator;
     }
 
     // ----------------------------------------------------
@@ -210,6 +220,90 @@ public class TransactionOfflineService implements TransactionOfflineInterface {
                 .stream()
                 .map(mapper::toDto)
                 .collect(Collectors.toList());
+    }
+
+    // ----------------------------------------------------
+    // Filtrer par caissier (A valider)
+    // ----------------------------------------------------
+    @Override
+    public List<TransactionOfflineDto> getByCaissier(Integer idCaissier) {
+        log.info("Recherche transactions offline en attente de validation pour le caissier ID={}", idCaissier);
+
+        return repository.findByCaissierChoisi_IdEmployeAndStatutSynchro(idCaissier, StatutSynchroOffline.EN_ATTENTE)
+                .stream()
+                .map(mapper::toDto)
+                .collect(Collectors.toList());
+    }
+
+    // ----------------------------------------------------
+    // Validation d'une transaction offline par le caissier
+    // ----------------------------------------------------
+    @Override
+    public TransactionOfflineDto valider(String idOffline, Integer idCaissier) {
+        log.info("Validation transaction offline ID={} par caissier ID={}", idOffline, idCaissier);
+
+        TransactionOffline offline = repository.findById(idOffline)
+                .orElseThrow(() -> new RuntimeException("Transaction offline introuvable"));
+
+        if (offline.getStatutSynchro() != StatutSynchroOffline.EN_ATTENTE) {
+            throw new RuntimeException("Cette transaction a déjà été traitée ou est déjà synchronisée");
+        }
+
+        Employe caissier = employeRepository.findById(idCaissier)
+                .orElseThrow(() -> new RuntimeException("Caissier introuvable"));
+
+        // 1. Créer la transaction finale
+        Transaction transaction = new Transaction();
+        transaction.setIdTransaction(codeGenerator.generateTransactionRef());
+        transaction.setReference(codeGenerator.generateTransactionRef()); // Générer une référence unique
+        transaction.setMontant(offline.getMontant());
+        transaction.setTypeTransaction(offline.getTypeTransaction());
+        transaction.setDateTransaction(offline.getDateTransaction()); // On garde la date de la collecte
+        transaction.setCompte(offline.getCompte());
+        transaction.setInitiateur(offline.getEmploye());
+        transaction.setCaissierValidateur(caissier);
+        transaction.setDateValidationCaisse(Instant.now());
+        transaction.setStatut(StatutTransaction.VALIDEE_CAISSE);
+
+        // Calculer les soldes avant/après (obligatoires)
+        Compte compte = offline.getCompte();
+        BigDecimal soldeAvant = compte.getSolde();
+        BigDecimal montant = offline.getMontant();
+
+        // Calcul du solde après selon le type de transaction
+        BigDecimal soldeApres;
+        if (offline.getTypeTransaction() == TypeTransaction.RETRAIT) {
+            soldeApres = soldeAvant.subtract(montant);
+        } else {
+            // DEPOT ou VERSEMENT
+            soldeApres = soldeAvant.add(montant);
+        }
+
+        transaction.setSoldeAvant(soldeAvant);
+        transaction.setSoldeApres(soldeApres);
+
+        // Mettre à jour le solde du compte
+        compte.setSolde(soldeApres);
+
+        Transaction savedTransaction = transactionRepository.save(transaction);
+
+        // 2. Marquer l'offline comme synchronisée
+        offline.setStatutSynchro(StatutSynchroOffline.SYNCHRONISEE);
+        offline.setTransactionFinale(savedTransaction);
+        offline.setDateSynchro(Instant.now());
+        offline.setCaissierChoisi(caissier); // Juste au cas où il n'était pas déjà mis
+
+        return mapper.toDto(repository.save(offline));
+    }
+
+    @Override
+    public void rejeter(String idOffline, String motif) {
+        log.info("Rejet transaction offline ID={} pour motif: {}", idOffline, motif);
+        TransactionOffline offline = repository.findById(idOffline)
+                .orElseThrow(() -> new RuntimeException("Transaction offline introuvable"));
+
+        offline.setStatutSynchro(StatutSynchroOffline.ERREUR); // Ou on peut ajouter REJETEE à l'id
+        repository.save(offline);
     }
 
     // ----------------------------------------------------

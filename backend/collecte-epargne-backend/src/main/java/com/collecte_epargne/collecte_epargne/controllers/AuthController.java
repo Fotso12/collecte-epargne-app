@@ -51,8 +51,12 @@ public class AuthController {
 
         // 4️⃣ Retour du token avec les détails utilisateur
         Integer idAgence = null;
-        if (utilisateur.getEmploye() != null && utilisateur.getEmploye().getAgenceZone() != null) {
-            idAgence = utilisateur.getEmploye().getAgenceZone().getIdAgence();
+        Integer idEmploye = null;
+        if (utilisateur.getEmploye() != null) {
+            idEmploye = utilisateur.getEmploye().getIdEmploye();
+            if (utilisateur.getEmploye().getAgenceZone() != null) {
+                idAgence = utilisateur.getEmploye().getAgenceZone().getIdAgence();
+            }
         }
 
         return ResponseEntity.ok(new LoginResponse(
@@ -66,7 +70,8 @@ public class AuthController {
                 utilisateur.getTelephone(),
                 utilisateur.getRole() != null ? utilisateur.getRole().getId() : null,
                 utilisateur.getRole() != null ? utilisateur.getRole().getCode() : null,
-                idAgence
+                idAgence,
+                idEmploye
         ));
     }
 }

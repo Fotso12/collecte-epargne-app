@@ -19,6 +19,12 @@ public interface TransactionOfflineInterface {
 
     List<TransactionOfflineDto> getByEmployeToday(Integer idEmploye);
 
+    List<TransactionOfflineDto> getByCaissier(Integer idCaissier);
+
+    TransactionOfflineDto valider(String idOffline, Integer idCaissier);
+
+    void rejeter(String idOffline, String motif);
+
     TransactionOfflineDto markAsSynced(
             String idOffline,
             String idTransactionFinale
