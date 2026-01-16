@@ -1,3 +1,4 @@
+### Backend (Maven - Java) ###
 # Compiled class file
 *.class
 
@@ -19,6 +20,136 @@
 *.tar.gz
 *.rar
 
-# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
+# virtual machine crash logs
 hs_err_pid*
 replay_pid*
+
+# Maven
+target/
+.m2/
+*.pom
+dependency-reduced-pom.xml
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+.flattened-pom.xml
+
+# IDE
+.classpath
+.project
+.settings/
+.sts4-cache/
+.vscode/
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# Logs
+logs/
+*.log
+
+# Spring Boot
+spring_session.db
+application-local.properties
+
+# Uploads directory
+backend/collecte-epargne-backend/uploads/
+
+### Frontend Web (Angular) ###
+# Node modules
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Build output
+frontend-web/SAVELYWEB/dist/
+frontend-web/SAVELYWEB/out/
+
+# Angular
+.angular/
+.angular-cache/
+
+# IDE
+.vscode/
+.idea/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+### Frontend Mobile (Flutter/Dart) ###
+# Flutter
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+build/
+pubspec.lock
+
+# iOS
+ios/Pods/
+ios/Podfile.lock
+ios/Flutter/Flutter.podspec
+
+# Android
+android/.gradle/
+android/local.properties
+android/build/
+android/app/release/
+android/.idea/
+android/.gradle
+android/app/debug/
+android/app/profile/
+android/app/release/
+*.apk
+*.jks
+*.keystore
+*.aab
+
+# Build artifacts
+*.so
+.dart_tool/
+build/
+
+# IDE
+.vscode/
+.idea/
+*.iml
+
+# OS
+.DS_Store
+Thumbs.db
+
+### General ###
+# Dependencies
+.venv/
+venv/
+env/
+ENV/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+.env.local
+
+# Build
+dist/
+build/
+
+# CI/CD
+.github/workflows/*.log
+
+# ngrok
+.ngrok2/
+ngrok-config.yml
+*.ngrok.yml
