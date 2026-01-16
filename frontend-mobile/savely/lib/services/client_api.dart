@@ -177,10 +177,24 @@ class ClientApi {
   /// GET /api/clients/{id}/profile
   static Future<Map<String, dynamic>> getClientProfile(String clientId) async {
     try {
-      final uri = _uri('/api/clients/$clientId/profile');
+      // Certains déploiements exposent /api/clients/login/{login} et /api/clients/{codeClient}
+      // On essaie d'abord la route login, puis on tombe en fallback vers la route par codeClient.
+      final uriLogin = _uri('/api/clients/login/$clientId');
+      var res = await _client
+          .get(uriLogin)
+          .timeout(
+            const Duration(seconds: 10),
+            onTimeout: () =>
+                throw Exception('Timeout: le serveur ne répond pas'),
+          );
+      if (res.statusCode == 200) {
+        return jsonDecode(res.body) as Map<String, dynamic>;
+      }
 
-      final res = await _client
-          .get(uri)
+      // Fallback: essayer par codeClient (ex: /api/clients/{codeClient})
+      final uriCode = _uri('/api/clients/$clientId');
+      res = await _client
+          .get(uriCode)
           .timeout(
             const Duration(seconds: 10),
             onTimeout: () =>
@@ -203,7 +217,8 @@ class ClientApi {
   /// GET /api/clients/{id}/accounts
   static Future<List<dynamic>> getClientAccounts(String clientId) async {
     try {
-      final uri = _uri('/api/clients/$clientId/accounts');
+      // Le backend expose l'endpoint /api/comptes/client/{codeClient}
+      final uri = _uri('/api/comptes/client/$clientId');
 
       final res = await _client
           .get(uri)
@@ -212,7 +227,6 @@ class ClientApi {
             onTimeout: () =>
                 throw Exception('Timeout: le serveur ne répond pas'),
           );
-
       if (res.statusCode != 200) {
         throw Exception(
           'Impossible de récupérer les comptes (${res.statusCode})',

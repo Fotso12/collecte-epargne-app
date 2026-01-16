@@ -146,12 +146,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Logo Savely
+              // Logo Savely (JPEG asset)
               Center(
                 child: Image.asset(
-                  'assets/images/logo_savely.svg',
+                  'assets/images/logo-savely.jpg',
                   height: 100,
                   width: 100,
+                  fit: BoxFit.contain,
                 ),
               ),
               const SizedBox(height: 16),

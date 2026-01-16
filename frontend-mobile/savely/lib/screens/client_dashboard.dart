@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../models/client_model.dart';
 import '../models/compte_model.dart';
 import '../services/client_api.dart';
+import '../services/compte_api.dart';
 import '../services/auth_api.dart';
 import '../services/error_handler.dart';
 import 'login_screen.dart';
@@ -32,20 +33,27 @@ class _ClientDashboardState extends State<ClientDashboard> {
         _errorMessage = null;
       });
 
-      // Récupérer l'ID du client depuis l'utilisateur connecté
+      // Récupérer le login de l'utilisateur connecté
       final user = AuthApi.currentUser;
       if (user == null) {
         throw Exception('Utilisateur non connecté');
       }
-      final collecteurId = user.login;
 
-      // Charger le profil
-      final clientData = await ClientApi.getClientProfile(collecteurId);
+      final login = user.login;
+
+      // Résoudre le code client via l'endpoint backend /api/clients/login/{login}
+      final codeClient = await ClientApi.getCodeClientByLogin(login);
+      if (codeClient == null || codeClient.isEmpty) {
+        throw Exception('Impossible de résoudre le code client pour $login');
+      }
+
+      // Charger le profil via le code client
+      final clientData = await ClientApi.getClientByCode(codeClient);
       final client = ClientModel.fromJson(clientData);
 
-      // Charger les comptes
-      final comptesData = await ClientApi.getClientAccounts(collecteurId);
-      final comptes = (comptesData as List)
+      // Charger les comptes via le contrôleur comptes (/api/comptes/client/{codeClient})
+      final comptesData = await CompteApi.getComptesByClient(codeClient);
+      final comptes = comptesData
           .map((c) => CompteModel.fromJson(c as Map<String, dynamic>))
           .toList();
 

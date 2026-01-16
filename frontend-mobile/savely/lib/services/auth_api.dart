@@ -3,58 +3,12 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
+import 'package:http/io_client.dart';
 import '../models/user_model.dart';
 
-/// Client HTTP personnalisé pour accepter les certificats auto-signés (ngrok)
-class _HttpClientWithSelfSignedCert extends http.BaseClient {
-  final HttpClient _httpClient = HttpClient();
-
-  _HttpClientWithSelfSignedCert() {
-    // Accepte les certificats auto-signés (nécessaire pour ngrok en HTTPS)
-    _httpClient.badCertificateCallback = (cert, host, port) => true;
-  }
-
-  @override
-  Future<http.StreamedResponse> send(http.BaseRequest request) async {
-    try {
-      final clientRequest = await _httpClient.openUrl(
-        request.method,
-        request.url,
-      );
-
-      // Copier tous les headers
-      request.headers.forEach((header, value) {
-        clientRequest.headers.set(header, value);
-      });
-
-      // Envoyer le body et fermer la requête
-      await clientRequest.addStream(request.finalize());
-      final clientResponse = await clientRequest.close();
-
-      // Lire la réponse complète
-      final body = await clientResponse.cast<List<int>>().toList();
-      final bodyBytes = body.isEmpty
-          ? <int>[]
-          : body.reduce((a, b) => [...a, ...b]);
-
-      // Convertir les headers
-      final headersMap = <String, String>{};
-      clientResponse.headers.forEach((name, values) {
-        headersMap[name] = values.join(',');
-      });
-
-      return http.StreamedResponse(
-        Stream.value(bodyBytes),
-        clientResponse.statusCode,
-        request: request,
-        headers: headersMap,
-        isRedirect: clientResponse.isRedirect,
-      );
-    } catch (e) {
-      throw Exception('Erreur HTTP: $e');
-    }
-  }
-}
+// We use IOClient wrapping a dart:io HttpClient configured to accept
+// self-signed certificates (ngrok). IOClient avoids prematurely closing
+// the underlying connection and integrates cleanly with `package:http`.
 
 class RoleOption {
   final int id;
@@ -79,7 +33,9 @@ class RoleOption {
 
 class AuthApi {
   // Client HTTP personnalisé pour accepter certificats auto-signés (ngrok)
-  static final http.Client _httpClient = _HttpClientWithSelfSignedCert();
+  static final http.Client _httpClient = IOClient(
+    HttpClient()..badCertificateCallback = (cert, host, port) => true,
+  );
 
   // Stockage du token JWT et de l'ID utilisateur
   static String? token;

@@ -12,13 +12,18 @@ class EmployeApi {
   static Future<Map<String, dynamic>> getByMatricule(String matricule) async {
     try {
       final uri = _uri('/api/employes/$matricule');
-      final res = await _client.get(uri).timeout(
-        const Duration(seconds: 10),
-        onTimeout: () => throw Exception('Timeout: le serveur ne répond pas'),
-      );
+      final res = await _client
+          .get(uri)
+          .timeout(
+            const Duration(seconds: 10),
+            onTimeout: () =>
+                throw Exception('Timeout: le serveur ne répond pas'),
+          );
 
       if (res.statusCode != 200) {
-        throw Exception('Impossible de récupérer l\'employé (${res.statusCode})');
+        throw Exception(
+          'Impossible de récupérer l\'employé (${res.statusCode})',
+        );
       }
 
       return jsonDecode(res.body) as Map<String, dynamic>;
@@ -33,20 +38,46 @@ class EmployeApi {
     try {
       // Chercher dans la liste des collecteurs
       final uri = _uri('/api/employes/collecteurs');
-      final res = await _client.get(uri).timeout(
-        const Duration(seconds: 10),
-        onTimeout: () => throw Exception('Timeout: le serveur ne répond pas'),
-      );
+      final res = await _client
+          .get(uri)
+          .timeout(
+            const Duration(seconds: 10),
+            onTimeout: () =>
+                throw Exception('Timeout: le serveur ne répond pas'),
+          );
 
       if (res.statusCode != 200) {
-        throw Exception('Impossible de récupérer les collecteurs (${res.statusCode})');
+        throw Exception(
+          'Impossible de récupérer les collecteurs (${res.statusCode})',
+        );
       }
 
       final List<dynamic> collecteurs = jsonDecode(res.body);
       for (var collecteur in collecteurs) {
-        final loginUtilisateur = collecteur['loginUtilisateur']?.toString();
-        if (loginUtilisateur != null && loginUtilisateur == login) {
-          return collecteur as Map<String, dynamic>;
+        // Plusieurs variantes possibles selon le backend: 'loginUtilisateur', 'login', ou utilisateur nested
+        final c = collecteur as Map<String, dynamic>;
+        final candidates = <String?>[
+          c['login']?.toString(),
+          c['loginUtilisateur']?.toString(),
+          c['matricule']?.toString(),
+        ];
+
+        // Check nested structures
+        if (c.containsKey('utilisateur') && c['utilisateur'] is Map) {
+          final u = c['utilisateur'] as Map<String, dynamic>;
+          candidates.add(u['login']?.toString());
+          candidates.add(u['email']?.toString());
+        }
+        if (c.containsKey('user') && c['user'] is Map) {
+          final u = c['user'] as Map<String, dynamic>;
+          candidates.add(u['login']?.toString());
+          candidates.add(u['email']?.toString());
+        }
+
+        for (var candidate in candidates) {
+          if (candidate != null && candidate == login) {
+            return c;
+          }
         }
       }
 
@@ -74,38 +105,51 @@ class EmployeApi {
 
   /// Récupère les clients assignés à un collecteur
   /// idCollecteur doit être l'ID_EMPLOYE (entier) et non le matricule
-  static Future<List<Map<String, dynamic>>> getClientsByCollecteur(String idCollecteur) async {
+  static Future<List<Map<String, dynamic>>> getClientsByCollecteur(
+    String idCollecteur,
+  ) async {
     try {
-      final uri = _uri('/api/employes/collecteurs/$idCollecteur/clients');
-      final res = await _client.get(uri).timeout(
-        const Duration(seconds: 10),
-        onTimeout: () => throw Exception('Timeout: le serveur ne répond pas'),
-      );
+      // Le backend expose /api/employes/collecteurs/{matricule}/clients
+      // Acceptons plusieurs formes d'identifiant: login, matricule ou idString
+
+      String matricule = idCollecteur;
+
+      // Si un login est fourni, tenter de résoudre le matricule
+      try {
+        final resolved = await getMatriculeByLogin(idCollecteur);
+        if (resolved != null && resolved.isNotEmpty) {
+          matricule = resolved;
+        }
+      } catch (_) {
+        // Ignorer si la résolution échoue et utiliser la valeur fournie
+      }
+
+      final uri = _uri('/api/employes/collecteurs/$matricule/clients');
+      final res = await _client
+          .get(uri)
+          .timeout(
+            const Duration(seconds: 10),
+            onTimeout: () =>
+                throw Exception('Timeout: le serveur ne répond pas'),
+          );
 
       if (res.statusCode == 404 || res.statusCode == 204) {
-        // Aucun client trouvé, retourner une liste vide
         return [];
       }
 
       if (res.statusCode == 400) {
-        // Bad Request - probablement que l'ID n'est pas valide
-        // Retourner une liste vide plutôt que de lancer une exception
         return [];
       }
 
       if (res.statusCode != 200) {
-        throw Exception('Impossible de récupérer les clients (${res.statusCode})');
+        throw Exception(
+          'Impossible de récupérer les clients (${res.statusCode})',
+        );
       }
 
       final dynamic body = jsonDecode(res.body);
-      if (body == null) {
-        return [];
-      }
-
-      if (body is List) {
-        return body.cast<Map<String, dynamic>>();
-      }
-
+      if (body == null) return [];
+      if (body is List) return body.cast<Map<String, dynamic>>();
       return [];
     } catch (e) {
       // En cas d'erreur, retourner une liste vide plutôt que de propager l'erreur
@@ -113,4 +157,3 @@ class EmployeApi {
     }
   }
 }
-

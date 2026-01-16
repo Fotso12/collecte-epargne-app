@@ -1,117 +1,59 @@
 import 'dart:convert';
-import 'package:http/http.dart' as http;
+
 import '../models/collecteur_model.dart';
 import '../models/transaction_model.dart';
 import 'auth_api.dart';
+import 'employe_api.dart';
+import 'transaction_offline_api.dart';
 
 class CollecteurApi {
-  static final http.Client _client = AuthApi.getHttpClient();
-  static String _baseUrl() => AuthApi.getBaseUrl();
-
-  static Uri _uri(String path) => Uri.parse('${_baseUrl()}$path');
-
-  /// Récupérer le profil du collecteur avec KPIs
-  /// GET /api/collecteur/{idEmploye}/profile
-  static Future<CollecteurModel?> getProfile(String idEmploye) async {
+  /// Récupérer le profil du collecteur (accepte login ou matricule)
+  /// Délègue à `EmployeApi.getByMatricule` après résolution éventuelle du login
+  static Future<CollecteurModel?> getProfile(String loginOrMatricule) async {
     try {
-      final uri = _uri('/api/collecteur/$idEmploye/profile');
-      final res = await _client
-          .get(uri)
-          .timeout(
-            const Duration(seconds: 10),
-            onTimeout: () =>
-                throw Exception('Timeout: le serveur ne répond pas'),
-          );
+      String matricule = loginOrMatricule;
+      try {
+        final resolved = await EmployeApi.getMatriculeByLogin(loginOrMatricule);
+        if (resolved != null && resolved.isNotEmpty) matricule = resolved;
+      } catch (_) {}
 
-      if (res.statusCode != 200) {
-        throw Exception(
-          'Impossible de récupérer le profil (${res.statusCode})',
-        );
-      }
+      final emp = await EmployeApi.getByMatricule(matricule);
+      if (emp == null) return null;
 
-      final data = jsonDecode(res.body) as Map<String, dynamic>;
-      return CollecteurModel.fromJson(data);
+      return CollecteurModel.fromJson(emp);
     } catch (e) {
       print('[CollecteurApi] Error getting profile: $e');
       return null;
     }
   }
 
-  /// Récupérer les KPIs du collecteur
-  /// GET /api/collecteur/{idEmploye}/stats
-  static Future<Map<String, dynamic>?> getStats(String idEmploye) async {
-    try {
-      final uri = _uri('/api/collecteur/$idEmploye/stats');
-      final res = await _client
-          .get(uri)
-          .timeout(
-            const Duration(seconds: 10),
-            onTimeout: () =>
-                throw Exception('Timeout: le serveur ne répond pas'),
-          );
-
-      if (res.statusCode != 200) {
-        throw Exception(
-          'Impossible de récupérer les stats (${res.statusCode})',
-        );
-      }
-
-      return jsonDecode(res.body) as Map<String, dynamic>;
-    } catch (e) {
-      print('[CollecteurApi] Error getting stats: $e');
-      return null;
-    }
+  /// KPIs placeholder (backend may expose later)
+  static Future<Map<String, dynamic>?> getStats(String loginOrMatricule) async {
+    return null;
   }
 
-  /// Récupérer les transactions du collecteur
-  /// GET /api/collecteur/{idEmploye}/transactions
-  /// Query params: limit, offset, status, type
+  /// Récupérer les transactions du collecteur via TransactionOfflineApi
   static Future<List<TransactionModel>> getTransactions(
-    String idEmploye, {
+    String loginOrId, {
     int limit = 20,
     int offset = 0,
     String? status,
     String? type,
   }) async {
     try {
-      final uri = _uri('/api/collecteur/$idEmploye/transactions').replace(
-        queryParameters: {
-          'limit': limit.toString(),
-          'offset': offset.toString(),
-          if (status != null) 'status': status,
-          if (type != null) 'type': type,
-        },
+      String idEmp = loginOrId;
+      try {
+        final resolved = await EmployeApi.getIdEmployeByLogin(loginOrId);
+        if (resolved != null && resolved.isNotEmpty) idEmp = resolved;
+      } catch (_) {}
+
+      final txs = await TransactionOfflineApi.getTransactionsByCollecteur(
+        idEmp,
       );
+      if (txs == null) return [];
 
-      final res = await _client
-          .get(uri)
-          .timeout(
-            const Duration(seconds: 10),
-            onTimeout: () =>
-                throw Exception('Timeout: le serveur ne répond pas'),
-          );
-
-      if (res.statusCode != 200) {
-        throw Exception(
-          'Impossible de récupérer les transactions (${res.statusCode})',
-        );
-      }
-
-      final data = jsonDecode(res.body);
-      List<dynamic> list;
-
-      if (data is List) {
-        list = data;
-      } else if (data is Map && data.containsKey('data')) {
-        list = data['data'] as List? ?? [];
-      } else {
-        return [];
-      }
-
-      return list
-          .map(
-            (item) => TransactionModel.fromJson(item as Map<String, dynamic>),
-          )
+      return (txs as List)
+          .map((t) => TransactionModel.fromJson(t as Map<String, dynamic>))
           .toList();
     } catch (e) {
       print('[CollecteurApi] Error getting transactions: $e');
@@ -119,116 +61,90 @@ class CollecteurApi {
     }
   }
 
-  /// Créer une nouvelle transaction
-  /// POST /api/collecteur/{idEmploye}/transactions
-  static Future<Map<String, dynamic>?> createTransaction({
-    required String idEmploye,
+  /// Créer une transaction offline (délégué à TransactionOfflineApi)
+  static Future<Map<String, dynamic>?> createTransactionOffline({
+    required String loginOrId,
+    required String codeClient,
     required String idCompte,
     required double montant,
-    required String typeTransaction, // DEPOT, RETRAIT, COTISATION, etc.
-    required String modeTransaction, // LIQUIDE, CHEQUE, VIREMENT, etc.
+    required String typeTransaction,
     String? description,
     String? signatureClient,
+    double? latitude,
+    double? longitude,
   }) async {
     try {
-      final uri = _uri('/api/collecteur/$idEmploye/transactions');
+      String idEmp = loginOrId;
+      try {
+        final resolved = await EmployeApi.getIdEmployeByLogin(loginOrId);
+        if (resolved != null && resolved.isNotEmpty) idEmp = resolved;
+      } catch (_) {}
 
-      final payload = {
-        'idCompte': idCompte,
-        'montant': montant,
-        'typeTransaction': typeTransaction,
-        'modeTransaction': modeTransaction,
-        if (description != null) 'description': description,
-        if (signatureClient != null) 'signatureClient': signatureClient,
-      };
+      final created = await TransactionOfflineApi.createTransaction(
+        idEmploye: idEmp,
+        codeClient: codeClient,
+        idCompte: idCompte,
+        montant: montant,
+        typeTransaction: typeTransaction,
+        description: description,
+        signatureClient: signatureClient,
+        latitude: latitude,
+        longitude: longitude,
+      );
 
-      final res = await _client
-          .post(
-            uri,
-            headers: {'Content-Type': 'application/json'},
-            body: jsonEncode(payload),
-          )
-          .timeout(
-            const Duration(seconds: 30),
-            onTimeout: () =>
-                throw Exception('Timeout: le serveur ne répond pas'),
-          );
-
-      if (res.statusCode == 200 || res.statusCode == 201) {
-        return jsonDecode(res.body) as Map<String, dynamic>;
-      } else {
-        final error = jsonDecode(res.body);
-        throw Exception(
-          error['message'] ??
-              'Erreur lors de la création de la transaction (${res.statusCode})',
-        );
-      }
+      return created;
     } catch (e) {
-      print('[CollecteurApi] Error creating transaction: $e');
+      print('[CollecteurApi] Error creating offline transaction: $e');
       return null;
     }
   }
 
-  /// Récupérer les détails d'une transaction
-  /// GET /api/collecteur/{idEmploye}/transactions/{idTransaction}
+  /// Récupérer le détail d'une transaction (cherche dans les transactions offline)
   static Future<TransactionModel?> getTransaction(
-    String idEmploye,
+    String loginOrId,
     String idTransaction,
   ) async {
     try {
-      final uri = _uri(
-        '/api/collecteur/$idEmploye/transactions/$idTransaction',
+      String idEmp = loginOrId;
+      try {
+        final resolved = await EmployeApi.getIdEmployeByLogin(loginOrId);
+        if (resolved != null && resolved.isNotEmpty) idEmp = resolved;
+      } catch (_) {}
+
+      final txs = await TransactionOfflineApi.getTransactionsByCollecteur(
+        idEmp,
       );
+      if (txs == null) return null;
 
-      final res = await _client
-          .get(uri)
-          .timeout(
-            const Duration(seconds: 10),
-            onTimeout: () =>
-                throw Exception('Timeout: le serveur ne répond pas'),
-          );
+      final found = (txs as List).cast<Map<String, dynamic>>().firstWhere((m) {
+        final idFields = [
+          m['id'],
+          m['idTransaction'],
+          m['id_transaction'],
+          m['uuid'],
+        ];
+        return idFields.any((f) => f != null && f.toString() == idTransaction);
+      }, orElse: () => <String, dynamic>{});
 
-      if (res.statusCode != 200) {
-        throw Exception(
-          'Impossible de récupérer la transaction (${res.statusCode})',
-        );
-      }
-
-      final data = jsonDecode(res.body) as Map<String, dynamic>;
-      return TransactionModel.fromJson(data);
+      if (found.isEmpty) return null;
+      return TransactionModel.fromJson(found);
     } catch (e) {
       print('[CollecteurApi] Error getting transaction: $e');
       return null;
     }
   }
 
-  /// Récupérer les clients assignés au collecteur
-  /// GET /api/collecteur/{idEmploye}/clients
-  static Future<List<dynamic>> getClients(String idEmploye) async {
+  /// Récupérer les clients assignés au collecteur (via matricule)
+  static Future<List<dynamic>> getClients(String loginOrMatricule) async {
     try {
-      final uri = _uri('/api/collecteur/$idEmploye/clients');
+      String matricule = loginOrMatricule;
+      try {
+        final resolved = await EmployeApi.getMatriculeByLogin(loginOrMatricule);
+        if (resolved != null && resolved.isNotEmpty) matricule = resolved;
+      } catch (_) {}
 
-      final res = await _client
-          .get(uri)
-          .timeout(
-            const Duration(seconds: 10),
-            onTimeout: () =>
-                throw Exception('Timeout: le serveur ne répond pas'),
-          );
-
-      if (res.statusCode != 200) {
-        throw Exception(
-          'Impossible de récupérer les clients (${res.statusCode})',
-        );
-      }
-
-      final data = jsonDecode(res.body);
-      if (data is List) {
-        return data;
-      } else if (data is Map && data.containsKey('data')) {
-        return data['data'] as List? ?? [];
-      }
-      return [];
+      final clients = await EmployeApi.getClientsByCollecteur(matricule);
+      return clients ?? [];
     } catch (e) {
       print('[CollecteurApi] Error getting clients: $e');
       return [];

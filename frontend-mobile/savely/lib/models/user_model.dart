@@ -7,6 +7,8 @@ class UserModel {
   final int idRole;
   final String codeRole;
   final String nomRole;
+  // Champ 'role' tel que renvoyé par le backend (ex: "COLLECTEUR")
+  final String roleRaw;
 
   UserModel({
     required this.login,
@@ -17,6 +19,7 @@ class UserModel {
     required this.idRole,
     required this.codeRole,
     required this.nomRole,
+    required this.roleRaw,
   });
 
   factory UserModel.fromJson(Map<String, dynamic> json) => UserModel(
@@ -26,8 +29,10 @@ class UserModel {
     email: (json['email'] ?? '').toString(),
     telephone: (json['telephone'] ?? '').toString(),
     idRole: (json['idRole'] as num?)?.toInt() ?? 0,
+    // codeRole contient souvent l'abréviation (ex: COLL), role contient la valeur lisible (ex: COLLECTEUR)
     codeRole: (json['codeRole'] ?? '').toString(),
     nomRole: (json['nomRole'] ?? '').toString(),
+    roleRaw: (json['role'] ?? json['codeRole'] ?? '').toString(),
   );
 
   Map<String, dynamic> toJson() => {
@@ -39,9 +44,11 @@ class UserModel {
     'idRole': idRole,
     'codeRole': codeRole,
     'nomRole': nomRole,
+    'role': roleRaw,
   };
 
   // Getters utiles
   String get fullName => '$prenom $nom'.trim();
-  String get role => codeRole; // Alias pour codeRole (COLLECTEUR, CLIENT, etc.)
+  // Retourne d'abord la valeur lisible `role` (ex: COLLECTEUR), sinon `codeRole` (ex: COLL)
+  String get role => roleRaw.isNotEmpty ? roleRaw : codeRole;
 }

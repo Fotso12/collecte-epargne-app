@@ -48,14 +48,23 @@ class _LoginScreenState extends State<LoginScreen> {
 
       if (result['success'] as bool) {
         final user = result['user'] as UserModel?;
+        final token = result['token'] as String?;
+        // Debug logs pour aider le diagnostic (apparaissent dans la console)
+        debugPrint(
+          '🔐 Login success. User: ${user?.login}, role: ${user?.role}, token: ${token?.substring(0, token?.length ?? 0)}',
+        );
+
         if (user != null) {
-          // Redirection basée sur le rôle
+          // Redirection basée sur le rôle (avec fallback explicite)
           if (user.role == 'COLLECTEUR') {
             Navigator.of(context).pushReplacementNamed('/collecteur-dashboard');
-          } else if (user.role == 'CLIENT') {
+            return;
+          }
+          if (user.role == 'CLIENT') {
             Navigator.of(context).pushReplacementNamed('/client-dashboard');
-          } else if (user.role == 'CAISSIER' || user.role == 'SUPERVISEUR') {
-            // Redirection vers web
+            return;
+          }
+          if (user.role == 'CAISSIER' || user.role == 'SUPERVISEUR') {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
                 content: Text(
@@ -63,8 +72,37 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               ),
             );
+            return;
           }
         }
+
+        // Si on arrive ici, la navigation n'a pas encore eu lieu — essayer une navigation de secours
+        debugPrint(
+          '⚠️ Rôle inconnu ou user null; tentative de navigation de secours',
+        );
+        // Si backend renvoie un champ 'role' différent ou null, tenter de récupérer depuis le résultat brut
+        final rawRole = (result['user'] is UserModel)
+            ? (result['user'] as UserModel).role
+            : (result['role'] ?? result['user']?['role']);
+
+        if (rawRole == 'COLLECTEUR') {
+          Navigator.of(context).pushReplacementNamed('/collecteur-dashboard');
+          return;
+        }
+        if (rawRole == 'CLIENT') {
+          Navigator.of(context).pushReplacementNamed('/client-dashboard');
+          return;
+        }
+
+        // Dernier recours: afficher un message et rester sur la page de login
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'Connexion réussie mais rôle introuvable (role=$rawRole). Contactez l\'administrateur.',
+            ),
+            backgroundColor: Colors.orange,
+          ),
+        );
       } else {
         setState(
           () => _errorMessage = result['message'] ?? 'Erreur de connexion',
@@ -90,17 +128,12 @@ class _LoginScreenState extends State<LoginScreen> {
             children: [
               const SizedBox(height: 40),
 
-              // Logo Savely - Coeur vert avec texte
-              Container(
-                width: 120,
+              // Logo Savely (JPEG asset)
+              Image.asset(
+                'assets/images/logo-savely.jpg',
                 height: 120,
-                decoration: BoxDecoration(
-                  color: const Color(0xFF0D8A5F),
-                  shape: BoxShape.circle,
-                ),
-                child: const Center(
-                  child: Icon(Icons.favorite, size: 80, color: Colors.white),
-                ),
+                width: 120,
+                fit: BoxFit.contain,
               ),
               const SizedBox(height: 20),
 
