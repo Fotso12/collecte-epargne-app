@@ -61,13 +61,13 @@ export class GestionAgenceZoneComponent implements OnInit {
   chargerAgences() {
     this.chargement = true;
     this.agenceService.getAll().subscribe({
-      next: (data) => {
+      next: (data: any) => {
         this.agences = data;
         this.agencesFiltrees = data;
         this.chargement = false;
         this.cdr.detectChanges(); // Maintenant ceci fonctionnera
       },
-      error: (err) => {
+      error: (err: any) => {
         console.error("Erreur chargement agences", err);
         this.chargement = false;
         this.cdr.detectChanges();

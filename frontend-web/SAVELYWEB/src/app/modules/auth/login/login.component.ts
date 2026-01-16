@@ -58,8 +58,22 @@ export class LoginComponent implements OnInit {
 
         // Petit délai de sécurité pour laisser le navigateur dessiner
         setTimeout(() => {
-          this.router.navigate(['/accueil']); 
-        }, 2200);
+          // Redirection basée sur le rôle principal
+          if (this.authService.hasRole('CAISSIER')) {
+            this.router.navigate(['/caissier/accueil']);
+            return;
+          }
+          if (this.authService.hasRole('SUPERVISEUR')) {
+            this.router.navigate(['/accueil']);
+            return;
+          }
+          if (this.authService.hasRole('ADMIN') || this.authService.hasRole('SUPERADMIN')) {
+            this.router.navigate(['/admin']);
+            return;
+          }
+          // Default fallback
+          this.router.navigate(['/accueil']);
+        }, 1200);
       },
       error: (error) => {
         this.loading = false;

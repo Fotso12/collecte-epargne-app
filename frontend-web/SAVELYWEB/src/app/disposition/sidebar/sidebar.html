@@ -34,24 +34,34 @@
       <img src="/img/logo-savely.jpg" class="logo" alt="Logo">
       <h1 class="app-name">SAVELY</h1>
     </div>
-    <ul class="nav-links">
-      <li><a routerLink="/accueil" routerLinkActive="active"><i class="fas fa-home"></i><span>Accueil</span></a></li>
-      <li><a routerLink="/agences" routerLinkActive="active"><i class="fas fa-map-marked-alt"></i><span>Agences &
-            Zones</span></a></li>
+        <ul class="nav-links">
+      <!-- Accueil : unique link, route choisie selon rôle pour éviter doublons -->
+      <li><a [routerLink]="getHomeRoute()" routerLinkActive="active"><i class="fas fa-home"></i><span>{{ getHomeLabel() }}</span></a></li>
+
+      <!-- Agences et zones : non accessibles aux caissiers -->
+      <li *ngIf="!hasRole('CAISSIER')"><a routerLink="/agences" routerLinkActive="active"><i class="fas fa-map-marked-alt"></i><span>Agences & Zones</span></a></li>
+
       <li><a routerLink="/clients" routerLinkActive="active"><i class="fas fa-users"></i><span>Clients</span></a></li>
-      <li><a routerLink="/collecteurs" routerLinkActive="active"><i
-            class="fas fa-hand-holding-usd"></i><span>Collecteurs</span></a></li>
-      <li><a routerLink="/caissiers" routerLinkActive="active"><i
-            class="fas fa-cash-register"></i><span>Caissiers</span></a></li>
-      <li><a routerLink="/superviseurs" routerLinkActive="active"><i
-            class="fas fa-user-tie"></i><span>Superviseurs</span></a></li>
-      <li><a routerLink="/transactions" routerLinkActive="active"><i
-            class="fas fa-exchange-alt"></i><span>Transactions</span></a></li>
-      <li><a routerLink="/parametres" routerLinkActive="active"><i class="fas fa-cogs"></i><span>Paramètres</span></a>
-      </li>
-      <li><a routerLink="/reporting" routerLinkActive="active"><i class="fas fa-chart-pie"></i><span>Rapports</span></a>
-      </li>
-    </ul>
+
+      <!-- Liste des employés métiers réservée aux supervisuer/admin -->
+      <li *ngIf="!hasRole('CAISSIER')"><a routerLink="/collecteurs" routerLinkActive="active"><i class="fas fa-hand-holding-usd"></i><span>Collecteurs</span></a></li>
+      <li *ngIf="!hasRole('CAISSIER')"><a routerLink="/caissiers" routerLinkActive="active"><i class="fas fa-cash-register"></i><span>Caissiers</span></a></li>
+      <li *ngIf="!hasRole('CAISSIER')"><a routerLink="/superviseurs" routerLinkActive="active"><i class="fas fa-user-tie"></i><span>Superviseurs</span></a></li>
+
+      <!-- Liens spécifiques au caissier -->
+      <li *ngIf="hasRole('CAISSIER')"><a routerLink="/caissier/validations" routerLinkActive="active"><i class="fas fa-check-circle"></i><span>Validations</span></a></li>
+      <li *ngIf="hasRole('CAISSIER')"><a routerLink="/caissier/recu" routerLinkActive="active"><i class="fas fa-receipt"></i><span>Reçu</span></a></li>
+      <li *ngIf="hasRole('SUPERVISEUR') || hasRole('ADMIN')"><a routerLink="/superviseur/recu" routerLinkActive="active"><i class="fas fa-receipt"></i><span>Reçus</span></a></li>
+
+      <!-- Transactions, Paramètres, Rapports : restreindre par rôle pour éviter les plantages côté client
+           Transactions et Rapports accessibles aux superviseurs/admins ; Paramètres uniquement aux superviseurs/admins -->
+      <li *ngIf="!hasRole('CAISSIER')"><a routerLink="/transactions" routerLinkActive="active"><i class="fas fa-exchange-alt"></i><span>Transactions</span></a></li>
+      <li *ngIf="hasRole('SUPERVISEUR') || hasRole('ADMIN') || hasRole('SUPERADMIN')"><a routerLink="/parametres" routerLinkActive="active"><i class="fas fa-cogs"></i><span>Paramètres</span></a></li>
+      <li *ngIf="!hasRole('CAISSIER')"><a routerLink="/reporting" routerLinkActive="active"><i class="fas fa-chart-pie"></i><span>Rapports</span></a></li>
+
+      <!-- Validation création de compte : dédiée aux superviseurs -->
+      <li *ngIf="hasRole('SUPERVISEUR')"><a routerLink="/superviseur/validation-comptes" routerLinkActive="active"><i class="fas fa-user-check"></i><span>Validation Création Compte</span></a></li>
+        </ul>
     <div class="sidebar-footer">
       <a class="logout-link" (click)="openLogoutModal()"><i class="fas fa-sign-out-alt"></i><span>Déconnexion</span></a>
     </div>

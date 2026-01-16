@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 import '../services/auth_api.dart';
 
 class EmployeApi {
+  static final http.Client _client = AuthApi.getHttpClient();
   static String _baseUrl() => AuthApi.getBaseUrl();
 
   static Uri _uri(String path) => Uri.parse('${_baseUrl()}$path');
@@ -11,7 +12,7 @@ class EmployeApi {
   static Future<Map<String, dynamic>> getByMatricule(String matricule) async {
     try {
       final uri = _uri('/api/employes/$matricule');
-      final res = await http.get(uri).timeout(
+      final res = await _client.get(uri).timeout(
         const Duration(seconds: 10),
         onTimeout: () => throw Exception('Timeout: le serveur ne répond pas'),
       );
@@ -32,7 +33,7 @@ class EmployeApi {
     try {
       // Chercher dans la liste des collecteurs
       final uri = _uri('/api/employes/collecteurs');
-      final res = await http.get(uri).timeout(
+      final res = await _client.get(uri).timeout(
         const Duration(seconds: 10),
         onTimeout: () => throw Exception('Timeout: le serveur ne répond pas'),
       );
@@ -76,7 +77,7 @@ class EmployeApi {
   static Future<List<Map<String, dynamic>>> getClientsByCollecteur(String idCollecteur) async {
     try {
       final uri = _uri('/api/employes/collecteurs/$idCollecteur/clients');
-      final res = await http.get(uri).timeout(
+      final res = await _client.get(uri).timeout(
         const Duration(seconds: 10),
         onTimeout: () => throw Exception('Timeout: le serveur ne répond pas'),
       );

@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 import '../services/auth_api.dart';
 
 class TransactionOfflineApi {
+  static final http.Client _client = AuthApi.getHttpClient();
   static String _baseUrl() => AuthApi.getBaseUrl();
 
   static Uri _uri(String path) => Uri.parse('${_baseUrl()}$path');
@@ -35,18 +36,24 @@ class TransactionOfflineApi {
       };
 
       final uri = _uri('/api/transactions-offline');
-      final res = await http.post(
-        uri,
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode(payload),
-      ).timeout(
-        const Duration(seconds: 10),
-        onTimeout: () => throw Exception('Timeout: le serveur ne répond pas'),
-      );
+      final res = await http
+          .post(
+            uri,
+            headers: {'Content-Type': 'application/json'},
+            body: jsonEncode(payload),
+          )
+          .timeout(
+            const Duration(seconds: 10),
+            onTimeout: () =>
+                throw Exception('Timeout: le serveur ne répond pas'),
+          );
 
       if (res.statusCode != 201 && res.statusCode != 200) {
         final error = jsonDecode(res.body);
-        throw Exception(error['error'] ?? 'Erreur lors de la création de la transaction (${res.statusCode})');
+        throw Exception(
+          error['error'] ??
+              'Erreur lors de la création de la transaction (${res.statusCode})',
+        );
       }
 
       return jsonDecode(res.body) as Map<String, dynamic>;
@@ -57,13 +64,18 @@ class TransactionOfflineApi {
 
   /// Récupère toutes les transactions offline d'un collecteur
   /// Note: Cet endpoint n'existe peut-être pas encore dans le backend
-  static Future<List<Map<String, dynamic>>> getTransactionsByCollecteur(String idEmploye) async {
+  static Future<List<Map<String, dynamic>>> getTransactionsByCollecteur(
+    String idEmploye,
+  ) async {
     try {
       final uri = _uri('/api/transactions-offline/collecteur/$idEmploye');
-      final res = await http.get(uri).timeout(
-        const Duration(seconds: 10),
-        onTimeout: () => throw Exception('Timeout: le serveur ne répond pas'),
-      );
+      final res = await http
+          .get(uri)
+          .timeout(
+            const Duration(seconds: 10),
+            onTimeout: () =>
+                throw Exception('Timeout: le serveur ne répond pas'),
+          );
 
       if (res.statusCode == 404 || res.statusCode == 204) {
         // Endpoint n'existe pas encore ou aucune transaction trouvée, retourner une liste vide
@@ -91,15 +103,20 @@ class TransactionOfflineApi {
     }
   }
 
-  /// Récupère les transactions du jour pour un collecteur
+  /// Récupère les transactions du jour pour un collecteur 
   /// Note: Cet endpoint n'existe peut-être pas encore dans le backend
-  static Future<List<Map<String, dynamic>>> getTodayTransactions(String idEmploye) async {
+  static Future<List<Map<String, dynamic>>> getTodayTransactions(
+    String idEmploye,
+  ) async {
     try {
       final uri = _uri('/api/transactions-offline/collecteur/$idEmploye/today');
-      final res = await http.get(uri).timeout(
-        const Duration(seconds: 10),
-        onTimeout: () => throw Exception('Timeout: le serveur ne répond pas'),
-      );
+      final res = await http
+          .get(uri)
+          .timeout(
+            const Duration(seconds: 10),
+            onTimeout: () =>
+                throw Exception('Timeout: le serveur ne répond pas'),
+          );
 
       if (res.statusCode == 404 || res.statusCode == 204) {
         // Endpoint n'existe pas encore ou aucune transaction trouvée, retourner une liste vide
@@ -127,4 +144,3 @@ class TransactionOfflineApi {
     }
   }
 }
-

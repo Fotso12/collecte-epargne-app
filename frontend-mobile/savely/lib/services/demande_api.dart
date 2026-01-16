@@ -4,6 +4,7 @@ import '../models/demande_ouverture_compte_model.dart';
 import '../services/auth_api.dart';
 
 class DemandeApi {
+  static final http.Client _client = AuthApi.getHttpClient();
   static String _baseUrl() => AuthApi.getBaseUrl();
 
   static Uri _uri(String path) => Uri.parse('${_baseUrl()}$path');
@@ -24,7 +25,7 @@ class DemandeApi {
         'statut': 'EN_ATTENTE',
       };
 
-      final res = await http.post(
+      final res = await _client.post(
         _uri('/api/demandes-ouverture'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode(payload),
@@ -48,7 +49,7 @@ class DemandeApi {
   static Future<List<DemandeOuvertureCompteModel>> getDemandesByClient(String codeClient) async {
     try {
       final uri = _uri('/api/demandes-ouverture/client/$codeClient');
-      final res = await http.get(uri).timeout(
+      final res = await _client.get(uri).timeout(
         const Duration(seconds: 10),
         onTimeout: () => throw Exception('Timeout: le serveur ne répond pas'),
       );

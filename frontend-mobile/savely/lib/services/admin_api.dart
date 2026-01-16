@@ -3,6 +3,8 @@ import 'package:http/http.dart' as http;
 import 'auth_api.dart';
 
 class AdminApi {
+  static final http.Client _client = AuthApi.getHttpClient();
+
   static String _baseUrl() => AuthApi.getBaseUrl();
 
   static Uri _uri(String path) => Uri.parse('${_baseUrl()}$path');
@@ -18,8 +20,10 @@ class AdminApi {
     final payload = {
       'name': name,
       'code': code,
-      if (contactEmail != null && contactEmail.isNotEmpty) 'contactEmail': contactEmail,
-      if (contactPhone != null && contactPhone.isNotEmpty) 'contactPhone': contactPhone,
+      if (contactEmail != null && contactEmail.isNotEmpty)
+        'contactEmail': contactEmail,
+      if (contactPhone != null && contactPhone.isNotEmpty)
+        'contactPhone': contactPhone,
       'timezone': timezone ?? 'Africa/Abidjan',
     };
 
@@ -27,7 +31,7 @@ class AdminApi {
     final uri = _uri('/api/admin/institutions');
     print('🌐 URL: $uri');
 
-    final res = await http.post(
+    final res = await _client.post(
       uri,
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode(payload),
@@ -38,7 +42,9 @@ class AdminApi {
     if (res.statusCode != 201) {
       try {
         final error = jsonDecode(res.body);
-        throw Exception(error['error'] ?? 'Erreur lors de la création de l\'agence');
+        throw Exception(
+          error['error'] ?? 'Erreur lors de la création de l\'agence',
+        );
       } catch (e) {
         throw Exception('Erreur HTTP ${res.statusCode}: ${res.body}');
       }
@@ -49,8 +55,8 @@ class AdminApi {
   static Future<List<Map<String, dynamic>>> getInstitutions() async {
     final uri = _uri('/api/admin/institutions');
     print('📤 Récupération agences: $uri');
-    
-    final res = await http.get(uri);
+
+    final res = await _client.get(uri);
 
     print('📥 Réponse: ${res.statusCode} - ${res.body}');
 
@@ -60,7 +66,9 @@ class AdminApi {
       print('✅ ${institutions.length} agence(s) récupérée(s)');
       return institutions;
     } else {
-      throw Exception('Erreur lors de la récupération des agences: ${res.statusCode} - ${res.body}');
+      throw Exception(
+        'Erreur lors de la récupération des agences: ${res.statusCode} - ${res.body}',
+      );
     }
   }
 
@@ -76,8 +84,10 @@ class AdminApi {
     final payload = {
       'name': name,
       'code': code,
-      if (contactEmail != null && contactEmail.isNotEmpty) 'contactEmail': contactEmail,
-      if (contactPhone != null && contactPhone.isNotEmpty) 'contactPhone': contactPhone,
+      if (contactEmail != null && contactEmail.isNotEmpty)
+        'contactEmail': contactEmail,
+      if (contactPhone != null && contactPhone.isNotEmpty)
+        'contactPhone': contactPhone,
       'timezone': timezone ?? 'Africa/Abidjan',
     };
 
@@ -85,7 +95,7 @@ class AdminApi {
     final uri = _uri('/api/admin/institutions/$id');
     print('🌐 URL: $uri');
 
-    final res = await http.put(
+    final res = await _client.put(
       uri,
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode(payload),
@@ -96,7 +106,9 @@ class AdminApi {
     if (res.statusCode != 200) {
       try {
         final error = jsonDecode(res.body);
-        throw Exception(error['error'] ?? 'Erreur lors de la modification de l\'agence');
+        throw Exception(
+          error['error'] ?? 'Erreur lors de la modification de l\'agence',
+        );
       } catch (e) {
         throw Exception('Erreur HTTP ${res.statusCode}: ${res.body}');
       }
@@ -108,14 +120,16 @@ class AdminApi {
     final uri = _uri('/api/admin/institutions/$id');
     print('📤 Suppression agence ID $id: $uri');
 
-    final res = await http.delete(uri);
+    final res = await _client.delete(uri);
 
     print('📥 Réponse: ${res.statusCode} - ${res.body}');
 
     if (res.statusCode != 200) {
       try {
         final error = jsonDecode(res.body);
-        throw Exception(error['error'] ?? 'Erreur lors de la suppression de l\'agence');
+        throw Exception(
+          error['error'] ?? 'Erreur lors de la suppression de l\'agence',
+        );
       } catch (e) {
         throw Exception('Erreur HTTP ${res.statusCode}: ${res.body}');
       }
@@ -146,7 +160,7 @@ class AdminApi {
       if (matricule != null && matricule.isNotEmpty) 'matricule': matricule,
     };
 
-    final res = await http.post(
+    final res = await _client.post(
       _uri('/api/admin/users'),
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode(payload),
@@ -154,13 +168,15 @@ class AdminApi {
 
     if (res.statusCode != 201) {
       final error = jsonDecode(res.body);
-      throw Exception(error['error'] ?? 'Erreur lors de la création de l\'utilisateur');
+      throw Exception(
+        error['error'] ?? 'Erreur lors de la création de l\'utilisateur',
+      );
     }
   }
 
   /// Lister tous les utilisateurs
   static Future<List<Map<String, dynamic>>> getUsers() async {
-    final res = await http.get(_uri('/api/admin/users'));
+    final res = await _client.get(_uri('/api/admin/users'));
 
     if (res.statusCode == 200) {
       final List<dynamic> data = jsonDecode(res.body);
@@ -171,31 +187,39 @@ class AdminApi {
   }
 
   /// Récupérer les détails d'une institution
-  static Future<Map<String, dynamic>> getInstitutionDetails(int institutionId) async {
+  static Future<Map<String, dynamic>> getInstitutionDetails(
+    int institutionId,
+  ) async {
     final uri = _uri('/api/admin/institutions/$institutionId');
     print('📤 Récupération détails institution: $uri');
-    
-    final res = await http.get(uri);
+
+    final res = await _client.get(uri);
 
     if (res.statusCode == 200) {
       return jsonDecode(res.body) as Map<String, dynamic>;
     } else {
-      throw Exception('Erreur lors de la récupération des détails: ${res.statusCode} - ${res.body}');
+      throw Exception(
+        'Erreur lors de la récupération des détails: ${res.statusCode} - ${res.body}',
+      );
     }
   }
 
   /// Récupérer les employés d'une institution
-  static Future<List<Map<String, dynamic>>> getInstitutionEmployees(int institutionId) async {
+  static Future<List<Map<String, dynamic>>> getInstitutionEmployees(
+    int institutionId,
+  ) async {
     final uri = _uri('/api/admin/institutions/$institutionId/employees');
     print('📤 Récupération employés institution: $uri');
-    
-    final res = await http.get(uri);
+
+    final res = await _client.get(uri);
 
     if (res.statusCode == 200) {
       final List<dynamic> data = jsonDecode(res.body);
       return data.map((e) => e as Map<String, dynamic>).toList();
     } else {
-      throw Exception('Erreur lors de la récupération des employés: ${res.statusCode} - ${res.body}');
+      throw Exception(
+        'Erreur lors de la récupération des employés: ${res.statusCode} - ${res.body}',
+      );
     }
   }
 
@@ -209,7 +233,7 @@ class AdminApi {
 
     print('📤 Affectation employé: $payload');
 
-    final res = await http.post(
+    final res = await _client.post(
       uri,
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode(payload),
@@ -230,12 +254,14 @@ class AdminApi {
     required int institutionId,
     required int employeeId,
   }) async {
-    final uri = _uri('/api/admin/institutions/$institutionId/unassign-employee');
+    final uri = _uri(
+      '/api/admin/institutions/$institutionId/unassign-employee',
+    );
     final payload = {'employeeId': employeeId};
 
     print('📤 Retrait employé: $payload');
 
-    final res = await http.post(
+    final res = await _client.post(
       uri,
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode(payload),
@@ -255,13 +281,15 @@ class AdminApi {
   static Future<Map<String, dynamic>> getUserDetails(String login) async {
     final uri = _uri('/api/admin/users/$login');
     print('📤 Récupération détails utilisateur: $uri');
-    
-    final res = await http.get(uri);
+
+    final res = await _client.get(uri);
 
     if (res.statusCode == 200) {
       return jsonDecode(res.body) as Map<String, dynamic>;
     } else {
-      throw Exception('Erreur lors de la récupération des détails: ${res.statusCode} - ${res.body}');
+      throw Exception(
+        'Erreur lors de la récupération des détails: ${res.statusCode} - ${res.body}',
+      );
     }
   }
 
@@ -276,7 +304,7 @@ class AdminApi {
     print('📤 Changement statut utilisateur $login: $statut');
     print('🌐 URL: $uri');
 
-    final res = await http.patch(
+    final res = await _client.patch(
       uri,
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode(payload),
@@ -287,7 +315,9 @@ class AdminApi {
     if (res.statusCode != 200) {
       try {
         final error = jsonDecode(res.body);
-        throw Exception(error['error'] ?? 'Erreur lors du changement de statut');
+        throw Exception(
+          error['error'] ?? 'Erreur lors du changement de statut',
+        );
       } catch (e) {
         throw Exception('Erreur HTTP ${res.statusCode}: ${res.body}');
       }
@@ -322,7 +352,7 @@ class AdminApi {
 
     print('📤 Modification utilisateur: $payload');
 
-    final res = await http.put(
+    final res = await _client.put(
       uri,
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode(payload),
@@ -343,7 +373,7 @@ class AdminApi {
     final uri = _uri('/api/admin/users/$login');
     print('📤 Suppression utilisateur: $uri');
 
-    final res = await http.delete(uri);
+    final res = await _client.delete(uri);
 
     if (res.statusCode != 200) {
       try {

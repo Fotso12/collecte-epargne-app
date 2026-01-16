@@ -19,6 +19,18 @@ export class Sidebar implements OnInit {
     private router: Router
   ) {}
 
+  hasRole(role: string): boolean {
+    return this.authService.hasRole(role);
+  }
+
+  getHomeRoute(): string {
+    return this.hasRole('CAISSIER') ? '/caissier/accueil' : '/accueil';
+  }
+
+  getHomeLabel(): string {
+    return this.hasRole('CAISSIER') ? 'Accueil Caissier' : 'Accueil';
+  }
+
   ngOnInit(): void {
     // S'abonne aux infos de l'utilisateur connecté
     this.authService.currentUser$.subscribe(user => {

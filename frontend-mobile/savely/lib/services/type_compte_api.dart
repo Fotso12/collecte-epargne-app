@@ -4,6 +4,7 @@ import '../models/type_compte_model.dart';
 import '../services/auth_api.dart';
 
 class TypeCompteApi {
+  static final http.Client _client = AuthApi.getHttpClient();
   static String _baseUrl() => AuthApi.getBaseUrl();
 
   static Uri _uri(String path) => Uri.parse('${_baseUrl()}$path');
@@ -12,7 +13,7 @@ class TypeCompteApi {
   static Future<List<TypeCompteModel>> getAll() async {
     try {
       final uri = _uri('/api/type-comptes');
-      final res = await http.get(uri).timeout(
+      final res = await _client.get(uri).timeout(
         const Duration(seconds: 10),
         onTimeout: () => throw Exception('Timeout: le serveur ne répond pas'),
       );
@@ -53,7 +54,7 @@ class TypeCompteApi {
         if (dureeBlocageJours != null) 'dureeBlocageJours': dureeBlocageJours,
       };
 
-      final res = await http.post(
+      final res = await _client.post(
         _uri('/api/type-comptes'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode(payload),
@@ -99,7 +100,7 @@ class TypeCompteApi {
         if (dureeBlocageJours != null) 'dureeBlocageJours': dureeBlocageJours,
       };
 
-      final res = await http.put(
+      final res = await _client.put(
         _uri('/api/type-comptes/$id'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode(payload),
@@ -122,7 +123,7 @@ class TypeCompteApi {
   /// Supprimer un type de compte
   static Future<void> deleteTypeCompte(int id) async {
     try {
-      final res = await http.delete(
+      final res = await _client.delete(
         _uri('/api/type-comptes/$id'),
       ).timeout(
         const Duration(seconds: 10),

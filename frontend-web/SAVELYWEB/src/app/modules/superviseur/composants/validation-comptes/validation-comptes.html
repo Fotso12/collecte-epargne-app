@@ -1,0 +1,38 @@
+<div class="validation-comptes-container">
+  <h1>Validation — Demandes d'ouverture de compte</h1>
+
+  <div *ngIf="loading">Chargement des demandes…</div>
+  <div *ngIf="errorMessage" class="error">{{ errorMessage }}</div>
+
+  <table *ngIf="!loading && demandes.length > 0" class="table-demandes">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Date</th>
+        <th>Client</th>
+        <th>Type compte</th>
+        <th>Montant initial</th>
+        <th>Motif</th>
+        <th>Statut</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let d of demandes">
+        <td>{{ d.idDemande || d.id_demande }}</td>
+        <td>{{ d.dateDemande || d.date_demande }}</td>
+        <td>{{ d.client?.codeClient || d.code_client }}</td>
+        <td>{{ d.typeCompte?.nom || d.type_compte }}</td>
+        <td>{{ d.montantInitial || d.montant_initial || '-' }}</td>
+        <td>{{ d.motif || '-' }}</td>
+        <td>{{ d.statut || '-' }}</td>
+        <td>
+          <button class="btn-validate" (click)="valider(d.idDemande || d.id_demande)">Valider</button>
+          <button class="btn-reject" (click)="rejeter(d.idDemande || d.id_demande)">Rejeter</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div *ngIf="!loading && demandes.length === 0">Aucune demande en attente.</div>
+</div>

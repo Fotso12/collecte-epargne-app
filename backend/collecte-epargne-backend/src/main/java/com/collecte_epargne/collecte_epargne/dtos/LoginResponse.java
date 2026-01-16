@@ -16,6 +16,9 @@ public class LoginResponse {
     private String telephone;
     private Integer idRole;
     private String codeRole;
+    // Employee and agency identifiers (nullable)
+    private Integer idEmploye;
+    private Integer idAgence;
 
     public LoginResponse() {
     }
@@ -31,6 +34,12 @@ public class LoginResponse {
         this.telephone = telephone;
         this.idRole = idRole;
         this.codeRole = codeRole;
+    }
+
+    public LoginResponse(String token, String type, String login, String email, String nom, String prenom, String role, String telephone, Integer idRole, String codeRole, Integer idEmploye, Integer idAgence) {
+        this(token, type, login, email, nom, prenom, role, telephone, idRole, codeRole);
+        this.idEmploye = idEmploye;
+        this.idAgence = idAgence;
     }
     
     // Constructor matching AuthController usage (legacy/current) but fixed?
@@ -76,4 +85,10 @@ public class LoginResponse {
 
     public String getCodeRole() { return codeRole; }
     public void setCodeRole(String codeRole) { this.codeRole = codeRole; }
+
+    public Integer getIdEmploye() { return idEmploye; }
+    public void setIdEmploye(Integer idEmploye) { this.idEmploye = idEmploye; }
+
+    public Integer getIdAgence() { return idAgence; }
+    public void setIdAgence(Integer idAgence) { this.idAgence = idAgence; }
 }

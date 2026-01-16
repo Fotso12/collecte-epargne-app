@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 import '../services/auth_api.dart';
 
 class ClientApi {
+  static final http.Client _client = AuthApi.getHttpClient();
   static String _baseUrl() => AuthApi.getBaseUrl();
 
   static Uri _uri(String path) => Uri.parse('${_baseUrl()}$path');
@@ -11,17 +12,22 @@ class ClientApi {
   static Future<String> getCodeClientByLogin(String login) async {
     try {
       final uri = _uri('/api/clients/login/$login');
-      final res = await http.get(uri).timeout(
-        const Duration(seconds: 10),
-        onTimeout: () => throw Exception('Timeout: le serveur ne répond pas'),
-      );
+      final res = await _client
+          .get(uri)
+          .timeout(
+            const Duration(seconds: 10),
+            onTimeout: () =>
+                throw Exception('Timeout: le serveur ne répond pas'),
+          );
 
       if (res.statusCode == 404) {
         throw Exception('Aucun client trouvé pour le login: $login');
       }
 
       if (res.statusCode != 200) {
-        throw Exception('Impossible de récupérer le client (${res.statusCode})');
+        throw Exception(
+          'Impossible de récupérer le client (${res.statusCode})',
+        );
       }
 
       final Map<String, dynamic> client = jsonDecode(res.body);
@@ -35,13 +41,18 @@ class ClientApi {
   static Future<Map<String, dynamic>> getClientByCode(String codeClient) async {
     try {
       final uri = _uri('/api/clients/$codeClient');
-      final res = await http.get(uri).timeout(
-        const Duration(seconds: 10),
-        onTimeout: () => throw Exception('Timeout: le serveur ne répond pas'),
-      );
+      final res = await _client
+          .get(uri)
+          .timeout(
+            const Duration(seconds: 10),
+            onTimeout: () =>
+                throw Exception('Timeout: le serveur ne répond pas'),
+          );
 
       if (res.statusCode != 200) {
-        throw Exception('Impossible de récupérer le client (${res.statusCode})');
+        throw Exception(
+          'Impossible de récupérer le client (${res.statusCode})',
+        );
       }
 
       return jsonDecode(res.body) as Map<String, dynamic>;
@@ -76,18 +87,23 @@ class ClientApi {
       if (cniVersoPath != null) payload['cniVersoPath'] = cniVersoPath;
 
       final uri = _uri('/api/clients/$codeClient');
-      final res = await http.put(
-        uri,
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode(payload),
-      ).timeout(
-        const Duration(seconds: 10),
-        onTimeout: () => throw Exception('Timeout: le serveur ne répond pas'),
-      );
+      final res = await _client
+          .put(
+            uri,
+            headers: {'Content-Type': 'application/json'},
+            body: jsonEncode(payload),
+          )
+          .timeout(
+            const Duration(seconds: 10),
+            onTimeout: () =>
+                throw Exception('Timeout: le serveur ne répond pas'),
+          );
 
       if (res.statusCode != 200) {
         final error = jsonDecode(res.body);
-        throw Exception(error['error'] ?? 'Erreur lors de la mise à jour du client');
+        throw Exception(
+          error['error'] ?? 'Erreur lors de la mise à jour du client',
+        );
       }
 
       return jsonDecode(res.body) as Map<String, dynamic>;
@@ -95,5 +111,123 @@ class ClientApi {
       throw Exception('Erreur lors de la mise à jour du client: $e');
     }
   }
-}
 
+  /// Enregistrer un nouveau client (Registration)
+  /// POST /api/clients/register
+  static Future<Map<String, dynamic>> registerClient({
+    required String nom,
+    required String prenom,
+    required String email,
+    required String telephone,
+    required String password,
+    required DateTime dateNaissance,
+    required String lieuNaissance,
+    required String profession,
+    String? adresse,
+    String? ville,
+    String? typeCni,
+    String? numCni,
+    String collectorMatricule = '0000',
+  }) async {
+    try {
+      final uri = _uri('/api/clients/register');
+
+      final payload = {
+        'fullName': '$nom $prenom',
+        'phone': telephone,
+        'email': email,
+        'password': password,
+        'dateNaissance': dateNaissance.toIso8601String().split('T').first,
+        'lieuNaissance': lieuNaissance,
+        'profession': profession,
+        if (adresse != null) 'address': adresse,
+        if (ville != null) 'ville': ville,
+        if (typeCni != null) 'identityType': typeCni,
+        if (numCni != null) 'identityNumber': numCni,
+        if (collectorMatricule != '0000')
+          'collectorMatricule': collectorMatricule,
+      };
+
+      final res = await _client
+          .post(
+            uri,
+            headers: {'Content-Type': 'application/json'},
+            body: jsonEncode(payload),
+          )
+          .timeout(
+            const Duration(seconds: 30),
+            onTimeout: () =>
+                throw Exception('Timeout: le serveur ne répond pas'),
+          );
+
+      if (res.statusCode == 200 || res.statusCode == 201) {
+        return jsonDecode(res.body) as Map<String, dynamic>;
+      } else {
+        final error = jsonDecode(res.body);
+        throw Exception(
+          error['message'] ?? 'Erreur lors de l\'enregistrement du client',
+        );
+      }
+    } catch (e) {
+      throw Exception('Erreur lors de l\'enregistrement du client: $e');
+    }
+  }
+
+  /// Récupérer le profil complet du client
+  /// GET /api/clients/{id}/profile
+  static Future<Map<String, dynamic>> getClientProfile(String clientId) async {
+    try {
+      final uri = _uri('/api/clients/$clientId/profile');
+
+      final res = await _client
+          .get(uri)
+          .timeout(
+            const Duration(seconds: 10),
+            onTimeout: () =>
+                throw Exception('Timeout: le serveur ne répond pas'),
+          );
+
+      if (res.statusCode != 200) {
+        throw Exception(
+          'Impossible de récupérer le profil (${res.statusCode})',
+        );
+      }
+
+      return jsonDecode(res.body) as Map<String, dynamic>;
+    } catch (e) {
+      throw Exception('Erreur lors de la récupération du profil: $e');
+    }
+  }
+
+  /// Récupérer les comptes du client
+  /// GET /api/clients/{id}/accounts
+  static Future<List<dynamic>> getClientAccounts(String clientId) async {
+    try {
+      final uri = _uri('/api/clients/$clientId/accounts');
+
+      final res = await _client
+          .get(uri)
+          .timeout(
+            const Duration(seconds: 10),
+            onTimeout: () =>
+                throw Exception('Timeout: le serveur ne répond pas'),
+          );
+
+      if (res.statusCode != 200) {
+        throw Exception(
+          'Impossible de récupérer les comptes (${res.statusCode})',
+        );
+      }
+
+      final data = jsonDecode(res.body);
+      if (data is List) {
+        return data;
+      } else if (data is Map && data.containsKey('data')) {
+        return data['data'] as List? ?? [];
+      }
+      return [];
+    } catch (e) {
+      throw Exception('Erreur lors de la récupération des comptes: $e');
+    }
+  }
+}

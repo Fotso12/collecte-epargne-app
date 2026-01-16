@@ -16,9 +16,8 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
-    @Service
-    public class AgenceZoneService implements AgenceZoneInterface {
+@Service
+public class AgenceZoneService implements AgenceZoneInterface {
 
         private static final Logger log = LoggerFactory.getLogger(AgenceZoneService.class);
 

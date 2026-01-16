@@ -4,6 +4,7 @@ import '../models/compte_model.dart';
 import '../services/auth_api.dart';
 
 class CompteApi {
+  static final http.Client _client = AuthApi.getHttpClient();
   static String _baseUrl() => AuthApi.getBaseUrl();
 
   static Uri _uri(String path) => Uri.parse('${_baseUrl()}$path');
@@ -12,7 +13,7 @@ class CompteApi {
   static Future<List<CompteModel>> getComptesByClient(String codeClient) async {
     try {
       final uri = _uri('/api/comptes/client/$codeClient');
-      final res = await http.get(uri).timeout(
+      final res = await _client.get(uri).timeout(
         const Duration(seconds: 10),
         onTimeout: () => throw Exception('Timeout: le serveur ne répond pas'),
       );
@@ -37,7 +38,7 @@ class CompteApi {
   static Future<CompteModel> getCompteById(String idCompte) async {
     try {
       final uri = _uri('/api/comptes/$idCompte');
-      final res = await http.get(uri).timeout(
+      final res = await _client.get(uri).timeout(
         const Duration(seconds: 10),
         onTimeout: () => throw Exception('Timeout: le serveur ne répond pas'),
       );

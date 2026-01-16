@@ -49,20 +49,30 @@ public class AuthController {
         // 3️⃣ Génération du token
         String token = jwtService.generateToken(request.getEmail());
 
-        // 4️⃣ Retour du token avec les détails utilisateur
-        // 4️⃣ Retour du token avec les détails utilisateur
-        return ResponseEntity.ok(new LoginResponse(
-                token,
-                "Bearer",
-                utilisateur.getLogin(),
-                utilisateur.getEmail(),
-                utilisateur.getNom(),
-                utilisateur.getPrenom(),
-                utilisateur.getRole() != null ? utilisateur.getRole().getNom() : null,
-                utilisateur.getTelephone(),
-                utilisateur.getRole() != null ? utilisateur.getRole().getId() : null,
-                utilisateur.getRole() != null ? utilisateur.getRole().getCode() : null
-        ));
+                // 4️⃣ Retour du token avec les détails utilisateur + éventuel idEmploye et idAgence
+                Integer idEmploye = null;
+                Integer idAgence = null;
+                if (utilisateur.getEmploye() != null) {
+                        idEmploye = utilisateur.getEmploye().getIdEmploye();
+                        if (utilisateur.getEmploye().getAgenceZone() != null) {
+                                idAgence = utilisateur.getEmploye().getAgenceZone().getIdAgence();
+                        }
+                }
+
+                return ResponseEntity.ok(new LoginResponse(
+                                token,
+                                "Bearer",
+                                utilisateur.getLogin(),
+                                utilisateur.getEmail(),
+                                utilisateur.getNom(),
+                                utilisateur.getPrenom(),
+                                utilisateur.getRole() != null ? utilisateur.getRole().getNom() : null,
+                                utilisateur.getTelephone(),
+                                utilisateur.getRole() != null ? utilisateur.getRole().getId() : null,
+                                utilisateur.getRole() != null ? utilisateur.getRole().getCode() : null,
+                                idEmploye,
+                                idAgence
+                ));
     }
 }
 

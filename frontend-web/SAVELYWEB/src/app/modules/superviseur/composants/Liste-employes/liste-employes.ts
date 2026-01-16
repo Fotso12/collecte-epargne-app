@@ -118,8 +118,8 @@ export class ListeEmployesComponent implements OnInit {
     }
 
     serviceCall.subscribe({
-      next: (data) => {
-        this.employes = data.map(e => ({
+      next: (data: any) => {
+        this.employes = data.map((e: any) => ({
           ...e,
           statut: e.statut || (e as any).utilisateur?.statut || 'ACTIF'
         }));
@@ -149,13 +149,13 @@ export class ListeEmployesComponent implements OnInit {
     this.collecteurActif = collecteur;
     this.pageActuelleClient = 1;
     this.employeService.getClientsByCollecteur(collecteur.matricule).subscribe({
-      next: (data) => {
+      next: (data: any) => {
         this.tousLesClientsDuCollecteur = data;
         this.mettreAJourTrancheClients();
         this.isClientsModalOpen = true;
         this.cdr.detectChanges();
       },
-      error: (err) => {
+      error: (err: any) => {
         console.error("Erreur chargement clients:", err);
         this.showFeedback('Erreur lors du chargement des clients', true);
       }
@@ -194,7 +194,7 @@ export class ListeEmployesComponent implements OnInit {
           console.error('Erreur Update:', err);
           return of(null);
         })
-      ).subscribe(res => {
+      ).subscribe((res: any) => {
         if (res) {
           this.showFeedback('Modifications enregistrées avec succès');
           this.fermerModalAjout();
@@ -284,7 +284,7 @@ export class ListeEmployesComponent implements OnInit {
         return of(null);
       })
     ).subscribe({
-      next: (res) => {
+      next: (res: any) => {
         if (res !== null) {
           this.showFeedback('Suppression effectuée avec succès');
         } else {
@@ -355,13 +355,13 @@ export class ListeEmployesComponent implements OnInit {
     delete payload.password;
 
     this.employeService.modifierEmploye(this.employeAffectation.matricule, payload).subscribe({
-      next: (res) => {
+      next: (res: any) => {
         this.showFeedback("Agence affectée avec succès !");
         this.employeAffectation.idAgence = this.selectedAgenceId; // Update local display
         this.chargerDonnees(); // Reload to be safe
         this.fermerModalAffectation();
       },
-      error: (err) => {
+      error: (err: any) => {
         console.error(err);
         this.showFeedback("Erreur lors de l'affectation", true);
       }

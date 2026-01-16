@@ -20,25 +20,28 @@ class UserModel {
   });
 
   factory UserModel.fromJson(Map<String, dynamic> json) => UserModel(
-        login: (json['login'] ?? '').toString(),
-        nom: (json['nom'] ?? '').toString(),
-        prenom: (json['prenom'] ?? '').toString(),
-        email: (json['email'] ?? '').toString(),
-        telephone: (json['telephone'] ?? '').toString(),
-        idRole: (json['idRole'] as num?)?.toInt() ?? 0,
-        codeRole: (json['codeRole'] ?? '').toString(),
-        nomRole: (json['nomRole'] ?? '').toString(),
-      );
+    login: (json['login'] ?? '').toString(),
+    nom: (json['nom'] ?? '').toString(),
+    prenom: (json['prenom'] ?? '').toString(),
+    email: (json['email'] ?? '').toString(),
+    telephone: (json['telephone'] ?? '').toString(),
+    idRole: (json['idRole'] as num?)?.toInt() ?? 0,
+    codeRole: (json['codeRole'] ?? '').toString(),
+    nomRole: (json['nomRole'] ?? '').toString(),
+  );
 
   Map<String, dynamic> toJson() => {
-        'login': login,
-        'nom': nom,
-        'prenom': prenom,
-        'email': email,
-        'telephone': telephone,
-        'idRole': idRole,
-        'codeRole': codeRole,
-        'nomRole': nomRole,
-      };
-}
+    'login': login,
+    'nom': nom,
+    'prenom': prenom,
+    'email': email,
+    'telephone': telephone,
+    'idRole': idRole,
+    'codeRole': codeRole,
+    'nomRole': nomRole,
+  };
 
+  // Getters utiles
+  String get fullName => '$prenom $nom'.trim();
+  String get role => codeRole; // Alias pour codeRole (COLLECTEUR, CLIENT, etc.)
+}

@@ -40,13 +40,13 @@ export class ReportingComponent {
         this.cdr.detectChanges();
 
         this.reportingService.getTransactions(this.dateDebut, this.dateFin).subscribe({
-            next: (data) => {
+            next: (data: any) => {
                 this.transactions = data;
                 this.calculerStats();
                 this.chargement = false;
                 this.cdr.detectChanges();
             },
-            error: (err) => {
+            error: (err: any) => {
                 console.error("Erreur chargement rapport", err);
                 this.erreur = "Impossible de récupérer les données du rapport.";
                 this.chargement = false;

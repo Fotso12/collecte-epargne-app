@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 import '../services/auth_api.dart';
 
 class UtilisateurApi {
+  static final http.Client _client = AuthApi.getHttpClient();
   static String _baseUrl() => AuthApi.getBaseUrl();
 
   static Uri _uri(String path) => Uri.parse('${_baseUrl()}$path');
@@ -11,7 +12,7 @@ class UtilisateurApi {
   static Future<Map<String, dynamic>> getByLogin(String login) async {
     try {
       final uri = _uri('/api/utilisateurs/$login');
-      final res = await http.get(uri).timeout(
+      final res = await _client.get(uri).timeout(
         const Duration(seconds: 10),
         onTimeout: () => throw Exception('Timeout: le serveur ne répond pas'),
       );
@@ -44,7 +45,7 @@ class UtilisateurApi {
       if (photoPath != null) payload['photoPath'] = photoPath;
 
       final uri = _uri('/api/utilisateurs/$login');
-      final res = await http.put(
+      final res = await _client.put(
         uri,
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode(payload),
@@ -73,7 +74,7 @@ class UtilisateurApi {
       final payload = {'newPassword': newPassword};
 
       final uri = _uri('/api/utilisateurs/$login/password');
-      final res = await http.put(
+      final res = await _client.put(
         uri,
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode(payload),

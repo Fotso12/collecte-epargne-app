@@ -3,6 +3,7 @@ package com.collecte_epargne.collecte_epargne.entities;
 import com.collecte_epargne.collecte_epargne.utils.ModeTransaction;
 import com.collecte_epargne.collecte_epargne.utils.StatutTransaction;
 import com.collecte_epargne.collecte_epargne.utils.TypeTransaction;
+import com.collecte_epargne.collecte_epargne.utils.StatusValidation;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -79,6 +80,11 @@ public class Transaction {
 
     @Column(name = "DATE_VALIDATION_SUPERVISEUR")
     private Instant dateValidationSuperviseur;
+
+    // COMMENT CLEF: Status validation pour workflow caissier - EN_ATTENTE/VALIDEE/REJETEE
+    @Enumerated(EnumType.STRING)
+    @Column(name = "STATUS_VALIDATION")
+    private StatusValidation statusValidation;
 
     @Lob
     @Column(name = "MOTIF_REJET")
@@ -272,6 +278,15 @@ public class Transaction {
 
     public void setHashTransaction(String hashTransaction) {
         this.hashTransaction = hashTransaction;
+    }
+
+    // COMMENT CLEF: Getter/Setter pour status validation (workflow caissier)
+    public StatusValidation getStatusValidation() {
+        return statusValidation;
+    }
+
+    public void setStatusValidation(StatusValidation statusValidation) {
+        this.statusValidation = statusValidation;
     }
 
     public Transaction(String idTransaction, Compte compte, Employe initiateur, Employe caissierValidateur, Employe superviseurValidateur, Recu recu, Set<Notification> notifications, String reference, TypeTransaction typeTransaction, BigDecimal montant, BigDecimal soldeAvant, BigDecimal soldeApres, String description, Instant dateTransaction, Instant dateValidationCaisse, Instant dateValidationSuperviseur, String motifRejet, StatutTransaction statut, ModeTransaction modeTransaction, String signatureClient, String hashTransaction) {

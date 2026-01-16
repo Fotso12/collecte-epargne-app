@@ -17,6 +17,8 @@ export interface AuthResponse {
   role: string;
   nom?: string;
   prenom?: string;
+  idEmploye?: number;
+  idAgence?: number;
 }
 
 @Injectable({
@@ -121,10 +123,21 @@ export class AuthService {
 
   getUserRoles(): string[] {
     const user = this.getUser();
-    return user ? (user.roles || [user.role]) : [];
+    if (!user) return [];
+    const roles = user.roles || [user.role];
+    // Normaliser les rôles en majuscules et sans espaces
+    return roles.map((r: string) => String(r).toUpperCase().trim());
   }
 
   hasRole(role: string): boolean {
-    return this.getUserRoles().includes(role);
+    if (!role) return false;
+    const wanted = String(role).toUpperCase().trim();
+    const roles = this.getUserRoles();
+    // Supporter les formats avec/sans préfixe ROLE_
+    if (roles.includes(wanted)) return true;
+    if (roles.includes('ROLE_' + wanted)) return true;
+    // Si roles contiennent des valeurs avec ROLE_ prefix, comparer sans préfixe
+    const stripped = roles.map(r => r.replace(/^ROLE_/, ''));
+    return stripped.includes(wanted);
   }
 }
