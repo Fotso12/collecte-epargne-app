@@ -56,6 +56,20 @@ services:
       timeout: 10s
       retries: 5
 
+  mobile:
+    image: darryl1234/collecte-epargne-mobile:latest
+    container_name: collecte-epargne-mobile
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    networks:
+      - collecte-epargne-network
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3000/"]
+      timeout: 10s
+      retries: 5
+
 volumes:
   mysql-data:
 

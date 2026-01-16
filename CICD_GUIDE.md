@@ -41,14 +41,15 @@ Ce projet utilise GitHub Actions pour automatiser la construction, les tests et 
 - Expose le port 80
 - Configuration Nginx avec routing Angular
 
-#### 3. Check Mobile (Flutter)
-- Flutter dernier version
-- Télécharge les dépendances (flutter pub get)
-- Vérifie la qualité du code (flutter analyze)
+#### 3. Build Mobile (Flutter Web)
+- Flutter 3.19.0
+- Analyse du code avec `flutter analyze`
+- Build web avec `flutter build web --release`
+- Génère les fichiers static pour servir via Nginx
 
 #### 4. Docker Build & Push
 - Se déclenche après le succès de tous les jobs précédents
-- Crée les images Docker
+- Crée les images Docker pour backend, web et mobile
 - Pousse les images vers Docker Hub avec deux tags :
   - `latest`
   - hash du commit (version spécifique)
@@ -139,11 +140,16 @@ docker-compose up -d
 
 - **Backend** : Port 8082
   - URL: `http://localhost:8082`
-  - Health check: `http://localhost:8082/health`
+  - Health check: `http://localhost:8082/actuator/health`
 
 - **Web** : Port 80
   - URL: `http://localhost`
   - API proxy vers backend automatique
+
+- **Mobile Web** : Port 3000
+  - URL: `http://localhost:3000`
+  - Version web de l'app Flutter
+  - API proxy vers backend ngrok
 
 ## Étapes de déploiement
 
@@ -169,6 +175,7 @@ docker-compose up -d
 4. **Images Docker disponibles** :
    - `darryl1234/collecte-epargne-backend:latest`
    - `darryl1234/collecte-epargne-web:latest`
+   - `darryl1234/collecte-epargne-mobile:latest`
 
 ### Déploiement manual
 

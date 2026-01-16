@@ -36,7 +36,7 @@ jobs:
           mvn clean package -DskipTests
       
       - name: Upload backend artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: backend-jar
           path: backend/collecte-epargne-backend/target/*.jar
@@ -71,14 +71,14 @@ jobs:
           npm run build
       
       - name: Upload web artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: web-dist
           path: frontend-web/SAVELYWEB/dist/
 
-  # Mobile Dependencies Check Job
-  check-mobile:
-    name: Check Mobile (Flutter)
+  # Mobile Build Job
+  build-mobile:
+    name: Build Mobile (Flutter Web)
     runs-on: ubuntu-latest
     
     steps:
@@ -88,7 +88,8 @@ jobs:
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: 'latest'
+          flutter-version: '3.19.0'
+          channel: 'stable'
       
       - name: Get Flutter dependencies
         run: |
@@ -99,13 +100,25 @@ jobs:
         run: |
           cd frontend-mobile/savely
           flutter analyze
+      
+      - name: Build Flutter Web
+        run: |
+          cd frontend-mobile/savely
+          flutter build web --release
+      
+      - name: Upload mobile artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: mobile-web
+          path: frontend-mobile/savely/build/web/
 
   # Docker Build and Push Job
   docker-build-push:
     name: Build and Push Docker Images
     runs-on: ubuntu-latest
-    needs: [build-backend, build-web, check-mobile]
-    if: github.event_name == 'push'
+    needs: [build-backend, build-web, build-mobile]
+    if: github.event_name == 'push' && always()
+    continue-on-error: true
     
     steps:
       - name: Checkout code
@@ -141,12 +154,23 @@ jobs:
         run: |
           docker push darryl1234/collecte-epargne-web:latest
           docker push darryl1234/collecte-epargne-web:${{ github.sha }}
+      
+      - name: Build Mobile Docker image
+        run: |
+          cd frontend-mobile/savely
+          docker build -t darryl1234/collecte-epargne-mobile:latest \
+                       -t darryl1234/collecte-epargne-mobile:${{ github.sha }} .
+      
+      - name: Push Mobile image to Docker Hub
+        run: |
+          docker push darryl1234/collecte-epargne-mobile:latest
+          docker push darryl1234/collecte-epargne-mobile:${{ github.sha }}
 
   # Notify on Success
   notify-success:
     name: Notify Success
     runs-on: ubuntu-latest
-    needs: [build-backend, build-web, check-mobile, docker-build-push]
+    needs: [build-backend, build-web, build-mobile, docker-build-push]
     if: success() && github.event_name == 'push'
     
     steps:
@@ -159,4 +183,5 @@ jobs:
           echo ""
           echo "Artifacts deployed:"
           echo "- Backend: darryl1234/collecte-epargne-backend:${{ github.sha }}"
-          echo "- Frontend: darryl1234/collecte-epargne-web:${{ github.sha }}"
+          echo "- Frontend Web: darryl1234/collecte-epargne-web:${{ github.sha }}"
+          echo "- Frontend Mobile: darryl1234/collecte-epargne-mobile:${{ github.sha }}"
