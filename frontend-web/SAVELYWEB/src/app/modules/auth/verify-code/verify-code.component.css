@@ -1,0 +1,105 @@
+
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 20px;
+}
+
+
+.login-card {
+  background: #ffffff;
+  border-radius: 14px;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+  padding: 40px;
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+/* ===== TITRES ===== */
+.login-card h2 {
+  margin-bottom: 10px;
+  color: #333;
+  font-weight: 600;
+}
+
+.login-card p {
+  margin-bottom: 25px;
+  font-size: 14px;
+  color: #666;
+}
+
+/* ===== FORMULAIRE ===== */
+form {
+  display: flex;
+  flex-direction: column;
+}
+
+/* ===== INPUTS ===== */
+.form-control {
+  width: 100%;
+  padding: 14px 16px;
+  margin-bottom: 15px;
+  border-radius: 8px;
+  border: 2px solid #e1e5e9;
+  font-size: 15px;
+  transition: border-color 0.3s;
+  box-sizing: border-box;
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: #764ba2;
+}
+
+/* ===== ERREUR INPUT ===== */
+.form-control.error {
+  border-color: #e74c3c;
+}
+
+/* ===== BOUTON ===== */
+.btn-login {
+  margin-top: 10px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #fff;
+  border: none;
+  padding: 14px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.btn-login:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.btn-login:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ===== MESSAGE ERREUR ===== */
+.error-message {
+  color: #e74c3c;
+  font-size: 13px;
+  margin-bottom: 10px;
+}
+
+/* ===== ANIMATION ===== */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

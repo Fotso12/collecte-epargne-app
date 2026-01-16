@@ -18,6 +18,9 @@ public interface UtilisateurRepository extends JpaRepository<Utilisateur, String
     @Query("SELECT u FROM Utilisateur u JOIN FETCH u.role WHERE u.email = :email")
     Optional<Utilisateur> findByEmailWithRole(String email);
 
+
     // Trouver tous les utilisateurs ayant un rôle spécifique
     List<Utilisateur> findByRoleId(Integer idRole);
+
+    Optional<Utilisateur> findByEmailIgnoreCase(String email);
 }

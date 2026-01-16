@@ -18,7 +18,10 @@
           <i class="fas" [ngClass]="showPassword ? 'fa-eye-slash' : 'fa-eye'" (click)="togglePassword()"></i>
         </div>
         <div class="form-utils">
-          <a class="forgot-password">Mot de passe oublié ?</a>
+          <a class="forgot-password" routerLink="/forgot-password">
+            Mot de passe oublié ?
+          </a>
+
         </div>
       </div>
 

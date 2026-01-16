@@ -2,6 +2,7 @@ package com.collecte_epargne.collecte_epargne.services.implementations;
 
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 /**
@@ -26,6 +27,7 @@ public class EmailService {
      * @param login   Login de l'utilisateur
      * @param password Mot de passe en clair de l'utilisateur
      */
+    @Async
     public void sendUserCredentialsEmail(String toEmail, String login, String password) {
         // Création d'un message email simple
         SimpleMailMessage message = new SimpleMailMessage();
@@ -40,6 +42,28 @@ public class EmailService {
         message.setText("Bonjour,\n\nVos identifiants de connexion sont :\n\nLogin : " + login + "\nMot de passe : " + password + "\n\nVeuillez changer votre mot de passe après la première connexion.\n\nCordialement,\nL'équipe Collecte Épargne");
 
         // Envoi de l'email via JavaMailSender
+        mailSender.send(message);
+    }
+
+    /**
+     * Envoie un email avec le code de vérification pour la réinitialisation du mot de passe.
+     *
+     * @param toEmail Adresse email du destinataire
+     * @param code    Code de vérification (6 chiffres)
+     */
+    @Async
+    public void sendVerificationCode(String toEmail, String code) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(toEmail);
+        message.setSubject("Réinitialisation de votre mot de passe");
+        message.setText("Bonjour,\n\n" +
+                "Vous avez demandé la réinitialisation de votre mot de passe.\n" +
+                "Votre code de vérification est : " + code + "\n\n" +
+                "Ce code est valable 10 minutes.\n\n" +
+                "Si vous n'êtes pas à l'origine de cette demande, veuillez ignorer cet email.\n\n" +
+                "Cordialement,\n" +
+                "L'équipe Collecte Épargne");
+
         mailSender.send(message);
     }
 }

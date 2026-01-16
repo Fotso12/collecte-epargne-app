@@ -47,16 +47,12 @@ public class SecurityConfig {
                 // Autorisations
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**",
-                                "/api/registration/**",
                                 "/v3/api-docs/**",
                                 "/swagger-ui/**",
                                 "/api/utilisateurs",
-                                "/api/employes",
+                                "/password/**",
                                 "/error",
                                 "/swagger-ui.html").permitAll()
-                        // On autorise l'accès aux transactions à tout utilisateur authentifié.
-                        // Le contrôle précis (hasAuthority) se fait dans le Controller via @PreAuthorize
-                        .requestMatchers("/api/transactions/**").authenticated()
                         .anyRequest().authenticated()
                 )
 
@@ -100,14 +96,10 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        // Autoriser toutes les origines (ngrok change l'origine à chaque redémarrage)
-        configuration.setAllowedOriginPatterns(Arrays.asList("*"));
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
-        // Autoriser tous les en-têtes
+        configuration.setAllowedOriginPatterns(Arrays.asList("http://localhost:4200", "http://localhost:62112"));
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
         configuration.setAllowCredentials(true);
-        // Autoriser les méthodes OPTIONS (pré-flight CORS)
-        configuration.setMaxAge(3600L);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
