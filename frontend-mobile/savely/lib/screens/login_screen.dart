@@ -53,20 +53,22 @@ class _LoginScreenState extends State<LoginScreen> {
         );
 
         if (user != null) {
-          // Redirection basée sur le rôle (avec fallback explicite)
-          if (user.role == 'COLLECTEUR') {
+          final role = user.role.toUpperCase();
+          debugPrint('🔍 Redirecting user with role: $role');
+          
+          if (role == 'COLLECTEUR' || role == 'COLL') {
             Navigator.of(context).pushReplacementNamed('/collecteur-dashboard');
             return;
           }
-          if (user.role == 'CLIENT') {
+          if (role == 'CLIENT' || role == 'CLI') {
             Navigator.of(context).pushReplacementNamed('/client-dashboard');
             return;
           }
-          if (user.role == 'CAISSIER' || user.role == 'SUPERVISEUR') {
+          if (role == 'CAISSIER' || role == 'CAIS' || role == 'SUPERVISEUR' || role == 'SUP' || role == 'ADMIN') {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
                 content: Text(
-                  'Veuillez utiliser l\'interface web pour accéder au dashboard',
+                  'Veuillez utiliser l\'interface web pour accéder au dashboard de gestion',
                 ),
               ),
             );
@@ -75,19 +77,17 @@ class _LoginScreenState extends State<LoginScreen> {
         }
 
         // Si on arrive ici, la navigation n'a pas encore eu lieu — essayer une navigation de secours
-        debugPrint(
-          '⚠️ Rôle inconnu ou user null; tentative de navigation de secours',
-        );
-        // Si backend renvoie un champ 'role' différent ou null, tenter de récupérer depuis le résultat brut
         final rawRole = (result['user'] is UserModel)
-            ? (result['user'] as UserModel).role
-            : (result['role'] ?? result['user']?['role']);
+            ? (result['user'] as UserModel).role.toUpperCase()
+            : (result['role']?.toString().toUpperCase() ?? result['user']?['role']?.toString().toUpperCase() ?? '');
+        
+        debugPrint('⚠️ Navigation fallback logic. Raw Role: $rawRole');
 
-        if (rawRole == 'COLLECTEUR') {
+        if (rawRole == 'COLLECTEUR' || rawRole == 'COLL') {
           Navigator.of(context).pushReplacementNamed('/collecteur-dashboard');
           return;
         }
-        if (rawRole == 'CLIENT') {
+        if (rawRole == 'CLIENT' || rawRole == 'CLI') {
           Navigator.of(context).pushReplacementNamed('/client-dashboard');
           return;
         }
@@ -96,7 +96,7 @@ class _LoginScreenState extends State<LoginScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              'Connexion réussie mais rôle introuvable (role=$rawRole). Contactez l\'administrateur.',
+              'Connexion réussie mais rôle non reconnu pour le mobile (role=$rawRole).',
             ),
             backgroundColor: Colors.orange,
           ),
