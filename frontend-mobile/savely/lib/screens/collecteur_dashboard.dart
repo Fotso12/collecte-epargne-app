@@ -4,10 +4,9 @@ import '../models/transaction_model.dart';
 import '../services/collecteur_api.dart';
 import '../services/auth_api.dart';
 import '../services/error_handler.dart';
-import 'login_screen.dart';
 
 class CollecteurDashboard extends StatefulWidget {
-  const CollecteurDashboard({Key? key}) : super(key: key);
+  const CollecteurDashboard({super.key});
 
   @override
   State<CollecteurDashboard> createState() => _CollecteurDashboardState();
@@ -138,8 +137,63 @@ class _CollecteurDashboardState extends State<CollecteurDashboard> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // En-tête avec profil
-            if (_collecteur != null) _buildProfileHeader(),
+            // En-tête avec profil (si introuvable, afficher actions rapides)
+            if (_collecteur != null)
+              _buildProfileHeader()
+            else
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Colors.grey.shade200),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Profil introuvable',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 8),
+                    Wrap(
+                      spacing: 8,
+                      children: [
+                        ElevatedButton.icon(
+                          onPressed: () {
+                            Navigator.pushNamed(context, '/collecteur-profile');
+                          },
+                          icon: const Icon(Icons.person),
+                          label: const Text('Gérer le profil'),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF0D8A5F),
+                          ),
+                        ),
+                        ElevatedButton.icon(
+                          onPressed: () {
+                            Navigator.pushNamed(context, '/collecteur-collect');
+                          },
+                          icon: const Icon(Icons.payment),
+                          label: const Text('Collecter'),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFFFF6B6B),
+                          ),
+                        ),
+                        ElevatedButton.icon(
+                          onPressed: () {
+                            Navigator.pushNamed(context, '/collecteur-clients');
+                          },
+                          icon: const Icon(Icons.people),
+                          label: const Text('Mes clients'),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF0066CC),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
             const SizedBox(height: 24),
 
             // KPIs
@@ -224,6 +278,71 @@ class _CollecteurDashboardState extends State<CollecteurDashboard> {
                 fontWeight: FontWeight.bold,
               ),
             ),
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              ElevatedButton.icon(
+                onPressed: () {
+                  Navigator.pushNamed(
+                    context,
+                    '/collecteur-profile',
+                    arguments: {'matricule': _collecteur!.matricule},
+                  );
+                },
+                icon: const Icon(Icons.person),
+                label: const Text('Gérer le profil'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF0D8A5F),
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 10,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              OutlinedButton.icon(
+                onPressed: _loadDashboard,
+                icon: const Icon(Icons.refresh),
+                label: const Text('Rafraîchir'),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: Colors.white,
+                  side: BorderSide(color: Colors.white.withOpacity(0.2)),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 10,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              ElevatedButton.icon(
+                onPressed: () {
+                  Navigator.pushNamed(context, '/collecteur-collect');
+                },
+                icon: const Icon(Icons.payment),
+                label: const Text('Collecter'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFFFF6B6B),
+                  foregroundColor: Colors.white,
+                ),
+              ),
+              const SizedBox(width: 12),
+              ElevatedButton.icon(
+                onPressed: () {
+                  Navigator.pushNamed(context, '/collecteur-clients');
+                },
+                icon: const Icon(Icons.people),
+                label: const Text('Mes clients'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF0066CC),
+                  foregroundColor: Colors.white,
+                ),
+              ),
+            ],
           ),
         ],
       ),

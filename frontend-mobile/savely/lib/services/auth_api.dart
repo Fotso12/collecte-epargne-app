@@ -33,9 +33,19 @@ class RoleOption {
 
 class AuthApi {
   // Client HTTP personnalisé pour accepter certificats auto-signés (ngrok)
-  static final http.Client _httpClient = IOClient(
+  // Client HTTP personnalisé: accepte certificats auto-signés et injecte
+  // automatiquement l'en-tête Authorization quand `AuthApi.token` est défini.
+  static final http.Client _inner = IOClient(
     HttpClient()..badCertificateCallback = (cert, host, port) => true,
   );
+
+  static final http.Client _httpClient = _AuthHttpClient(_inner);
+
+  // Client wrapper qui ajoute Authorization: Bearer <token> si disponible
+  // et délègue l'envoi au client interne.
+  // Utiliser `AuthApi.getHttpClient()` retourne ce client.
+
+  // Private class below
 
   // Stockage du token JWT et de l'ID utilisateur
   static String? token;
@@ -192,8 +202,12 @@ class AuthApi {
         };
       } else {
         final error = jsonDecode(res.body);
-        final errorMsg =
+        String errorMsg =
             error['error'] ?? error['message'] ?? 'Erreur de connexion';
+        // Map common auth status codes to friendlier messages
+        if (res.statusCode == 401 || res.statusCode == 403) {
+          errorMsg = 'Email ou mot de passe incorrect';
+        }
         print('❌ Erreur de connexion: $errorMsg');
         return {
           'success': false,
@@ -340,5 +354,27 @@ class AuthApi {
     if (res.statusCode != 201) {
       throw Exception('Création impossible (${res.statusCode}): ${res.body}');
     }
+  }
+}
+
+class _AuthHttpClient extends http.BaseClient {
+  final http.Client _inner;
+
+  _AuthHttpClient(this._inner);
+
+  @override
+  Future<http.StreamedResponse> send(http.BaseRequest request) {
+    // Ajoute l'en-tête Authorization si le token est présent et pas déjà fourni
+    try {
+      final token = AuthApi.token;
+      if (token != null &&
+          token.isNotEmpty &&
+          !request.headers.containsKey('Authorization')) {
+        request.headers['Authorization'] = 'Bearer $token';
+      }
+    } catch (_) {
+      // ignore
+    }
+    return _inner.send(request);
   }
 }

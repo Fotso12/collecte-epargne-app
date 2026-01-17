@@ -82,10 +82,10 @@ class TransactionModel {
       soldeApres: json['soldeApres'] != null
           ? (json['soldeApres'] as num).toDouble()
           : 0.0,
-      statusValidation: json['statusValidation']?.toString(),
-      statut: json['statut']?.toString(),
-      modeTransaction: json['modeTransaction']?.toString(),
-      typeTransaction: json['typeTransaction']?.toString(),
+      statusValidation: json['statusValidation']?.toString().toUpperCase(),
+      statut: json['statut']?.toString().toUpperCase(),
+      modeTransaction: json['modeTransaction']?.toString()?.toUpperCase(),
+      typeTransaction: json['typeTransaction']?.toString()?.toUpperCase(),
       dateTransaction: json['dateTransaction'] != null
           ? DateTime.parse(json['dateTransaction'] as String)
           : DateTime.now(),

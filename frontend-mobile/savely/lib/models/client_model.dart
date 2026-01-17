@@ -1,4 +1,3 @@
-import 'enums.dart';
 
 class ClientModel {
   int? numeroClient;

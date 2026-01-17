@@ -3,11 +3,9 @@ import '../services/auth_api.dart';
 import '../services/error_handler.dart';
 import '../models/user_model.dart';
 import 'register_screen.dart';
-import 'collecteur_dashboard.dart';
-import 'client_dashboard.dart';
 
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({Key? key}) : super(key: key);
+  const LoginScreen({super.key});
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -51,7 +49,7 @@ class _LoginScreenState extends State<LoginScreen> {
         final token = result['token'] as String?;
         // Debug logs pour aider le diagnostic (apparaissent dans la console)
         debugPrint(
-          '🔐 Login success. User: ${user?.login}, role: ${user?.role}, token: ${token?.substring(0, token?.length ?? 0)}',
+          '🔐 Login success. User: ${user?.login}, role: ${user?.role}, token: ${token?.substring(0, token.length ?? 0)}',
         );
 
         if (user != null) {

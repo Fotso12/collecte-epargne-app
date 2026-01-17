@@ -165,7 +165,7 @@ class _ClientDashboardState extends State<ClientDashboard> {
                             )
                           else
                             DropdownButtonFormField<int>(
-                              value: selectedTypeCompteId[0],
+                              initialValue: selectedTypeCompteId[0],
                               decoration: InputDecoration(
                                 labelText: 'Type de compte *',
                                 border: OutlineInputBorder(

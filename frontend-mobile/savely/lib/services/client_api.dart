@@ -20,16 +20,14 @@ class ClientApi {
                 throw Exception('Timeout: le serveur ne répond pas'),
           );
 
-      if (res.statusCode == 404) {
-        throw Exception('Aucun client trouvé pour le login: $login');
-      }
-
       if (res.statusCode != 200) {
-        throw Exception(
-          'Impossible de récupérer le client (${res.statusCode})',
-        );
+        // Log details for debugging
+        try {
+          print('UPDATE CLIENT -> HTTP ${res.statusCode}: ${res.body}');
+        } catch (_) {}
+        // Throw an exception that contains the HTTP status and body to help debugging
+        throw Exception('UPDATE CLIENT -> HTTP ${res.statusCode}: ${res.body}');
       }
-
       final Map<String, dynamic> client = jsonDecode(res.body);
       return client['codeClient'] as String;
     } catch (e) {
@@ -160,13 +158,28 @@ class ClientApi {
                 throw Exception('Timeout: le serveur ne répond pas'),
           );
 
+      // Retourner un objet standardisé pour faciliter le traitement côté UI
       if (res.statusCode == 200 || res.statusCode == 201) {
-        return jsonDecode(res.body) as Map<String, dynamic>;
+        final body = jsonDecode(res.body) as Map<String, dynamic>;
+        return {
+          'success': true,
+          'data': body,
+          'message': 'Inscription réussie',
+        };
       } else {
-        final error = jsonDecode(res.body);
-        throw Exception(
-          error['message'] ?? 'Erreur lors de l\'enregistrement du client',
-        );
+        // Essayer d'extraire le message d'erreur renvoyé par le backend
+        String msg = 'Erreur lors de l\'enregistrement du client';
+        String details = res.body;
+        try {
+          final error = jsonDecode(res.body);
+          msg = error['message'] ?? error['error'] ?? msg;
+        } catch (_) {}
+        return {
+          'success': false,
+          'message': msg,
+          'status': res.statusCode,
+          'details': details,
+        };
       }
     } catch (e) {
       throw Exception('Erreur lors de l\'enregistrement du client: $e');

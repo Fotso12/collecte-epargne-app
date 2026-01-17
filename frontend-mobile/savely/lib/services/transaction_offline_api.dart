@@ -36,7 +36,7 @@ class TransactionOfflineApi {
       };
 
       final uri = _uri('/api/transactions-offline');
-      final res = await http
+      final res = await _client
           .post(
             uri,
             headers: {'Content-Type': 'application/json'},
@@ -69,7 +69,7 @@ class TransactionOfflineApi {
   ) async {
     try {
       final uri = _uri('/api/transactions-offline/collecteur/$idEmploye');
-      final res = await http
+      final res = await _client
           .get(uri)
           .timeout(
             const Duration(seconds: 10),
@@ -103,14 +103,14 @@ class TransactionOfflineApi {
     }
   }
 
-  /// Récupère les transactions du jour pour un collecteur 
+  /// Récupère les transactions du jour pour un collecteur
   /// Note: Cet endpoint n'existe peut-être pas encore dans le backend
   static Future<List<Map<String, dynamic>>> getTodayTransactions(
     String idEmploye,
   ) async {
     try {
       final uri = _uri('/api/transactions-offline/collecteur/$idEmploye/today');
-      final res = await http
+      final res = await _client
           .get(uri)
           .timeout(
             const Duration(seconds: 10),

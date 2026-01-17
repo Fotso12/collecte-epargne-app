@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import '../models/client_model.dart';
 import '../models/compte_model.dart';
@@ -5,10 +7,9 @@ import '../services/client_api.dart';
 import '../services/compte_api.dart';
 import '../services/auth_api.dart';
 import '../services/error_handler.dart';
-import 'login_screen.dart';
 
 class ClientDashboard extends StatefulWidget {
-  const ClientDashboard({Key? key}) : super(key: key);
+  const ClientDashboard({super.key});
 
   @override
   State<ClientDashboard> createState() => _ClientDashboardState();
@@ -43,7 +44,7 @@ class _ClientDashboardState extends State<ClientDashboard> {
 
       // Résoudre le code client via l'endpoint backend /api/clients/login/{login}
       final codeClient = await ClientApi.getCodeClientByLogin(login);
-      if (codeClient == null || codeClient.isEmpty) {
+      if (codeClient.isEmpty) {
         throw Exception('Impossible de résoudre le code client pour $login');
       }
 
@@ -52,10 +53,31 @@ class _ClientDashboardState extends State<ClientDashboard> {
       final client = ClientModel.fromJson(clientData);
 
       // Charger les comptes via le contrôleur comptes (/api/comptes/client/{codeClient})
-      final comptesData = await CompteApi.getComptesByClient(codeClient);
-      final comptes = comptesData
-          .map((c) => CompteModel.fromJson(c as Map<String, dynamic>))
-          .toList();
+      final dynamic comptesDataRaw = await CompteApi.getComptesByClient(
+        codeClient,
+      );
+      List<CompteModel> comptes = [];
+
+      if (comptesDataRaw is List<CompteModel>) {
+        comptes = comptesDataRaw;
+      } else if (comptesDataRaw is List) {
+        // list dynamique — essayer de construire des CompteModel
+        comptes = comptesDataRaw.map<CompteModel>((c) {
+          if (c is CompteModel) return c;
+          if (c is Map<String, dynamic>) return CompteModel.fromJson(c);
+          if (c is String) {
+            try {
+              final decoded = jsonDecode(c) as Map<String, dynamic>;
+              return CompteModel.fromJson(decoded);
+            } catch (_) {
+              return CompteModel.fromJson(<String, dynamic>{});
+            }
+          }
+          return CompteModel.fromJson(<String, dynamic>{});
+        }).toList();
+      } else {
+        comptes = [];
+      }
 
       if (mounted) {
         setState(() {
@@ -237,6 +259,64 @@ class _ClientDashboardState extends State<ClientDashboard> {
                 fontWeight: FontWeight.bold,
               ),
             ),
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              ElevatedButton.icon(
+                onPressed: () {
+                  Navigator.pushNamed(
+                    context,
+                    '/client-profile',
+                    arguments: {'codeClient': _client!.codeClient},
+                  );
+                },
+                icon: const Icon(Icons.person),
+                label: const Text('Gérer le profil'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF0D8A5F),
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 10,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              OutlinedButton.icon(
+                onPressed: _loadDashboard,
+                icon: const Icon(Icons.refresh),
+                label: const Text('Rafraîchir'),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: Colors.white,
+                  side: BorderSide(color: Colors.white.withOpacity(0.2)),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 10,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              ElevatedButton.icon(
+                onPressed: () {
+                  // Go to aggregated client transactions (first account or aggregated view)
+                  Navigator.pushNamed(
+                    context,
+                    '/client-transactions',
+                    arguments: {'codeClient': _client!.codeClient},
+                  );
+                },
+                icon: const Icon(Icons.history),
+                label: const Text('Historique'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.white.withOpacity(0.12),
+                  foregroundColor: Colors.white,
+                ),
+              ),
+            ],
           ),
         ],
       ),
@@ -480,6 +560,25 @@ class _ClientDashboardState extends State<ClientDashboard> {
                 ),
               ),
             ),
+          const SizedBox(height: 12),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.pushNamed(
+                    context,
+                    '/account-history',
+                    arguments: {
+                      'idCompte': compte.idCompte,
+                      'numCompte': compte.numCompte,
+                    },
+                  );
+                },
+                child: const Text('Historique'),
+              ),
+            ],
+          ),
         ],
       ),
     );

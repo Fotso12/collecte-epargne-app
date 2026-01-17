@@ -51,8 +51,25 @@ class CollecteurModel {
   });
 
   factory CollecteurModel.fromJson(Map<String, dynamic> json) {
+    // helper to parse integers that may be encoded as String or num
+    int _parseInt(dynamic v, {int fallback = 0}) {
+      if (v == null) return fallback;
+      if (v is int) return v;
+      if (v is num) return v.toInt();
+      if (v is String) return int.tryParse(v) ?? fallback;
+      return fallback;
+    }
+
+    double _parseDouble(dynamic v, {double fallback = 0.0}) {
+      if (v == null) return fallback;
+      if (v is double) return v;
+      if (v is num) return v.toDouble();
+      if (v is String) return double.tryParse(v) ?? fallback;
+      return fallback;
+    }
+
     return CollecteurModel(
-      idEmploye: (json['idEmploye'] ?? json['idCollecteur'] ?? 0) as int,
+      idEmploye: _parseInt(json['idEmploye'] ?? json['idCollecteur'] ?? 0),
       matricule: (json['matricule'] ?? '').toString(),
       nom: json['nom']?.toString(),
       prenom: json['prenom']?.toString(),
@@ -60,22 +77,24 @@ class CollecteurModel {
       telephone: json['telephone']?.toString(),
       typeEmploye: (json['typeEmploye'] ?? 'COLLECTEUR').toString(),
       commissionTaux: json['commissionTaux'] != null
-          ? (json['commissionTaux'] as num).toDouble()
+          ? _parseDouble(json['commissionTaux'], fallback: 0.0)
           : null,
       dateEmbauche: json['dateEmbauche'] != null
           ? DateTime.parse(json['dateEmbauche'] as String)
           : DateTime.now(),
-      idSuperviseur: json['idSuperviseur'] as int?,
+      idSuperviseur: json['idSuperviseur'] != null
+          ? _parseInt(json['idSuperviseur'])
+          : null,
       nomSuperviseur: json['nomSuperviseur']?.toString(),
-      idAgence: (json['idAgence'] ?? 0) as int,
+      idAgence: _parseInt(json['idAgence'] ?? 0),
       nomAgence: json['nomAgence']?.toString(),
       montantCollecte: json['montantCollecte'] != null
-          ? (json['montantCollecte'] as num).toDouble()
+          ? _parseDouble(json['montantCollecte'], fallback: 0.0)
           : 0.0,
-      nombreClients: (json['nombreClients'] ?? 0) as int,
-      nombreTransactions: (json['nombreTransactions'] ?? 0) as int,
+      nombreClients: _parseInt(json['nombreClients'] ?? 0),
+      nombreTransactions: _parseInt(json['nombreTransactions'] ?? 0),
       gainsMoyens: json['gainsMoyens'] != null
-          ? (json['gainsMoyens'] as num).toDouble()
+          ? _parseDouble(json['gainsMoyens'], fallback: 0.0)
           : 0.0,
     );
   }

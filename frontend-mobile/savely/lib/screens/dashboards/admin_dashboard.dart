@@ -1103,10 +1103,10 @@ class _AdminDashboardState extends State<AdminDashboard> with SingleTickerProvid
 
   void _showCreateInstitutionDialog(BuildContext context, {Map<String, dynamic>? institutionDetails}) {
     final isEditMode = institutionDetails != null;
-    final nameController = TextEditingController(text: isEditMode ? (institutionDetails!['name']?.toString() ?? '') : '');
-    final codeController = TextEditingController(text: isEditMode ? (institutionDetails!['code']?.toString() ?? '') : '');
-    final emailController = TextEditingController(text: isEditMode ? (institutionDetails!['contactEmail']?.toString() ?? '') : '');
-    final phoneController = TextEditingController(text: isEditMode ? (institutionDetails!['contactPhone']?.toString() ?? '') : '');
+    final nameController = TextEditingController(text: isEditMode ? (institutionDetails['name']?.toString() ?? '') : '');
+    final codeController = TextEditingController(text: isEditMode ? (institutionDetails['code']?.toString() ?? '') : '');
+    final emailController = TextEditingController(text: isEditMode ? (institutionDetails['contactEmail']?.toString() ?? '') : '');
+    final phoneController = TextEditingController(text: isEditMode ? (institutionDetails['contactPhone']?.toString() ?? '') : '');
     bool isLoading = false;
 
     showDialog(
@@ -1155,7 +1155,7 @@ class _AdminDashboardState extends State<AdminDashboard> with SingleTickerProvid
                 setState(() => isLoading = true);
                 try {
                   if (isEditMode) {
-                    final instId = institutionDetails!['id'] as int?;
+                    final instId = institutionDetails['id'] as int?;
                     if (instId == null) {
                       throw Exception('ID institution introuvable');
                     }
@@ -1277,17 +1277,17 @@ class _AdminDashboardState extends State<AdminDashboard> with SingleTickerProvid
     final isEditMode = userDetails != null;
     
     final fullNameController = TextEditingController(
-      text: isEditMode ? '${userDetails!['prenom']?.toString() ?? ''} ${userDetails['nom']?.toString() ?? ''}'.trim() : '',
+      text: isEditMode ? '${userDetails['prenom']?.toString() ?? ''} ${userDetails['nom']?.toString() ?? ''}'.trim() : '',
     );
-    final emailController = TextEditingController(text: isEditMode ? (userDetails!['email']?.toString() ?? '') : '');
-    final phoneController = TextEditingController(text: isEditMode ? (userDetails!['phone']?.toString() ?? '') : '');
+    final emailController = TextEditingController(text: isEditMode ? (userDetails['email']?.toString() ?? '') : '');
+    final phoneController = TextEditingController(text: isEditMode ? (userDetails['phone']?.toString() ?? '') : '');
     final passwordController = TextEditingController();
     final badgeCodeController = TextEditingController();
     final zoneController = TextEditingController();
     final matriculeController = TextEditingController();
     
     // Charger les informations employé si en mode édition
-    if (isEditMode && userDetails!['employe'] != null) {
+    if (isEditMode && userDetails['employe'] != null) {
       final employe = userDetails['employe'] as Map<String, dynamic>?;
       if (employe != null) {
         matriculeController.text = employe['matricule']?.toString() ?? '';
@@ -1298,7 +1298,7 @@ class _AdminDashboardState extends State<AdminDashboard> with SingleTickerProvid
     
     // S'assurer que selectedRole correspond à une valeur valide dans le dropdown
     final validRoles = ['caissier', 'collector', 'supervisor', 'auditor'];
-    final initialRoleCode = roleCode ?? (isEditMode ? (userDetails!['roleCode']?.toString() ?? 'collector') : 'collector');
+    final initialRoleCode = roleCode ?? (isEditMode ? (userDetails['roleCode']?.toString() ?? 'collector') : 'collector');
     // Si le rôle n'est pas dans la liste valide (ex: 'client'), utiliser 'collector' par défaut
     String selectedRole = validRoles.contains(initialRoleCode) ? initialRoleCode : 'collector';
     int selectedInstitutionId = 1;
@@ -1313,7 +1313,7 @@ class _AdminDashboardState extends State<AdminDashboard> with SingleTickerProvid
       if (mounted) {
         setState(() {
           institutions = insts;
-          if (isEditMode && userDetails != null) {
+          if (isEditMode) {
             // Essayer de récupérer l'institution depuis les données utilisateur
             final userInstitutionId = userDetails['institutionId'] as int?;
             if (userInstitutionId != null && userInstitutionId > 0 && 
@@ -1487,7 +1487,7 @@ class _AdminDashboardState extends State<AdminDashboard> with SingleTickerProvid
                           ),
                         const SizedBox(height: 16),
                         DropdownButtonFormField<String>(
-                          value: selectedRole,
+                          initialValue: selectedRole,
                           decoration: InputDecoration(
                             labelText: 'Type de compte',
                             prefixIcon: _getRoleIcon(selectedRole),
@@ -1546,7 +1546,7 @@ class _AdminDashboardState extends State<AdminDashboard> with SingleTickerProvid
                           const Center(child: CircularProgressIndicator())
                         else
                           DropdownButtonFormField<int>(
-                            value: selectedInstitutionId,
+                            initialValue: selectedInstitutionId,
                             decoration: InputDecoration(
                               labelText: 'Agence',
                               prefixIcon: const Icon(Icons.business),
@@ -1675,7 +1675,7 @@ class _AdminDashboardState extends State<AdminDashboard> with SingleTickerProvid
                           setState(() => isLoading = true);
                           try {
                             if (isEditMode) {
-                              final login = userDetails!['login']?.toString();
+                              final login = userDetails['login']?.toString();
                               if (login == null || login.isEmpty) {
                                 throw Exception('Login utilisateur introuvable');
                               }
@@ -1847,7 +1847,7 @@ class _AdminDashboardState extends State<AdminDashboard> with SingleTickerProvid
                   Text(userName.isNotEmpty ? userName : login,
                       style: const TextStyle(fontWeight: FontWeight.bold)),
                   Text(user['email']?.toString() ?? '', style: const TextStyle(fontSize: 12)),
-                  Text('${user['roleName']?.toString() ?? ''}', style: const TextStyle(fontSize: 12)),
+                  Text(user['roleName']?.toString() ?? '', style: const TextStyle(fontSize: 12)),
                 ],
               ),
             ),
@@ -1927,7 +1927,7 @@ class _AdminDashboardState extends State<AdminDashboard> with SingleTickerProvid
                   Text('${user['prenom']?.toString() ?? ''} ${user['nom']?.toString() ?? ''}',
                       style: const TextStyle(fontWeight: FontWeight.bold)),
                   Text(user['email']?.toString() ?? '', style: const TextStyle(fontSize: 12)),
-                  Text('${user['roleName']?.toString() ?? ''}', style: const TextStyle(fontSize: 12)),
+                  Text(user['roleName']?.toString() ?? '', style: const TextStyle(fontSize: 12)),
                 ],
               ),
             ),

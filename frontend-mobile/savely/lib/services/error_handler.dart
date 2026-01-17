@@ -18,53 +18,43 @@ class AppException implements Exception {
 }
 
 class NetworkException extends AppException {
-  NetworkException({String message = 'Erreur réseau', dynamic originalError})
+  NetworkException({super.message = 'Erreur réseau', super.originalError})
     : super(
-        message: message,
         code: 'NETWORK_ERROR',
-        originalError: originalError,
       );
 }
 
 class AuthException extends AppException {
   AuthException({
-    String message = 'Authentification échouée',
-    dynamic originalError,
+    super.message = 'Authentification échouée',
+    super.originalError,
   }) : super(
-         message: message,
          code: 'AUTH_ERROR',
-         originalError: originalError,
        );
 }
 
 class ValidationException extends AppException {
   ValidationException({
-    String message = 'Données invalides',
-    dynamic originalError,
+    super.message = 'Données invalides',
+    super.originalError,
   }) : super(
-         message: message,
          code: 'VALIDATION_ERROR',
-         originalError: originalError,
        );
 }
 
 class ServerException extends AppException {
-  ServerException({String message = 'Erreur serveur', dynamic originalError})
+  ServerException({super.message = 'Erreur serveur', super.originalError})
     : super(
-        message: message,
         code: 'SERVER_ERROR',
-        originalError: originalError,
       );
 }
 
 class TimeoutException extends AppException {
   TimeoutException({
-    String message = 'La demande a expiré',
-    dynamic originalError,
+    super.message = 'La demande a expiré',
+    super.originalError,
   }) : super(
-         message: message,
          code: 'TIMEOUT_ERROR',
-         originalError: originalError,
        );
 }
 

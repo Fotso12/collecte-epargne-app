@@ -171,7 +171,7 @@ class _NouvelleCollecteScreenState extends State<NouvelleCollecteScreen> {
                             
                             // Sélection du client
                             DropdownButtonFormField<String>(
-                              value: _selectedClientCode,
+                              initialValue: _selectedClientCode,
                               decoration: const InputDecoration(
                                 labelText: 'Client *',
                                 border: OutlineInputBorder(),
@@ -202,7 +202,7 @@ class _NouvelleCollecteScreenState extends State<NouvelleCollecteScreen> {
                             
                             // Sélection du compte
                             DropdownButtonFormField<String>(
-                              value: _selectedCompteId,
+                              initialValue: _selectedCompteId,
                               decoration: InputDecoration(
                                 labelText: 'Compte *',
                                 border: const OutlineInputBorder(),
@@ -249,7 +249,7 @@ class _NouvelleCollecteScreenState extends State<NouvelleCollecteScreen> {
                             
                             // Type de transaction
                             DropdownButtonFormField<String>(
-                              value: _selectedTypeTransaction,
+                              initialValue: _selectedTypeTransaction,
                               decoration: const InputDecoration(
                                 labelText: 'Type de transaction *',
                                 border: OutlineInputBorder(),

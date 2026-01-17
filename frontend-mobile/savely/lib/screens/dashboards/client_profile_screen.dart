@@ -503,7 +503,7 @@ class _ClientProfileScreenState extends State<ClientProfileScreen> {
                             ),
                             const SizedBox(height: 16),
                             DropdownButtonFormField<String>(
-                              value: _selectedTypeCni,
+                              initialValue: _selectedTypeCni,
                               decoration: InputDecoration(
                                 labelText: 'Type de CNI',
                                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),

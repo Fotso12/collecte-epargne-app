@@ -1,8 +1,6 @@
-import 'dart:convert';
 
 import '../models/collecteur_model.dart';
 import '../models/transaction_model.dart';
-import 'auth_api.dart';
 import 'employe_api.dart';
 import 'transaction_offline_api.dart';
 
@@ -18,7 +16,6 @@ class CollecteurApi {
       } catch (_) {}
 
       final emp = await EmployeApi.getByMatricule(matricule);
-      if (emp == null) return null;
 
       return CollecteurModel.fromJson(emp);
     } catch (e) {
@@ -50,7 +47,6 @@ class CollecteurApi {
       final txs = await TransactionOfflineApi.getTransactionsByCollecteur(
         idEmp,
       );
-      if (txs == null) return [];
 
       return (txs as List)
           .map((t) => TransactionModel.fromJson(t as Map<String, dynamic>))
@@ -114,7 +110,6 @@ class CollecteurApi {
       final txs = await TransactionOfflineApi.getTransactionsByCollecteur(
         idEmp,
       );
-      if (txs == null) return null;
 
       final found = (txs as List).cast<Map<String, dynamic>>().firstWhere((m) {
         final idFields = [
