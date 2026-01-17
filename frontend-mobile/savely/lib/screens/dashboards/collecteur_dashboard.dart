@@ -278,10 +278,9 @@ class _CollecteurDashboardState extends State<CollecteurDashboard> {
           final result = await Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => NouvelleCollecteScreen(
-                loginCollecteur: widget.user.login,
-                idEmploye: _idEmploye,
-              ),
+          builder: (context) => NouvelleCollecteScreen(
+            matriculeCollecteur: widget.user.login,
+          ),
             ),
           );
           if (result == true) {
@@ -657,8 +656,7 @@ class _CollecteurDashboardState extends State<CollecteurDashboard> {
                         context,
                         MaterialPageRoute(
                           builder: (context) => NouvelleCollecteScreen(
-                            loginCollecteur: widget.user.login,
-                            idEmploye: _idEmploye,
+                            matriculeCollecteur: widget.user.login,
                           ),
                         ),
                       );
@@ -680,8 +678,7 @@ class _CollecteurDashboardState extends State<CollecteurDashboard> {
                         context,
                         MaterialPageRoute(
                           builder: (context) => ClientsListScreen(
-                            loginCollecteur: widget.user.login,
-                            idEmploye: _idEmploye,
+                            matriculeCollecteur: widget.user.login,
                           ),
                         ),
                       );
@@ -911,10 +908,9 @@ class _CollecteurDashboardState extends State<CollecteurDashboard> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => ClientsListScreen(
-                          loginCollecteur: widget.user.login,
-                          idEmploye: _idEmploye,
-                        ),
+                      builder: (context) => ClientsListScreen(
+                        matriculeCollecteur: widget.user.login,
+                      ),
                       ),
                     );
                   },

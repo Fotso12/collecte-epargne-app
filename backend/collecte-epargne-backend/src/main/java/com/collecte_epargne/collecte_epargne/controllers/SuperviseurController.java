@@ -19,24 +19,69 @@ import java.util.Map;
  */
 @RestController
 @RequestMapping("/api/superviseur")
-@PreAuthorize("hasRole('SUPERVISEUR')")
+@PreAuthorize("hasRole('SUPERVISOR') or hasRole('SUPERVISEUR') or hasRole('ADMIN') or hasRole('SUP')")
 public class SuperviseurController {
     
     private static final Logger log = LoggerFactory.getLogger(SuperviseurController.class);
     
     private final SuperviseurService superviseurService;
+    private final com.collecte_epargne.collecte_epargne.services.implementations.SuperviseurKpiService kpiService;
 
-    public SuperviseurController(SuperviseurService superviseurService) {
+    // Repositories needed to find the connected employee
+    private final com.collecte_epargne.collecte_epargne.repositories.UtilisateurRepository utilisateurRepository;
+    private final com.collecte_epargne.collecte_epargne.repositories.EmployeRepository employeRepository;
+    private final com.collecte_epargne.collecte_epargne.repositories.AgenceZoneRepository agenceZoneRepository;
+
+    public SuperviseurController(SuperviseurService superviseurService,
+                                 com.collecte_epargne.collecte_epargne.services.implementations.SuperviseurKpiService kpiService,
+                                 com.collecte_epargne.collecte_epargne.repositories.UtilisateurRepository utilisateurRepository,
+                                 com.collecte_epargne.collecte_epargne.repositories.EmployeRepository employeRepository,
+                                 com.collecte_epargne.collecte_epargne.repositories.AgenceZoneRepository agenceZoneRepository) {
         this.superviseurService = superviseurService;
+        this.kpiService = kpiService;
+        this.utilisateurRepository = utilisateurRepository;
+        this.employeRepository = employeRepository;
+        this.agenceZoneRepository = agenceZoneRepository;
+    }
+
+    private Integer getAuthenticatedSuperviseurId(java.security.Principal principal) {
+        if (principal == null) throw new RuntimeException("Utilisateur non authentifié");
+        String email = principal.getName();
+        com.collecte_epargne.collecte_epargne.entities.Utilisateur utilisateur = utilisateurRepository.findByEmail(email)
+            .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé: " + email));
+
+        // Allow ADMIN to bypass employee check
+        if (utilisateur.getRole().getCode().equalsIgnoreCase("admin")) {
+            // Pour l'admin, on essaie de trouver un superviseur par défaut ou on retourne null
+            return employeRepository.findByTypeEmploye(com.collecte_epargne.collecte_epargne.utils.TypeEmploye.SUPERVISEUR)
+                    .stream().findFirst()
+                    .map(com.collecte_epargne.collecte_epargne.entities.Employe::getIdEmploye)
+                    .orElse(null); // Return null if no supervisor found
+        }
+            
+        com.collecte_epargne.collecte_epargne.entities.Employe employe = employeRepository.findByUtilisateurLogin(utilisateur.getLogin())
+            .orElseThrow(() -> new RuntimeException("Cet utilisateur n'est pas lié à un employé (Superviseur)"));
+            
+        return employe.getIdEmploye();
     }
 
     /**
      * COMMENT CLEF: Dashboard superviseur - KPIs agence
      */
     @GetMapping("/dashboard")
-    public ResponseEntity<SuperviseurDashboardDTO> getDashboard(@RequestParam Integer idSuperviseur) {
-        log.info("GET /api/superviseur/dashboard - Superviseur: {}", idSuperviseur);
+    public ResponseEntity<SuperviseurDashboardDTO> getDashboard(java.security.Principal principal) {
+        log.info("GET /api/superviseur/dashboard - User: {}", principal.getName());
         try {
+            Integer idSuperviseur = getAuthenticatedSuperviseurId(principal);
+            
+            // Si Admin et pas de superviseur trouvé, retourner un dashboard vide
+            if (idSuperviseur == null) {
+                SuperviseurDashboardDTO emptyDashboard = new SuperviseurDashboardDTO();
+                emptyDashboard.setNomSuperviseur("ADMIN (Vue Globale)");
+                emptyDashboard.setAgenceNom("Toutes Agences");
+                return ResponseEntity.ok(emptyDashboard);
+            }
+            
             SuperviseurDashboardDTO dashboard = superviseurService.obtenirDashboard(idSuperviseur);
             return ResponseEntity.ok(dashboard);
         } catch (RuntimeException e) {
@@ -46,12 +91,46 @@ public class SuperviseurController {
     }
 
     /**
+     * COMMENT CLEF: KPIs complets pour le superviseur
+     */
+    @GetMapping("/kpis")
+    public ResponseEntity<SuperviseurKpiDto> getKpis(java.security.Principal principal) {
+        log.info("GET /api/superviseur/kpis - User: {}", principal.getName());
+        try {
+            Integer idSup = getAuthenticatedSuperviseurId(principal);
+            com.collecte_epargne.collecte_epargne.entities.AgenceZone agence = null;
+
+            if (idSup != null) {
+                agence = employeRepository.findById(idSup)
+                    .map(com.collecte_epargne.collecte_epargne.entities.Employe::getAgenceZone)
+                    .orElse(null);
+            }
+
+            // Fallback pour Admin si aucune agence trouvée via l'employé
+            if (agence == null) {
+                agence = agenceZoneRepository.findAll().stream().findFirst()
+                    .orElseThrow(() -> new RuntimeException("Aucune agence trouvée dans le système"));
+            }
+
+            SuperviseurKpiDto kpis = kpiService.getKpis(agence);
+            return ResponseEntity.ok(kpis);
+        } catch (Exception e) {
+            log.error("Erreur récupération KPIs: {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    /**
+     * COMMENT CLEF: Récupère comptes EN_ATTENTE d'approbation
+     */
+    /**
      * COMMENT CLEF: Récupère comptes EN_ATTENTE d'approbation
      */
     @GetMapping("/comptes/pending")
-    public ResponseEntity<List<CompteDto>> getComptesEnAttente(@RequestParam Integer idSuperviseur) {
-        log.info("GET /api/superviseur/comptes/pending - Superviseur: {}", idSuperviseur);
+    public ResponseEntity<List<CompteDto>> getComptesEnAttente(java.security.Principal principal) {
         try {
+            Integer idSuperviseur = getAuthenticatedSuperviseurId(principal);
+            log.info("GET /api/superviseur/comptes/pending - Superviseur: {}", idSuperviseur);
             List<CompteDto> comptes = superviseurService.obtenirComptesEnAttenteApprobation(idSuperviseur);
             return ResponseEntity.ok(comptes);
         } catch (RuntimeException e) {
@@ -67,12 +146,13 @@ public class SuperviseurController {
     @PostMapping("/comptes/{idCompte}/approve")
     public ResponseEntity<CompteDto> approuverCompte(
             @PathVariable String idCompte,
-            @RequestParam Integer idSuperviseur,
+            java.security.Principal principal,
             @RequestBody Map<String, Object> request) {
         
-        log.info("POST /api/superviseur/comptes/{}/approve - Superviseur: {}", idCompte, idSuperviseur);
-        
         try {
+            Integer idSuperviseur = getAuthenticatedSuperviseurId(principal);
+            log.info("POST /api/superviseur/comptes/{}/approve - Superviseur: {}", idCompte, idSuperviseur);
+        
             // COMMENT CLEF: Vérifier confirmation
             Boolean confirme = (Boolean) request.get("confirmé");
             if (confirme == null || !confirme) {
@@ -96,12 +176,13 @@ public class SuperviseurController {
     @PostMapping("/comptes/{idCompte}/reject")
     public ResponseEntity<CompteDto> rejeterCompte(
             @PathVariable String idCompte,
-            @RequestParam Integer idSuperviseur,
+            java.security.Principal principal,
             @RequestBody Map<String, Object> request) {
         
-        log.info("POST /api/superviseur/comptes/{}/reject - Superviseur: {}", idCompte, idSuperviseur);
-        
         try {
+            Integer idSuperviseur = getAuthenticatedSuperviseurId(principal);
+            log.info("POST /api/superviseur/comptes/{}/reject - Superviseur: {}", idCompte, idSuperviseur);
+        
             String motifRejet = (String) request.get("motifRejet");
             Boolean confirme = (Boolean) request.get("confirmé");
             

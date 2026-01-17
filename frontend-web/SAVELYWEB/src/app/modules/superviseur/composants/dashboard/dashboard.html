@@ -1,119 +1,222 @@
-<div class="dashboard-header">
-    <h2>Tableau de Bord</h2>
-    <p>Aperçu global de l'activité SAVELY</p>
+<div class="dashboard-container">
+    <div class="dashboard-header">
+        <h1>Dashboard Superviseur</h1>
+        <div class="user-info">
+            <p><strong>{{ dashboard.nomSuperviseur }}</strong></p>
+            <p class="agence">{{ dashboard.agenceNom }}</p>
+        </div>
+        <div class="header-actions">
+            <button class="btn-refresh" (click)="rafraichir()" title="Rafraîchir">
+                <i class="fas fa-sync-alt"></i>
+            </button>
+        </div>
+    </div>
+
+    <div *ngIf="errorMessage" class="alert alert-danger">
+        {{ errorMessage }}
+    </div>
+
+    <div *ngIf="isLoading || isLoadingKpis" class="spinner">
+        <div class="loading-content">
+            <i class="fas fa-circle-notch fa-spin"></i>
+            <p>Chargement des données...</p>
+        </div>
+    </div>
+
+    <div *ngIf="!isLoading && !isLoadingKpis" class="dashboard-content">
+        <!-- KPIs Cards - Row 1 -->
+        <div class="kpi-container">
+            <div class="kpi-card bg-primary">
+                <div class="kpi-icon"><i class="fas fa-clock"></i></div>
+                <div class="kpi-value">{{ dashboard.comptesEnAttenteApprobation }}</div>
+                <div class="kpi-label">Comptes en Attente</div>
+            </div>
+
+            <div class="kpi-card bg-success">
+                <div class="kpi-icon"><i class="fas fa-users"></i></div>
+                <div class="kpi-value">{{ dashboard.collecteursTotal }}</div>
+                <div class="kpi-label">Collecteurs Actifs</div>
+            </div>
+
+            <div class="kpi-card bg-info">
+                <div class="kpi-icon"><i class="fas fa-coins"></i></div>
+                <div class="kpi-value">{{ formatMontant(kpis?.collecteJournaliere || 0) }}</div>
+                <div class="kpi-label">Collecte Aujourd'hui</div>
+            </div>
+
+            <div class="kpi-card bg-warning">
+                <div class="kpi-icon"><i class="fas fa-wallet"></i></div>
+                <div class="kpi-value">{{ formatMontant(kpis?.gainSuperviseur || 0) }}</div>
+                <div class="kpi-label">Mes Gains</div>
+            </div>
+        </div>
+
+        <!-- KPIs Cards - Row 2 -->
+        <div class="kpi-container">
+            <div class="kpi-card bg-teal">
+                <div class="kpi-icon"><i class="fas fa-calendar-week"></i></div>
+                <div class="kpi-value">{{ formatMontant(kpis?.collecteHebdomadaire || 0) }}</div>
+                <div class="kpi-label">Collecte Hebdomadaire</div>
+            </div>
+
+            <div class="kpi-card bg-purple">
+                <div class="kpi-icon"><i class="fas fa-calendar-alt"></i></div>
+                <div class="kpi-value">{{ formatMontant(kpis?.collecteMensuelle || 0) }}</div>
+                <div class="kpi-label">Collecte Mensuelle</div>
+            </div>
+
+            <div class="kpi-card bg-indigo">
+                <div class="kpi-icon"><i class="fas fa-university"></i></div>
+                <div class="kpi-value">{{ formatMontant(kpis?.caisseEntreprise || 0) }}</div>
+                <div class="kpi-label">Caisse Agence</div>
+            </div>
+
+            <div class="kpi-card bg-orange">
+                <div class="kpi-icon"><i class="fas fa-chart-line"></i></div>
+                <div class="kpi-value">{{ kpis?.nombreTransactions || 0 }}</div>
+                <div class="kpi-label">Total Transactions</div>
+            </div>
+        </div>
+
+        <!-- Meilleurs Collecteurs Section -->
+        <div class="section-row">
+            <!-- Meilleur Collecteur (Montant) -->
+            <div class="section half-width">
+                <div class="section-header">
+                    <h2><i class="fas fa-trophy"></i> Meilleur Collecteur</h2>
+                </div>
+                <div *ngIf="kpis?.meilleurCollecteur" class="best-collector-card">
+                    <div class="collector-header">
+                        <div class="collector-name">
+                            {{ kpis?.meilleurCollecteur?.prenom }} {{ kpis?.meilleurCollecteur?.nom }}
+                        </div>
+                        <div class="collector-badge gold">🏆 Top Collecteur</div>
+                    </div>
+                    <div class="collector-stats">
+                        <div class="stat">
+                            <span class="label">Matricule:</span>
+                            <span class="value">{{ kpis?.meilleurCollecteur?.matricule }}</span>
+                        </div>
+                        <div class="stat">
+                            <span class="label">Montant Collecté:</span>
+                            <span class="value highlight">{{ formatMontant(kpis?.meilleurCollecteur?.montantCollecte ||
+                                0) }}</span>
+                        </div>
+                        <div class="stat">
+                            <span class="label">Transactions:</span>
+                            <span class="value">{{ kpis?.meilleurCollecteur?.nombreTransactions }}</span>
+                        </div>
+                    </div>
+                </div>
+                <div *ngIf="!kpis?.meilleurCollecteur" class="no-data">
+                    Aucune donnée disponible
+                </div>
+            </div>
+
+            <!-- Collecteur avec Plus de Clients -->
+            <div class="section half-width">
+                <div class="section-header">
+                    <h2><i class="fas fa-user-friends"></i> Plus de Clients</h2>
+                </div>
+                <div *ngIf="kpis?.collecteurPlusClients" class="best-collector-card clients-card">
+                    <div class="collector-header">
+                        <div class="collector-name">
+                            {{ kpis?.collecteurPlusClients?.prenom }} {{ kpis?.collecteurPlusClients?.nom }}
+                        </div>
+                        <div class="collector-badge silver">👥 Top Clients</div>
+                    </div>
+                    <div class="collector-stats">
+                        <div class="stat">
+                            <span class="label">Matricule:</span>
+                            <span class="value">{{ kpis?.collecteurPlusClients?.matricule }}</span>
+                        </div>
+                        <div class="stat">
+                            <span class="label">Nombre de Clients:</span>
+                            <span class="value highlight">{{ kpis?.collecteurPlusClients?.nombreClients }}</span>
+                        </div>
+                        <div class="stat">
+                            <span class="label">Montant Collecté:</span>
+                            <span class="value">{{ formatMontant(kpis?.collecteurPlusClients?.montantCollecte || 0)
+                                }}</span>
+                        </div>
+                    </div>
+                </div>
+                <div *ngIf="!kpis?.collecteurPlusClients" class="no-data">
+                    Aucune donnée disponible
+                </div>
+            </div>
+        </div>
+
+        <!-- Clients en Retard -->
+        <div class="section">
+            <div class="section-header">
+                <h2><i class="fas fa-exclamation-triangle"></i> Clients en Retard de Cotisation</h2>
+            </div>
+            <div *ngIf="kpis?.clientsEnRetard && (kpis?.clientsEnRetard?.length || 0) > 0" class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Code Client</th>
+                            <th>Nom</th>
+                            <th>Téléphone</th>
+                            <th>Retard</th>
+                            <th>Montant Dû</th>
+                            <th>Intérêts</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let client of kpis?.clientsEnRetard" class="retard-row">
+                            <td class="font-weight-bold">{{ client.codeClient }}</td>
+                            <td>{{ client.prenom }} {{ client.nom }}</td>
+                            <td>{{ client.telephone }}</td>
+                            <td>
+                                <span class="badge badge-danger">{{ client.joursRetard }} jours</span>
+                            </td>
+                            <td>{{ formatMontant(client.montantDu) }}</td>
+                            <td class="text-danger">{{ formatMontant(client.interetsRetard) }}</td>
+                            <td class="font-weight-bold text-dark">{{ formatMontant(client.montantDu +
+                                client.interetsRetard) }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div *ngIf="!kpis?.clientsEnRetard || kpis?.clientsEnRetard?.length === 0" class="no-data">
+                <div class="success-icon"><i class="fas fa-check-circle"></i></div>
+                <p>Aucun client en retard</p>
+            </div>
+        </div>
+
+        <!-- Historique Collection -->
+        <div class="section">
+            <div class="section-header">
+                <h2><i class="fas fa-history"></i> Historique Collection</h2>
+            </div>
+            <div *ngIf="dashboard.historiquesCollection && dashboard.historiquesCollection.length > 0"
+                class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Période</th>
+                            <th>Montant</th>
+                            <th>Transactions</th>
+                            <th>Collecteurs</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let history of dashboard.historiquesCollection">
+                            <td class="font-weight-bold">{{ history.periode }}</td>
+                            <td class="text-success">{{ formatMontant(history.montant) }}</td>
+                            <td>{{ history.nombreTransactions }}</td>
+                            <td>{{ history.nombreCollecteurs }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div *ngIf="!dashboard.historiquesCollection || dashboard.historiquesCollection.length === 0"
+                class="no-data">
+                Aucun historique disponible
+            </div>
+        </div>
+    </div>
 </div>
-
-<!-- KPIs Principaux (Ligne 1) -->
-<section class="stats-grid">
-    <div class="stat-card cyan">
-        <i class="fas fa-building card-icon"></i>
-        <div class="card-info">
-            <h3>{{ isLoading ? '...' : (stats.totalAgences | number) }}</h3>
-            <p>Entreprises</p>
-        </div>
-    </div>
-
-    <div class="stat-card blue">
-        <i class="fas fa-user-friends card-icon"></i>
-        <div class="card-info">
-            <h3>{{ isLoading ? '...' : (stats.totalClients | number) }}</h3>
-            <p>Clients</p>
-        </div>
-    </div>
-
-    <div class="stat-card teal">
-        <i class="fas fa-wallet card-icon"></i>
-        <div class="card-info">
-            <h3>{{ isLoading ? '...' : (stats.totalComptesActifs | number) }}</h3>
-            <p>Comptes Actifs</p>
-        </div>
-    </div>
-
-    <div class="stat-card success">
-        <i class="fas fa-piggy-bank card-icon"></i>
-        <div class="card-info">
-            <h3>{{ isLoading ? '...' : (stats.soldeTotalEpargne | number:'1.0-0') }}</h3>
-            <p>Épargne (FCFA)</p>
-        </div>
-    </div>
-</section>
-
-<!-- KPIs Secondaires (Ligne 2) -->
-<section class="stats-grid mt-3">
-    <div class="stat-card purple">
-        <i class="fas fa-walking card-icon"></i>
-        <div class="card-info">
-            <h3>{{ isLoading ? '...' : (stats.totalCollecteurs | number) }}</h3>
-            <p>Collecteurs</p>
-        </div>
-    </div>
-
-    <div class="stat-card orange">
-        <i class="fas fa-vault card-icon"></i>
-        <div class="card-info">
-            <h3>{{ isLoading ? '...' : (stats.totalCaissiers | number) }}</h3>
-            <p>Caissiers</p>
-        </div>
-    </div>
-
-    <div class="stat-card green">
-        <i class="fas fa-check-circle card-icon"></i>
-        <div class="card-info">
-            <h3>{{ isLoading ? '...' : (stats.pourcentageTransactionsValidees | number:'1.0-1') }}%</h3>
-            <p>Validées</p>
-        </div>
-    </div>
-
-    <div class="stat-card" style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);"
-        *ngIf="stats.transactionsEnAttente > 0">
-        <i class="fas fa-clock card-icon"></i>
-        <div class="card-info">
-            <h3>{{ isLoading ? '...' : (stats.transactionsEnAttente | number) }}</h3>
-            <p>En Attente <span class="badge bg-warning-subtle text-warning"
-                    *ngIf="!isLoading && stats.transactionsEnAttente > 5">!</span></p>
-        </div>
-    </div>
-</section>
-
-<!-- KPIs Financiers (Ligne 3) -->
-<section class="stats-grid mt-3">
-    <div class="stat-card" style="background: #fff; border-left: 4px solid #10b981;">
-        <i class="fas fa-arrow-up card-icon" style="color: #10b981; background: #10b98115;"></i>
-        <div class="card-info">
-            <h3 style="color: #10b981;">{{ isLoading ? '...' : (stats.volumeCotisation | number:'1.0-0') }}</h3>
-            <p>Dépôts (FCFA)</p>
-        </div>
-    </div>
-
-    <div class="stat-card" style="background: #fff; border-left: 4px solid #ef4444;">
-        <i class="fas fa-arrow-down card-icon" style="color: #ef4444; background: #ef444415;"></i>
-        <div class="card-info">
-            <h3 style="color: #ef4444;">{{ isLoading ? '...' : (stats.volumeRetraits | number:'1.0-0') }}</h3>
-            <p>Retraits (FCFA)</p>
-        </div>
-    </div>
-
-    <div class="stat-card" style="background: #fff; border-left: 4px solid #3b82f6;">
-        <i class="fas fa-chart-line card-icon" style="color: #3b82f6; background: #3b82f615;"></i>
-        <div class="card-info">
-            <h3 style="color: #3b82f6;">{{ isLoading ? '...' : (stats.epargneParClient | number:'1.0-0') }}</h3>
-            <p>Moy./Client (FCFA)</p>
-        </div>
-    </div>
-
-    <div class="stat-card" style="background: #fff; border-left: 4px solid #f59e0b;" *ngIf="stats.tauxPenalites > 0">
-        <i class="fas fa-exclamation-triangle card-icon" style="color: #f59e0b; background: #f59e0b15;"></i>
-        <div class="card-info">
-            <h3 style="color: #f59e0b;">{{ isLoading ? '...' : (stats.tauxPenalites | number:'1.0-1') }}%</h3>
-            <p>Pénalités</p>
-        </div>
-    </div>
-</section>
-
-<section class="charts-grid">
-    <!-- Les graphiques seront ajoutés ici -->
-</section>
-
-<section class="table-container summary-section">
-    <!-- Les tableaux récapitulatifs seront ajoutés ici -->
-</section>

@@ -2,6 +2,8 @@ import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DashboardService } from '../../../../core/services/dashboard.service';
 import { AgenceZoneService } from '../../../../core/services/gestion-agence-zone.service';
+import { SuperviseurService } from '../../../../core/services/superviseur.service';
+import { KpiService, SuperviseurKpi } from '../../../../core/services/kpi.service';
 import { forkJoin } from 'rxjs';
 
 @Component({
@@ -12,51 +14,90 @@ import { forkJoin } from 'rxjs';
   styleUrl: './dashboard.css'
 })
 export class Dashboard implements OnInit {
-  stats: any = {
-    totalClients: 0,
-    totalCollecteurs: 0,
-    totalCaissiers: 0,
-    volumeCotisation: 0,
-    totalAgences: 0,
-    pourcentageTransactionsValidees: 0,
-    // Nouveaux KPIs
-    totalComptesActifs: 0,
-    soldeTotalEpargne: 0,
-    volumeRetraits: 0,
-    transactionsEnAttente: 0,
-    tauxPenalites: 0,
-    epargneParClient: 0
+  dashboard: any = {
+    idSuperviseur: 0,
+    nomSuperviseur: '',
+    agenceNom: '',
+    comptesEnAttenteApprobation: 0,
+    collecteursTotal: 0,
+    montantCollecteJour: 0,
+    gainsJourSuperviseur: 0,
+    meilleurCollecteur: null,
+    historiquesCollection: []
   };
-  isLoading = true;
 
-  loader = true;
+  kpis: SuperviseurKpi | null = null;
+  isLoading = true;
+  isLoadingKpis = true;
+  errorMessage = '';
 
   constructor(
-    private dashboardService: DashboardService,
-    private agenceService: AgenceZoneService,
+    private superviseurService: SuperviseurService,
+    private kpiService: KpiService,
     private cdr: ChangeDetectorRef
   ) { }
 
   ngOnInit(): void {
-    this.chargerStats();
+    this.chargerDashboard();
+    this.chargerKpis();
   }
 
-  chargerStats(): void {
-    const subs = forkJoin({
-      stats: this.dashboardService.getStats(),
-      agences: this.agenceService.getAll()
-    }).subscribe({
-      next: (res) => {
-        this.stats = res.stats;
-        this.stats.totalAgences = res.agences.length; // Add manual count
+  chargerDashboard(): void {
+    this.isLoading = true;
+    this.superviseurService.getDashboard().subscribe({
+      next: (data: any) => {
+        this.dashboard = data;
         this.isLoading = false;
         this.cdr.detectChanges();
       },
-      error: (err) => {
-        console.error('Erreur chargement stats', err);
+      error: (err: any) => {
+        this.errorMessage = 'Erreur lors du chargement du dashboard';
+        console.error(err);
         this.isLoading = false;
         this.cdr.detectChanges();
       }
     });
+  }
+
+  chargerKpis(): void {
+    this.isLoadingKpis = true;
+    this.kpiService.getKpis().subscribe({
+      next: (data: SuperviseurKpi) => {
+        this.kpis = data;
+        this.isLoadingKpis = false;
+        this.cdr.detectChanges();
+      },
+      error: (err: any) => {
+        console.error('Erreur chargement KPIs:', err);
+        this.isLoadingKpis = false;
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  // Format montant
+  formatMontant(montant: number | undefined): string {
+    if (!montant) return '0 FCFA';
+    return new Intl.NumberFormat('fr-FR', {
+      style: 'decimal',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0
+    }).format(montant) + ' FCFA';
+  }
+
+  // Obtenir la couleur du statut
+  getStatusColor(status: string): string {
+    return this.kpiService.getStatusColor(status);
+  }
+
+  // Obtenir le libellé du statut
+  getStatusLabel(status: string): string {
+    return this.kpiService.getStatusLabel(status);
+  }
+
+  // Rafraîchir les données
+  rafraichir(): void {
+    this.chargerDashboard();
+    this.chargerKpis();
   }
 }

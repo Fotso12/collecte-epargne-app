@@ -1,8 +1,364 @@
-.dashboard-container { padding: 1rem; }
-.dashboard-header { display:flex; justify-content:space-between; align-items:center; }
-.kpi-container { display:flex; gap:1rem; flex-wrap:wrap; }
-.kpi-card { padding:1rem; border-radius:8px; color:#fff; min-width:160px }
-.bg-primary { background:#3b82f6 }
-.bg-success { background:#10b981 }
-.bg-info { background:#06b6d4 }
-.bg-warning { background:#f59e0b }
+.dashboard-container {
+    padding: 20px;
+    background-color: #f5f7fa;
+    min-height: 100vh;
+}
+
+.dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.dashboard-header h1 {
+    margin: 0;
+    color: #2c3e50;
+    font-size: 28px;
+}
+
+.user-info {
+    text-align: right;
+}
+
+.user-info p {
+    margin: 0;
+    color: #7f8c8d;
+}
+
+.user-info .agence {
+    color: #0D8A5F;
+    font-weight: 500;
+}
+
+.btn-refresh {
+    background: #0D8A5F;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.btn-refresh:hover {
+    background: #0a6d4c;
+    transform: rotate(180deg);
+}
+
+.alert {
+    padding: 15px;
+    margin-bottom: 20px;
+    border-radius: 5px;
+}
+
+.alert-danger {
+    background-color: #fee;
+    color: #c33;
+    border: 1px solid #fcc;
+}
+
+.spinner {
+    text-align: center;
+    padding: 50px;
+    font-size: 18px;
+    color: #7f8c8d;
+}
+
+.dashboard-content {
+    animation: fadeIn 0.5s;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* KPI Cards */
+.kpi-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.kpi-card {
+    background: white;
+    padding: 25px;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s, box-shadow 0.3s;
+    position: relative;
+    overflow: hidden;
+}
+
+.kpi-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.kpi-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: currentColor;
+}
+
+.kpi-icon {
+    font-size: 32px;
+    margin-bottom: 10px;
+    opacity: 0.8;
+}
+
+.kpi-value {
+    font-size: 28px;
+    font-weight: bold;
+    margin: 10px 0;
+    color: #2c3e50;
+}
+
+.kpi-label {
+    font-size: 14px;
+    color: #7f8c8d;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Color Themes */
+.bg-primary {
+    color: #3498db;
+}
+
+.bg-success {
+    color: #27ae60;
+}
+
+.bg-info {
+    color: #16a085;
+}
+
+.bg-warning {
+    color: #f39c12;
+}
+
+.bg-teal {
+    color: #1abc9c;
+}
+
+.bg-purple {
+    color: #9b59b6;
+}
+
+.bg-indigo {
+    color: #6c5ce7;
+}
+
+.bg-orange {
+    color: #e67e22;
+}
+
+/* Sections */
+.section {
+    background: white;
+    padding: 25px;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 30px;
+}
+
+.section h2 {
+    margin: 0 0 20px 0;
+    color: #2c3e50;
+    font-size: 22px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.section h2 i {
+    color: #0D8A5F;
+}
+
+.section-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.half-width {
+    min-width: 0;
+}
+
+/* Best Collector Card */
+.best-collector-card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.collector-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.collector-name {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.collector-badge {
+    padding: 8px 15px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.collector-badge.gold {
+    background: linear-gradient(135deg, #f7971e 0%, #ffd200 100%);
+    color: #333;
+}
+
+.collector-badge.silver {
+    background: linear-gradient(135deg, #bdc3c7 0%, #ecf0f1 100%);
+    color: #333;
+}
+
+.collector-stats {
+    display: grid;
+    gap: 15px;
+}
+
+.collector-stats .stat {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 5px;
+}
+
+.collector-stats .label {
+    font-size: 14px;
+    opacity: 0.9;
+}
+
+.collector-stats .value {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.collector-stats .value.highlight {
+    color: #ffd700;
+    font-size: 20px;
+}
+
+/* Tables */
+.table-responsive {
+    overflow-x: auto;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+
+.table thead {
+    background: #f8f9fa;
+}
+
+.table th {
+    padding: 12px;
+    text-align: left;
+    font-weight: 600;
+    color: #2c3e50;
+    border-bottom: 2px solid #dee2e6;
+}
+
+.table td {
+    padding: 12px;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.table tbody tr:hover {
+    background-color: #f8f9fa;
+}
+
+.retard-row {
+    background-color: #fff5f5;
+}
+
+.badge {
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.badge-danger {
+    background-color: #fee;
+    color: #c33;
+}
+
+.text-danger {
+    color: #dc3545;
+}
+
+.font-weight-bold {
+    font-weight: bold;
+}
+
+.no-data {
+    text-align: center;
+    padding: 40px;
+    color: #7f8c8d;
+    font-size: 16px;
+}
+
+.no-data i {
+    font-size: 48px;
+    margin-bottom: 15px;
+    color: #27ae60;
+    display: block;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .kpi-container {
+        grid-template-columns: 1fr;
+    }
+
+    .section-row {
+        grid-template-columns: 1fr;
+    }
+
+    .dashboard-header {
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .user-info {
+        text-align: center;
+    }
+}

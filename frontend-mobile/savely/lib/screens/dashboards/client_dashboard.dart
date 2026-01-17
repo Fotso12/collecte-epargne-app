@@ -8,6 +8,7 @@ import '../../services/demande_api.dart';
 import '../../services/type_compte_api.dart';
 import '../../screens/compte_detail_screen.dart';
 import 'client_profile_screen.dart';
+import '../client_transactions_history.dart';
 
 class ClientDashboard extends StatefulWidget {
   final UserModel user;
@@ -444,7 +445,10 @@ class _ClientDashboardState extends State<ClientDashboard> {
                       children: [
                         _buildWelcomeCard(context),
                         const SizedBox(height: 20),
+                        const SizedBox(height: 20),
                         _buildStatsGrid(context),
+                        const SizedBox(height: 24),
+                        _buildQuickActions(context),
                         const SizedBox(height: 24),
                         _buildComptesSection(context),
                         const SizedBox(height: 20),
@@ -712,6 +716,58 @@ class _ClientDashboardState extends State<ClientDashboard> {
               ],
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildQuickActions(BuildContext context) {
+    return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Actions Rapides',
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+            ),
+            const SizedBox(height: 16),
+            Row(
+              children: [
+                Expanded(
+                  child: ElevatedButton.icon(
+                    onPressed: () {
+                      if (_codeClient != null) {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ClientTransactionsHistory(
+                              codeClient: _codeClient!,
+                            ),
+                          ),
+                        );
+                      }
+                    },
+                    icon: const Icon(Icons.history),
+                    label: const Text('Historique Transactions'),
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      backgroundColor: Colors.orange,
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
         ),
       ),
     );

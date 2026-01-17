@@ -24,6 +24,10 @@ public interface ClientRepository extends JpaRepository<Client, Long> {
     void deleteByCodeClient(String codeClient);
     // Trouver tous les clients assignés à un collecteur spécifique (nécessaire pour la recherche des employés)
     List<Client> findByCollecteurAssigneIdEmploye(Integer idEmploye);
+    
+    // Compter les clients assignés à un collecteur
+    long countByCollecteurAssigne(com.collecte_epargne.collecte_epargne.entities.Employe collecteur);
+
 
     //Trouver les clients en fonction de leur code
     Optional<Client> findByCodeClient(String codeClient);
@@ -34,4 +38,5 @@ public interface ClientRepository extends JpaRepository<Client, Long> {
 
     Optional<Client> findByUtilisateurLogin(String login);
 
+    long countByCollecteurAssigne_AgenceZone(AgenceZone agenceZone);
 }

@@ -1,6 +1,7 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SuperviseurService } from '../../../core/services/superviseur.service';
+import { KpiService, SuperviseurKpi } from '../../../core/services/kpi.service';
 
 @Component({
   selector: 'app-superviseur-dashboard',
@@ -22,16 +23,20 @@ export class SuperviseurDashboard implements OnInit {
     historiquesCollection: []
   };
 
+  kpis: SuperviseurKpi | null = null;
   isLoading = true;
+  isLoadingKpis = true;
   errorMessage = '';
 
   constructor(
     private superviseurService: SuperviseurService,
+    private kpiService: KpiService,
     private cdr: ChangeDetectorRef
   ) { }
 
   ngOnInit(): void {
     this.chargerDashboard();
+    this.chargerKpis();
   }
 
   chargerDashboard(): void {
@@ -51,11 +56,45 @@ export class SuperviseurDashboard implements OnInit {
     });
   }
 
+  chargerKpis(): void {
+    this.isLoadingKpis = true;
+    this.kpiService.getKpis().subscribe({
+      next: (data: SuperviseurKpi) => {
+        this.kpis = data;
+        this.isLoadingKpis = false;
+        this.cdr.detectChanges();
+      },
+      error: (err: any) => {
+        console.error('Erreur chargement KPIs:', err);
+        this.isLoadingKpis = false;
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
   // Format montant
   formatMontant(montant: number): string {
+    if (!montant) return '0 FCFA';
     return new Intl.NumberFormat('fr-FR', {
-      style: 'currency',
-      currency: 'XAF'
-    }).format(montant);
+      style: 'decimal',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0
+    }).format(montant) + ' FCFA';
+  }
+
+  // Obtenir la couleur du statut
+  getStatusColor(status: string): string {
+    return this.kpiService.getStatusColor(status);
+  }
+
+  // Obtenir le libellé du statut
+  getStatusLabel(status: string): string {
+    return this.kpiService.getStatusLabel(status);
+  }
+
+  // Rafraîchir les données
+  rafraichir(): void {
+    this.chargerDashboard();
+    this.chargerKpis();
   }
 }

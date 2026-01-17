@@ -76,29 +76,40 @@ class _ClientProfileState extends State<ClientProfile> {
     if (!_formKey.currentState!.validate()) return;
     setState(() => _isLoading = true);
     try {
+      // 1. Mise à jour des informations textuelles et photo profil (si gérée via updateClient)
       final updated = await ClientApi.updateClient(
         codeClient: _codeClient,
         adresse: _adresseCtrl.text.isEmpty ? null : _adresseCtrl.text,
         profession: _professionCtrl.text.isEmpty ? null : _professionCtrl.text,
         photoPath: _photoUrlCtrl.text.isEmpty ? null : _photoUrlCtrl.text,
-        cniRectoPath: _cniRectoCtrl.text.isEmpty ? null : _cniRectoCtrl.text,
-        cniVersoPath: _cniVersoCtrl.text.isEmpty ? null : _cniVersoCtrl.text,
       );
+
+      // 2. Upload CNI si les deux images sont sélectionnées
+      if (_cniRectoFile != null && _cniVersoFile != null) {
+        await ClientApi.uploadCniImages(
+          codeClient: _codeClient,
+          rectoPath: _cniRectoFile!.path,
+          versoPath: _cniVersoFile!.path,
+        );
+      } else if (_cniRectoFile != null || _cniVersoFile != null) {
+        // Avertissement si une seule image est sélectionnée ?
+        // On continue pour l'instant
+      }
 
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text('Profil mis à jour')));
+      ).showSnackBar(const SnackBar(content: Text('Profil mis à jour avec succès')));
 
-      // Update local profile state with returned data when available
+      // Update local profile state
       if (updated.isNotEmpty) {
         _profile = updated;
-        _photoUrlCtrl.text =
-            updated['photoPath']?.toString() ?? _photoUrlCtrl.text;
+        _photoUrlCtrl.text = updated['photoPath']?.toString() ?? _photoUrlCtrl.text;
       }
+      
+      // Recharger pour avoir les nouveaux chemins d'images confirmés par le backend
+      await _init();
 
-      setState(() => _isLoading = false);
     } catch (e, st) {
-      // Show raw server message in a dialog to help debugging (will also be logged)
       ErrorHandler.logError(e, st);
       await ErrorHandler.showErrorDialog(
         context,
@@ -249,7 +260,7 @@ class _ClientProfileState extends State<ClientProfile> {
                     const SizedBox(height: 20),
 
                     const Text(
-                      'Documents',
+                      'Documents (CNI)',
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
@@ -259,66 +270,106 @@ class _ClientProfileState extends State<ClientProfile> {
                     Row(
                       children: [
                         Expanded(
-                          child: TextFormField(
-                            controller: _cniRectoCtrl,
-                            decoration: const InputDecoration(
-                              labelText: 'CNI Recto / Photo ID (URL)',
-                            ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              _cniRectoFile != null 
+                                ? Image.file(_cniRectoFile!, height: 100, fit: BoxFit.cover)
+                                : (_cniRectoCtrl.text.isNotEmpty 
+                                    ? Image.network(
+                                        _cniRectoCtrl.text, 
+                                        height: 100, 
+                                        fit: BoxFit.cover,
+                                        errorBuilder: (context, error, stackTrace) => 
+                                          Container(height: 100, color: Colors.grey[200], child: const Icon(Icons.broken_image)),
+                                      )
+                                    : Container(
+                                        height: 100,
+                                        color: Colors.grey[200],
+                                        child: const Icon(Icons.image, size: 40, color: Colors.grey),
+                                      )
+                                  ),
+                              const SizedBox(height: 4),
+                              ElevatedButton(
+                                onPressed: () async {
+                                  final picked = await _picker.pickImage(
+                                    source: ImageSource.gallery,
+                                    imageQuality: 80,
+                                  );
+                                  if (picked != null) {
+                                    setState(() {
+                                      _cniRectoFile = File(picked.path);
+                                    });
+                                  }
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: const Color(0xFF0D8A5F),
+                                  foregroundColor: Colors.white,
+                                  padding: const EdgeInsets.symmetric(vertical: 8),
+                                ),
+                                child: const Text('Recto', style: TextStyle(fontSize: 12)),
+                              ),
+                            ],
                           ),
                         ),
-                        const SizedBox(width: 8),
-                        ElevatedButton(
-                          onPressed: () async {
-                            final picked = await _picker.pickImage(
-                              source: ImageSource.gallery,
-                              imageQuality: 80,
-                            );
-                            if (picked != null) {
-                              setState(() {
-                                _cniRectoFile = File(picked.path);
-                                _cniRectoCtrl.text = _cniRectoFile!.path;
-                              });
-                            }
-                          },
-                          child: const Text('Choisir'),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF0D8A5F),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 12),
-                    Row(
-                      children: [
+                        const SizedBox(width: 16),
                         Expanded(
-                          child: TextFormField(
-                            controller: _cniVersoCtrl,
-                            decoration: const InputDecoration(
-                              labelText: 'CNI Verso (URL)',
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        ElevatedButton(
-                          onPressed: () async {
-                            final picked = await _picker.pickImage(
-                              source: ImageSource.gallery,
-                              imageQuality: 80,
-                            );
-                            if (picked != null) {
-                              setState(() {
-                                _cniVersoFile = File(picked.path);
-                                _cniVersoCtrl.text = _cniVersoFile!.path;
-                              });
-                            }
-                          },
-                          child: const Text('Choisir'),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF0D8A5F),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              _cniVersoFile != null 
+                                ? Image.file(_cniVersoFile!, height: 100, fit: BoxFit.cover)
+                                : (_cniVersoCtrl.text.isNotEmpty 
+                                    ? Image.network(
+                                        _cniVersoCtrl.text, 
+                                        height: 100, 
+                                        fit: BoxFit.cover,
+                                        errorBuilder: (context, error, stackTrace) => 
+                                          Container(height: 100, color: Colors.grey[200], child: const Icon(Icons.broken_image)),
+                                      )
+                                    : Container(
+                                        height: 100,
+                                        color: Colors.grey[200],
+                                        child: const Icon(Icons.image, size: 40, color: Colors.grey),
+                                      )
+                                  ),
+                              const SizedBox(height: 4),
+                              ElevatedButton(
+                                onPressed: () async {
+                                  final picked = await _picker.pickImage(
+                                    source: ImageSource.gallery,
+                                    imageQuality: 80,
+                                  );
+                                  if (picked != null) {
+                                    setState(() {
+                                      _cniVersoFile = File(picked.path);
+                                    });
+                                  }
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: const Color(0xFF0D8A5F),
+                                  foregroundColor: Colors.white,
+                                  padding: const EdgeInsets.symmetric(vertical: 8),
+                                ),
+                                child: const Text('Verso', style: TextStyle(fontSize: 12)),
+                              ),
+                            ],
                           ),
                         ),
                       ],
                     ),
+                    if (_cniRectoFile != null || _cniVersoFile != null)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 8.0),
+                        child: Text(
+                          'N\'oubliez pas de cliquer sur "Enregistrer" pour envoyer les images.',
+                          style: TextStyle(
+                            color: Colors.orange[800],
+                            fontSize: 12,
+                            fontStyle: FontStyle.italic,
+                          ),
+                        ),
+                      ),
                     const SizedBox(height: 20),
 
                     Row(

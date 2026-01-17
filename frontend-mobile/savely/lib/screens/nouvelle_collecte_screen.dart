@@ -1,17 +1,13 @@
 import 'package:flutter/material.dart';
-import '../services/employe_api.dart';
-import '../services/transaction_offline_api.dart';
-import '../services/compte_api.dart';
-import '../models/compte_model.dart';
+import '../services/collecte_api.dart';
+import '../services/error_handler.dart';
 
 class NouvelleCollecteScreen extends StatefulWidget {
-  final String loginCollecteur;
-  final String? idEmploye;
-
+  final String matriculeCollecteur;
+  
   const NouvelleCollecteScreen({
     super.key,
-    required this.loginCollecteur,
-    this.idEmploye,
+    required this.matriculeCollecteur,
   });
 
   @override
@@ -19,115 +15,317 @@ class NouvelleCollecteScreen extends StatefulWidget {
 }
 
 class _NouvelleCollecteScreenState extends State<NouvelleCollecteScreen> {
-  final _formKey = GlobalKey<FormState>();
+  // Controllers
   final _montantController = TextEditingController();
   final _descriptionController = TextEditingController();
+
+  // State variables
+  List<dynamic> _clients = [];
+  List<dynamic> _comptes = [];
+  List<dynamic> _caissiers = [];
   
   String? _selectedClientCode;
   String? _selectedCompteId;
-  String _selectedTypeTransaction = 'DEPOT';
-  bool _isLoading = false;
-  bool _loadingClients = false;
-  bool _loadingComptes = false;
+  String? _selectedTypeTransaction;
+  int? _selectedCaissierId;
   
-  List<Map<String, dynamic>> _clients = [];
-  List<CompteModel> _comptes = [];
-  String? _idEmploye;
+  bool _isLoading = false;
+  bool _isLoadingComptes = false;
 
   @override
   void initState() {
     super.initState();
-    _initializeData();
+    _chargerDonnees();
   }
 
-  Future<void> _initializeData() async {
-    setState(() => _loadingClients = true);
+  Future<void> _chargerDonnees() async {
+    setState(() => _isLoading = true);
     try {
-      // Obtenir l'ID_EMPLOYE si non fourni (le backend attend l'ID, pas le matricule)
-      if (widget.idEmploye == null) {
-        _idEmploye = await EmployeApi.getIdEmployeByLogin(widget.loginCollecteur);
-      } else {
-        _idEmploye = widget.idEmploye;
-      }
-
-      if (_idEmploye == null) {
-        throw Exception('Impossible de trouver l\'ID du collecteur');
-      }
-
-      // Charger les clients assignés (utilise l'ID_EMPLOYE)
-      _clients = await EmployeApi.getClientsByCollecteur(_idEmploye!);
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Erreur: $e')),
-        );
-      }
-    } finally {
-      setState(() => _loadingClients = false);
-    }
-  }
-
-  Future<void> _loadComptes(String codeClient) async {
-    setState(() {
-      _loadingComptes = true;
-      _selectedCompteId = null;
-      _comptes = [];
-    });
-
-    try {
-      final comptesData = await CompteApi.getComptesByClient(codeClient);
+      final clients = await CollecteApi.getClientsCollecteur(widget.matriculeCollecteur);
+      final caissiers = await CollecteApi.getCaissiers();
+      
       setState(() {
-        _comptes = comptesData;
+        _clients = clients;
+        _caissiers = caissiers;
+        _isLoading = false;
       });
     } catch (e) {
+      setState(() => _isLoading = false);
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Erreur lors du chargement des comptes: $e')),
-        );
+        ErrorHandler.showErrorSnackBar(context, e);
       }
-    } finally {
-      setState(() => _loadingComptes = false);
     }
   }
 
-  Future<void> _submit() async {
-    if (!_formKey.currentState!.validate()) return;
-    if (_selectedClientCode == null || _selectedCompteId == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Veuillez sélectionner un client et un compte')),
+  Future<void> _chargerComptesClient(String codeClient) async {
+    setState(() => _isLoadingComptes = true);
+    try {
+      final comptes = await CollecteApi.getComptesClient(codeClient);
+      setState(() {
+        _comptes = comptes;
+        _selectedCompteId = null;
+        _isLoadingComptes = false;
+      });
+    } catch (e) {
+      setState(() => _isLoadingComptes = false);
+      if (mounted) {
+        ErrorHandler.showErrorSnackBar(context, e);
+      }
+    }
+  }
+
+  Future<void> _soumettre() async {
+    // Validation
+    if (_selectedClientCode == null ||
+        _selectedCompteId == null ||
+        _selectedTypeTransaction == null ||
+        _selectedCaissierId == null ||
+        _montantController.text.isEmpty) {
+      ErrorHandler.showErrorSnackBar(
+        context,
+        'Veuillez remplir tous les champs obligatoires',
+      );
+      return;
+    }
+
+    final montant = double.tryParse(_montantController.text);
+    if (montant == null || montant <= 0) {
+      ErrorHandler.showErrorSnackBar(
+        context,
+        'Montant invalide',
       );
       return;
     }
 
     setState(() => _isLoading = true);
-
     try {
-      await TransactionOfflineApi.createTransaction(
-        idEmploye: _idEmploye!,
-        codeClient: _selectedClientCode!,
+      await CollecteApi.creerCollecte(
         idCompte: _selectedCompteId!,
-        montant: double.parse(_montantController.text),
-        typeTransaction: _selectedTypeTransaction,
-        description: _descriptionController.text.isEmpty ? null : _descriptionController.text,
+        typeTransaction: _selectedTypeTransaction!,
+        montant: montant,
+        idCaissier: _selectedCaissierId!,
+        description: _descriptionController.text,
       );
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Collecte créée avec succès!')),
+          const SnackBar(
+            content: Text('Collecte créée avec succès !'),
+            backgroundColor: Colors.green,
+          ),
         );
         Navigator.pop(context, true);
       }
     } catch (e) {
+      setState(() => _isLoading = false);
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Erreur: $e')),
-        );
-      }
-    } finally {
-      if (mounted) {
-        setState(() => _isLoading = false);
+        ErrorHandler.showErrorDialog(context, e);
       }
     }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Nouvelle Collecte'),
+        backgroundColor: const Color(0xFF0D8A5F),
+        foregroundColor: Colors.white,
+      ),
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : SingleChildScrollView(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  // En-tête
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF0D8A5F).withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: const Row(
+                      children: [
+                        Icon(Icons.info_outline, color: Color(0xFF0D8A5F)),
+                        SizedBox(width: 12),
+                        Expanded(
+                          child: Text(
+                            'Remplissez tous les champs pour créer une nouvelle collecte',
+                            style: TextStyle(fontSize: 14),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+
+                  // Dropdown Client
+                  DropdownButtonFormField<String>(
+                    decoration: const InputDecoration(
+                      labelText: 'Client *',
+                      border: OutlineInputBorder(),
+                      prefixIcon: Icon(Icons.person),
+                    ),
+                    value: _selectedClientCode,
+                    items: _clients.map((client) {
+                      return DropdownMenuItem<String>(
+                        value: client['codeClient'],
+                        child: Text('${client['nom']} ${client['prenom']}'),
+                      );
+                    }).toList(),
+                    onChanged: (value) {
+                      setState(() => _selectedClientCode = value);
+                      if (value != null) {
+                        _chargerComptesClient(value);
+                      }
+                    },
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Dropdown Compte
+                  _isLoadingComptes
+                      ? const Center(child: CircularProgressIndicator())
+                      : DropdownButtonFormField<String>(
+                          decoration: const InputDecoration(
+                            labelText: 'Compte *',
+                            border: OutlineInputBorder(),
+                            prefixIcon: Icon(Icons.account_balance),
+                          ),
+                          value: _selectedCompteId,
+                          items: _comptes.map((compte) {
+                            return DropdownMenuItem<String>(
+                              value: compte['idCompte'],
+                              child: Text('${compte['numeroCompte']} - ${compte['typeCompte']}'),
+                            );
+                          }).toList(),
+                          onChanged: (value) {
+                            setState(() => _selectedCompteId = value);
+                          },
+                        ),
+                  const SizedBox(height: 16),
+
+                  // Dropdown Type Transaction
+                  DropdownButtonFormField<String>(
+                    decoration: const InputDecoration(
+                      labelText: 'Type de Transaction *',
+                      border: OutlineInputBorder(),
+                      prefixIcon: Icon(Icons.swap_horiz),
+                    ),
+                    value: _selectedTypeTransaction,
+                    items: const [
+                      DropdownMenuItem(
+                        value: 'DEPOT',
+                        child: Row(
+                          children: [
+                            Icon(Icons.arrow_downward, color: Colors.green, size: 20),
+                            SizedBox(width: 8),
+                            Text('Dépôt'),
+                          ],
+                        ),
+                      ),
+                      DropdownMenuItem(
+                        value: 'RETRAIT',
+                        child: Row(
+                          children: [
+                            Icon(Icons.arrow_upward, color: Colors.red, size: 20),
+                            SizedBox(width: 8),
+                            Text('Retrait'),
+                          ],
+                        ),
+                      ),
+                      DropdownMenuItem(
+                        value: 'COTISATION',
+                        child: Row(
+                          children: [
+                            Icon(Icons.savings, color: Colors.blue, size: 20),
+                            SizedBox(width: 8),
+                            Text('Cotisation'),
+                          ],
+                        ),
+                      ),
+                    ],
+                    onChanged: (value) {
+                      setState(() => _selectedTypeTransaction = value);
+                    },
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Champ Montant
+                  TextField(
+                    controller: _montantController,
+                    keyboardType: TextInputType.number,
+                    decoration: const InputDecoration(
+                      labelText: 'Montant (FCFA) *',
+                      border: OutlineInputBorder(),
+                      prefixIcon: Icon(Icons.attach_money),
+                      hintText: 'Ex: 5000',
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Dropdown Caissier
+                  DropdownButtonFormField<int>(
+                    decoration: const InputDecoration(
+                      labelText: 'Caissier Validateur *',
+                      border: OutlineInputBorder(),
+                      prefixIcon: Icon(Icons.person_outline),
+                    ),
+                    value: _selectedCaissierId,
+                    items: _caissiers.map((caissier) {
+                      return DropdownMenuItem<int>(
+                        value: caissier['idEmploye'],
+                        child: Text('${caissier['nom']} ${caissier['prenom']}'),
+                      );
+                    }).toList(),
+                    onChanged: (value) {
+                      setState(() => _selectedCaissierId = value);
+                    },
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Champ Description
+                  TextField(
+                    controller: _descriptionController,
+                    maxLines: 3,
+                    decoration: const InputDecoration(
+                      labelText: 'Description (optionnel)',
+                      border: OutlineInputBorder(),
+                      hintText: 'Ajoutez une note...',
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+
+                  // Bouton Soumettre
+                  ElevatedButton(
+                    onPressed: _isLoading ? null : _soumettre,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF0D8A5F),
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    child: _isLoading
+                        ? const SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                            ),
+                          )
+                        : const Text(
+                            'Créer la Collecte',
+                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                          ),
+                  ),
+                ],
+              ),
+            ),
+    );
   }
 
   @override
@@ -136,198 +334,4 @@ class _NouvelleCollecteScreenState extends State<NouvelleCollecteScreen> {
     _descriptionController.dispose();
     super.dispose();
   }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Nouvelle Collecte'),
-        backgroundColor: Theme.of(context).colorScheme.primary,
-        foregroundColor: Colors.white,
-      ),
-      body: _loadingClients
-          ? const Center(child: CircularProgressIndicator())
-          : SingleChildScrollView(
-              padding: const EdgeInsets.all(16),
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Card(
-                      elevation: 2,
-                      child: Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Informations de la collecte',
-                              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                            ),
-                            const SizedBox(height: 20),
-                            
-                            // Sélection du client
-                            DropdownButtonFormField<String>(
-                              initialValue: _selectedClientCode,
-                              decoration: const InputDecoration(
-                                labelText: 'Client *',
-                                border: OutlineInputBorder(),
-                                prefixIcon: Icon(Icons.person),
-                              ),
-                              items: _clients.map((client) {
-                                final nom = '${client['prenom'] ?? ''} ${client['nom'] ?? ''}'.trim();
-                                final code = client['codeClient']?.toString() ?? '';
-                                return DropdownMenuItem(
-                                  value: code,
-                                  child: Text(nom.isEmpty ? code : '$nom ($code)'),
-                                );
-                              }).toList(),
-                              onChanged: (value) {
-                                setState(() {
-                                  _selectedClientCode = value;
-                                  _selectedCompteId = null;
-                                  _comptes = [];
-                                });
-                                if (value != null) {
-                                  _loadComptes(value);
-                                }
-                              },
-                              validator: (value) =>
-                                  value == null ? 'Veuillez sélectionner un client' : null,
-                            ),
-                            const SizedBox(height: 16),
-                            
-                            // Sélection du compte
-                            DropdownButtonFormField<String>(
-                              initialValue: _selectedCompteId,
-                              decoration: InputDecoration(
-                                labelText: 'Compte *',
-                                border: const OutlineInputBorder(),
-                                prefixIcon: const Icon(Icons.account_balance),
-                                suffixIcon: _loadingComptes
-                                    ? const SizedBox(
-                                        width: 20,
-                                        height: 20,
-                                        child: Padding(
-                                          padding: EdgeInsets.all(12),
-                                          child: CircularProgressIndicator(strokeWidth: 2),
-                                        ),
-                                      )
-                                    : null,
-                              ),
-                              items: _comptes.map((compte) {
-                                return DropdownMenuItem(
-                                  value: compte.idCompte.toString(),
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Text('Compte: ${compte.numCompte}'),
-                                      Text(
-                                        'Solde: ${compte.formattedSolde}',
-                                        style: TextStyle(
-                                          fontSize: 12,
-                                          color: Colors.grey[600],
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                );
-                              }).toList(),
-                              onChanged: _loadingComptes
-                                  ? null
-                                  : (value) {
-                                      setState(() => _selectedCompteId = value);
-                                    },
-                              validator: (value) =>
-                                  value == null ? 'Veuillez sélectionner un compte' : null,
-                            ),
-                            const SizedBox(height: 16),
-                            
-                            // Type de transaction
-                            DropdownButtonFormField<String>(
-                              initialValue: _selectedTypeTransaction,
-                              decoration: const InputDecoration(
-                                labelText: 'Type de transaction *',
-                                border: OutlineInputBorder(),
-                                prefixIcon: Icon(Icons.swap_horiz),
-                              ),
-                              items: const [
-                                DropdownMenuItem(value: 'DEPOT', child: Text('Dépôt')),
-                                DropdownMenuItem(value: 'RETRAIT', child: Text('Retrait')),
-                              ],
-                              onChanged: (value) {
-                                setState(() => _selectedTypeTransaction = value!);
-                              },
-                            ),
-                            const SizedBox(height: 16),
-                            
-                            // Montant
-                            TextFormField(
-                              controller: _montantController,
-                              decoration: const InputDecoration(
-                                labelText: 'Montant (FCFA) *',
-                                border: OutlineInputBorder(),
-                                prefixIcon: Icon(Icons.monetization_on),
-                              ),
-                              keyboardType: TextInputType.number,
-                              validator: (value) {
-                                if (value == null || value.isEmpty) {
-                                  return 'Veuillez entrer un montant';
-                                }
-                                final montant = double.tryParse(value);
-                                if (montant == null || montant <= 0) {
-                                  return 'Montant invalide';
-                                }
-                                return null;
-                              },
-                            ),
-                            const SizedBox(height: 16),
-                            
-                            // Description
-                            TextFormField(
-                              controller: _descriptionController,
-                              decoration: const InputDecoration(
-                                labelText: 'Description (optionnel)',
-                                border: OutlineInputBorder(),
-                                prefixIcon: Icon(Icons.description),
-                              ),
-                              maxLines: 3,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 24),
-                    
-                    // Bouton de soumission
-                    ElevatedButton.icon(
-                      onPressed: _isLoading ? null : _submit,
-                      icon: _isLoading
-                          ? const SizedBox(
-                              width: 20,
-                              height: 20,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                color: Colors.white,
-                              ),
-                            )
-                          : const Icon(Icons.save),
-                      label: Text(_isLoading ? 'Enregistrement...' : 'Enregistrer la collecte'),
-                      style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        backgroundColor: Theme.of(context).colorScheme.primary,
-                        foregroundColor: Colors.white,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-    );
-  }
 }
-

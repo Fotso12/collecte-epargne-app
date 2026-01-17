@@ -2,6 +2,7 @@ package com.collecte_epargne.collecte_epargne.repositories;
 
 import com.collecte_epargne.collecte_epargne.entities.Transaction;
 import com.collecte_epargne.collecte_epargne.entities.Employe;
+import com.collecte_epargne.collecte_epargne.entities.Client;
 import com.collecte_epargne.collecte_epargne.entities.Institution;
 import com.collecte_epargne.collecte_epargne.entities.AgenceZone;
 import com.collecte_epargne.collecte_epargne.utils.StatusValidation;
@@ -100,5 +101,15 @@ import java.util.Optional;
             @Param("agence") AgenceZone agence,
             @Param("startDate") Instant startDate,
             @Param("endDate") Instant endDate
+        );
+
+        long countByInitiateur_AgenceZone(AgenceZone agence);
+
+        List<Transaction> findByInitiateur_AgenceZone(AgenceZone agence);
+
+        List<Transaction> findByCompte_ClientAndTypeTransactionAndStatusValidationOrderByDateTransactionDesc(
+            Client client,
+            com.collecte_epargne.collecte_epargne.utils.TypeTransaction type,
+            StatusValidation status
         );
     }

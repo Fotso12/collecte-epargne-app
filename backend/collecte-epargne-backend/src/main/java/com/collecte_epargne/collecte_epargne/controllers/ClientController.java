@@ -1,9 +1,11 @@
 package com.collecte_epargne.collecte_epargne.controllers;
 
 import com.collecte_epargne.collecte_epargne.dtos.ClientDto;
+import com.collecte_epargne.collecte_epargne.dtos.ClientRegistrationRequest;
 import com.collecte_epargne.collecte_epargne.services.implementations.ClientService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -22,9 +24,21 @@ public class ClientController {
     private static final Logger log = LoggerFactory.getLogger(ClientController.class);
 
     private final ClientService clientService;
+    private final RegistrationController registrationController;
 
-    public ClientController(ClientService clientService) {
+    public ClientController(ClientService clientService, RegistrationController registrationController) {
         this.clientService = clientService;
+        this.registrationController = registrationController;
+    }
+
+    /**
+     * Endpoint d'inscription client pour compatibilité avec l'application mobile
+     * Délègue à RegistrationController
+     */
+    @PostMapping("/register")
+    public ResponseEntity<?> registerClient(@Valid @RequestBody ClientRegistrationRequest request) {
+        log.info("POST /api/clients/register - Délégation vers RegistrationController");
+        return registrationController.registerClient(request);
     }
 
     // --- NOUVELLE MÉTHODE : CRÉATION AVEC FICHIERS ---
@@ -73,6 +87,30 @@ public class ClientController {
             );
         } catch (Exception e) {
             log.error("Erreur mise à jour client avec fichiers", e);
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    /**
+     * Upload des images CNI (recto et verso) pour un client
+     */
+    @PostMapping(value = "/{codeClient}/upload-cni", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> uploadCniImages(
+            @PathVariable String codeClient,
+            @RequestPart(value = "cniRecto", required = false) MultipartFile cniRecto,
+            @RequestPart(value = "cniVerso", required = false) MultipartFile cniVerso) {
+
+        log.info("POST /api/clients/{}/upload-cni - Upload images CNI", codeClient);
+        try {
+            // Récupérer le client existant
+            ClientDto clientDto = clientService.getByCodeClient(codeClient);
+            
+            // Mettre à jour uniquement les images CNI
+            ClientDto updatedClient = clientService.updateWithFiles(codeClient, clientDto, null, cniRecto, cniVerso);
+            
+            return new ResponseEntity<>(updatedClient, HttpStatus.OK);
+        } catch (Exception e) {
+            log.error("Erreur upload CNI pour client {}", codeClient, e);
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }

@@ -5,69 +5,179 @@
       <p><strong>{{ dashboard.nomSuperviseur }}</strong></p>
       <p class="agence">{{ dashboard.agenceNom }}</p>
     </div>
+    <button class="btn-refresh" (click)="rafraichir()" title="Rafraîchir">
+      <i class="fas fa-sync-alt"></i>
+    </button>
   </div>
 
   <div *ngIf="errorMessage" class="alert alert-danger">
     {{ errorMessage }}
   </div>
 
-  <div *ngIf="isLoading" class="spinner">
+  <div *ngIf="isLoading || isLoadingKpis" class="spinner">
     <p>Chargement...</p>
   </div>
 
-  <div *ngIf="!isLoading" class="dashboard-content">
-    <!-- KPIs Cards -->
+  <div *ngIf="!isLoading && !isLoadingKpis" class="dashboard-content">
+    <!-- KPIs Cards - Row 1 -->
     <div class="kpi-container">
       <div class="kpi-card bg-primary">
+        <div class="kpi-icon"><i class="fas fa-clock"></i></div>
         <div class="kpi-value">{{ dashboard.comptesEnAttenteApprobation }}</div>
         <div class="kpi-label">Comptes en Attente</div>
       </div>
 
       <div class="kpi-card bg-success">
+        <div class="kpi-icon"><i class="fas fa-users"></i></div>
         <div class="kpi-value">{{ dashboard.collecteursTotal }}</div>
         <div class="kpi-label">Collecteurs Actifs</div>
       </div>
 
       <div class="kpi-card bg-info">
-        <div class="kpi-value">{{ formatMontant(dashboard.montantCollecteJour) }}</div>
+        <div class="kpi-icon"><i class="fas fa-coins"></i></div>
+        <div class="kpi-value">{{ formatMontant(kpis?.collecteJournaliere || 0) }}</div>
         <div class="kpi-label">Collecte Aujourd'hui</div>
       </div>
 
       <div class="kpi-card bg-warning">
-        <div class="kpi-value">{{ formatMontant(dashboard.gainsJourSuperviseur) }}</div>
-        <div class="kpi-label">Mes Gains (Jour)</div>
+        <div class="kpi-icon"><i class="fas fa-wallet"></i></div>
+        <div class="kpi-value">{{ formatMontant(kpis?.gainSuperviseur || 0) }}</div>
+        <div class="kpi-label">Mes Gains</div>
       </div>
     </div>
 
-    <!-- Meilleur Collecteur -->
-    <div *ngIf="dashboard.meilleurCollecteur" class="section">
-      <h2>Meilleur Collecteur</h2>
-      <div class="best-collector-card">
-        <div class="collector-header">
-          <div class="collector-name">{{ dashboard.meilleurCollecteur.nomCollecteur }}</div>
-          <div class="collector-badge">🏆 Top Collecteur</div>
+    <!-- KPIs Cards - Row 2 -->
+    <div class="kpi-container">
+      <div class="kpi-card bg-teal">
+        <div class="kpi-icon"><i class="fas fa-calendar-week"></i></div>
+        <div class="kpi-value">{{ formatMontant(kpis?.collecteHebdomadaire || 0) }}</div>
+        <div class="kpi-label">Collecte Hebdomadaire</div>
+      </div>
+
+      <div class="kpi-card bg-purple">
+        <div class="kpi-icon"><i class="fas fa-calendar-alt"></i></div>
+        <div class="kpi-value">{{ formatMontant(kpis?.collecteMensuelle || 0) }}</div>
+        <div class="kpi-label">Collecte Mensuelle</div>
+      </div>
+
+      <div class="kpi-card bg-indigo">
+        <div class="kpi-icon"><i class="fas fa-university"></i></div>
+        <div class="kpi-value">{{ formatMontant(kpis?.caisseEntreprise || 0) }}</div>
+        <div class="kpi-label">Caisse Entreprise</div>
+      </div>
+
+      <div class="kpi-card bg-orange">
+        <div class="kpi-icon"><i class="fas fa-chart-line"></i></div>
+        <div class="kpi-value">{{ kpis?.nombreTransactions || 0 }}</div>
+        <div class="kpi-label">Total Transactions</div>
+      </div>
+    </div>
+
+    <!-- Meilleurs Collecteurs Section -->
+    <div class="section-row">
+      <!-- Meilleur Collecteur (Montant) -->
+      <!-- Meilleur Collecteur (Montant) -->
+      <div class="section half-width">
+        <h2><i class="fas fa-trophy"></i> Meilleur Collecteur</h2>
+        <div *ngIf="kpis?.meilleurCollecteur" class="best-collector-card">
+          <div class="collector-header">
+            <div class="collector-name">
+              {{ kpis?.meilleurCollecteur?.prenom }} {{ kpis?.meilleurCollecteur?.nom }}
+            </div>
+            <div class="collector-badge gold">🏆 Top Collecteur</div>
+          </div>
+          <div class="collector-stats">
+            <div class="stat">
+              <span class="label">Matricule:</span>
+              <span class="value">{{ kpis?.meilleurCollecteur?.matricule }}</span>
+            </div>
+            <div class="stat">
+              <span class="label">Montant Collecté:</span>
+              <span class="value highlight">{{ formatMontant(kpis?.meilleurCollecteur?.montantCollecte || 0) }}</span>
+            </div>
+            <div class="stat">
+              <span class="label">Transactions:</span>
+              <span class="value">{{ kpis?.meilleurCollecteur?.nombreTransactions }}</span>
+            </div>
+          </div>
         </div>
-        <div class="collector-stats">
-          <div class="stat">
-            <span class="label">Montant Collecté:</span>
-            <span class="value">{{ formatMontant(dashboard.meilleurCollecteur.montantCollecte) }}</span>
+        <div *ngIf="!kpis?.meilleurCollecteur" class="no-data">
+          Aucune donnée disponible
+        </div>
+      </div>
+
+      <!-- Collecteur avec Plus de Clients -->
+      <div class="section half-width">
+        <h2><i class="fas fa-user-friends"></i> Plus de Clients</h2>
+        <div *ngIf="kpis?.collecteurPlusClients" class="best-collector-card">
+          <div class="collector-header">
+            <div class="collector-name">
+              {{ kpis?.collecteurPlusClients?.prenom }} {{ kpis?.collecteurPlusClients?.nom }}
+            </div>
+            <div class="collector-badge silver">👥 Top Clients</div>
           </div>
-          <div class="stat">
-            <span class="label">Clients:</span>
-            <span class="value">{{ dashboard.meilleurCollecteur.nombreClients }}</span>
-          </div>
-          <div class="stat">
-            <span class="label">Transactions:</span>
-            <span class="value">{{ dashboard.meilleurCollecteur.nombreTransactions }}</span>
+          <div class="collector-stats">
+            <div class="stat">
+              <span class="label">Matricule:</span>
+              <span class="value">{{ kpis?.collecteurPlusClients?.matricule }}</span>
+            </div>
+            <div class="stat">
+              <span class="label">Nombre de Clients:</span>
+              <span class="value highlight">{{ kpis?.collecteurPlusClients?.nombreClients }}</span>
+            </div>
+            <div class="stat">
+              <span class="label">Montant Collecté:</span>
+              <span class="value">{{ formatMontant(kpis?.collecteurPlusClients?.montantCollecte || 0) }}</span>
+            </div>
           </div>
         </div>
+        <div *ngIf="!kpis?.collecteurPlusClients" class="no-data">
+          Aucune donnée disponible
+        </div>
+      </div>
+    </div>
+
+    <!-- Clients en Retard -->
+    <div class="section">
+      <h2><i class="fas fa-exclamation-triangle"></i> Clients en Retard de Cotisation</h2>
+      <div *ngIf="kpis?.clientsEnRetard && (kpis?.clientsEnRetard?.length || 0) > 0" class="table-responsive">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Code Client</th>
+              <th>Nom</th>
+              <th>Téléphone</th>
+              <th>Jours de Retard</th>
+              <th>Montant Dû</th>
+              <th>Intérêts</th>
+              <th>Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let client of kpis?.clientsEnRetard" class="retard-row">
+              <td>{{ client.codeClient }}</td>
+              <td>{{ client.prenom }} {{ client.nom }}</td>
+              <td>{{ client.telephone }}</td>
+              <td>
+                <span class="badge badge-danger">{{ client.joursRetard }} jours</span>
+              </td>
+              <td>{{ formatMontant(client.montantDu) }}</td>
+              <td class="text-danger">{{ formatMontant(client.interetsRetard) }}</td>
+              <td class="font-weight-bold">{{ formatMontant(client.montantDu + client.interetsRetard) }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div *ngIf="!kpis?.clientsEnRetard || kpis?.clientsEnRetard?.length === 0" class="no-data">
+        <i class="fas fa-check-circle"></i> Aucun client en retard
       </div>
     </div>
 
     <!-- Historique Collection -->
     <div class="section">
-      <h2>Historique Collection</h2>
-      <div *ngIf="dashboard.historiquesCollection && dashboard.historiquesCollection.length > 0" class="table-responsive">
+      <h2><i class="fas fa-history"></i> Historique Collection</h2>
+      <div *ngIf="dashboard.historiquesCollection && dashboard.historiquesCollection.length > 0"
+        class="table-responsive">
         <table class="table">
           <thead>
             <tr>

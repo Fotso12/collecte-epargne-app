@@ -18,8 +18,10 @@ public class UserDetailsImpl implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
+        String roleCode = utilisateur.getRole().getCode().toUpperCase();
+        System.out.println("USER_LOGIN_DEBUG: User " + utilisateur.getEmail() + " has Role Code: " + roleCode + " -> Authority: ROLE_" + roleCode);
         return List.of(
-                new SimpleGrantedAuthority("ROLE_" + utilisateur.getRole().getNom())
+                new SimpleGrantedAuthority("ROLE_" + roleCode)
         );
     }
 

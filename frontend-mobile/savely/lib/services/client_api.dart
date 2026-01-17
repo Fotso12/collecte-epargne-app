@@ -257,4 +257,70 @@ class ClientApi {
       throw Exception('Erreur lors de la récupération des comptes: $e');
     }
   }
+
+  /// Upload des images CNI (recto et verso)
+  static Future<Map<String, dynamic>> uploadCniImages({
+    required String codeClient,
+    required String rectoPath,
+    required String versoPath,
+  }) async {
+    try {
+      final uri = _uri('/api/clients/$codeClient/upload-cni');
+
+      // Créer une requête multipart
+      var request = http.MultipartRequest('POST', uri);
+
+      // Ajouter les fichiers
+      request.files.add(
+        await http.MultipartFile.fromPath('cniRecto', rectoPath),
+      );
+      request.files.add(
+        await http.MultipartFile.fromPath('cniVerso', versoPath),
+      );
+
+      // Envoyer la requête
+      final streamedResponse = await request.send().timeout(
+        const Duration(seconds: 30),
+        onTimeout: () =>
+            throw Exception('Timeout: le serveur ne répond pas'),
+      );
+
+      final res = await http.Response.fromStream(streamedResponse);
+
+      if (res.statusCode != 200) {
+        throw Exception(
+          'Impossible d\'uploader les images CNI (${res.statusCode})',
+        );
+      }
+
+      return jsonDecode(res.body) as Map<String, dynamic>;
+    } catch (e) {
+      throw Exception('Erreur lors de l\'upload des images CNI: $e');
+    }
+  }
+  /// Récupère l'historique des transactions d'un client
+  static Future<List<dynamic>> getTransactions(String codeClient) async {
+    try {
+      // Endpoint supposé: /api/transactions/client/{codeClient}
+      final uri = _uri('/api/transactions/client/$codeClient');
+      final res = await _client.get(uri).timeout(
+        const Duration(seconds: 10),
+        onTimeout: () => throw Exception('Timeout: le serveur ne répond pas'),
+      );
+
+      if (res.statusCode != 200) {
+        throw Exception('Impossible de récupérer l\'historique (${res.statusCode})');
+      }
+
+      final data = jsonDecode(res.body);
+      if (data is List) {
+        return data;
+      } else if (data is Map && data.containsKey('data')) {
+        return data['data'] as List? ?? [];
+      }
+      return [];
+    } catch (e) {
+      throw Exception('Erreur lors de la récupération de l\'historique: $e');
+    }
+  }
 }

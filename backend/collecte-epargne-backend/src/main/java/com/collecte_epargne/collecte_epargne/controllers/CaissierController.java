@@ -22,24 +22,58 @@ import java.util.Map;
  */
 @RestController
 @RequestMapping("/api/caissier")
-@PreAuthorize("hasRole('CAISSIER')")
+@PreAuthorize("hasRole('CAISSIER') or hasRole('CASHIER') or hasRole('ADMIN') or hasRole('SUPERVISOR') or hasRole('SUPERVISEUR') or hasRole('CAIS') or hasRole('SUP')")
 public class CaissierController {
     
     private static final Logger log = LoggerFactory.getLogger(CaissierController.class);
     
     private final CaissierService caissierService;
+    private final com.collecte_epargne.collecte_epargne.repositories.UtilisateurRepository utilisateurRepository;
+    private final com.collecte_epargne.collecte_epargne.repositories.EmployeRepository employeRepository;
 
-    public CaissierController(CaissierService caissierService) {
+    public CaissierController(CaissierService caissierService,
+                              com.collecte_epargne.collecte_epargne.repositories.UtilisateurRepository utilisateurRepository,
+                              com.collecte_epargne.collecte_epargne.repositories.EmployeRepository employeRepository) {
         this.caissierService = caissierService;
+        this.utilisateurRepository = utilisateurRepository;
+        this.employeRepository = employeRepository;
+    }
+
+    private Integer getAuthenticatedCaissierId(java.security.Principal principal) {
+        if (principal == null) throw new RuntimeException("Utilisateur non authentifié");
+        String email = principal.getName();
+        com.collecte_epargne.collecte_epargne.entities.Utilisateur utilisateur = utilisateurRepository.findByEmail(email)
+            .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé: " + email));
+
+        // Allow ADMIN to bypass employee check
+        if (utilisateur.getRole().getCode().equalsIgnoreCase("admin")) {
+            // Pour l'admin, on essaie de trouver un caissier par défaut (le premier trouvé)
+            return employeRepository.findByTypeEmploye(com.collecte_epargne.collecte_epargne.utils.TypeEmploye.CAISSIER)
+                    .stream().findFirst()
+                    .map(com.collecte_epargne.collecte_epargne.entities.Employe::getIdEmploye)
+                    .orElse(null); // Return null if no caissier found
+        }
+            
+        com.collecte_epargne.collecte_epargne.entities.Employe employe = employeRepository.findByUtilisateurLogin(utilisateur.getLogin())
+            .orElseThrow(() -> new RuntimeException("Cet utilisateur n'est pas lié à un employé (Caissier)"));
+            
+        return employe.getIdEmploye();
     }
 
     /**
      * COMMENT CLEF: Dashboard caissier - KPIs agence
      */
     @GetMapping("/dashboard")
-    public ResponseEntity<CaissierDashboardDTO> getDashboard(@RequestParam Integer idCaissier) {
-        log.info("GET /api/caissier/dashboard - Caissier: {}", idCaissier);
+    public ResponseEntity<CaissierDashboardDTO> getDashboard(java.security.Principal principal) {
+        log.info("GET /api/caissier/dashboard - User: {}", principal.getName());
         try {
+            Integer idCaissier = getAuthenticatedCaissierId(principal);
+            
+            // Si Admin et pas de caissier trouvé, retourner un dashboard vide ou 404 géré
+            if (idCaissier == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+            }
+            
             CaissierDashboardDTO dashboard = caissierService.obtenirDashboard(idCaissier);
             return ResponseEntity.ok(dashboard);
         } catch (RuntimeException e) {
@@ -51,10 +85,14 @@ public class CaissierController {
     /**
      * COMMENT CLEF: Récupère transactions EN_ATTENTE de validation
      */
+    /**
+     * COMMENT CLEF: Récupère transactions EN_ATTENTE de validation
+     */
     @GetMapping("/transactions/pending")
-    public ResponseEntity<List<TransactionDto>> getTransactionsPending(@RequestParam Integer idCaissier) {
-        log.info("GET /api/caissier/transactions/pending - Caissier: {}", idCaissier);
+    public ResponseEntity<List<TransactionDto>> getTransactionsPending(java.security.Principal principal) {
         try {
+            Integer idCaissier = getAuthenticatedCaissierId(principal);
+            log.info("GET /api/caissier/transactions/pending - Caissier: {}", idCaissier);
             List<TransactionDto> transactions = caissierService.obtenirTransactionsEnAttente(idCaissier);
             return ResponseEntity.ok(transactions);
         } catch (RuntimeException e) {
@@ -70,12 +108,13 @@ public class CaissierController {
     @PostMapping("/transactions/{idTransaction}/validate")
     public ResponseEntity<TransactionDto> validerTransaction(
             @PathVariable String idTransaction,
-            @RequestParam Integer idCaissier,
+            java.security.Principal principal,
             @RequestBody Map<String, Object> request) {
         
-        log.info("POST /api/caissier/transactions/{}/validate - Caissier: {}", idTransaction, idCaissier);
-        
         try {
+            Integer idCaissier = getAuthenticatedCaissierId(principal);
+            log.info("POST /api/caissier/transactions/{}/validate - Caissier: {}", idTransaction, idCaissier);
+        
             // COMMENT CLEF: Vérifier confirmation
             Boolean confirme = (Boolean) request.get("confirmé");
             if (confirme == null || !confirme) {
@@ -100,12 +139,13 @@ public class CaissierController {
     @PostMapping("/transactions/{idTransaction}/reject")
     public ResponseEntity<TransactionDto> rejeterTransaction(
             @PathVariable String idTransaction,
-            @RequestParam Integer idCaissier,
+            java.security.Principal principal,
             @RequestBody Map<String, Object> request) {
         
-        log.info("POST /api/caissier/transactions/{}/reject - Caissier: {}", idTransaction, idCaissier);
-        
         try {
+            Integer idCaissier = getAuthenticatedCaissierId(principal);
+            log.info("POST /api/caissier/transactions/{}/reject - Caissier: {}", idTransaction, idCaissier);
+        
             String motifRejet = (String) request.get("motifRejet");
             Boolean confirme = (Boolean) request.get("confirmé");
             
