@@ -1,0 +1,8 @@
+.validation-comptes-container { padding: 1rem; }
+.validation-comptes-container h1 { margin-bottom: 1rem; }
+.table-demandes { width: 100%; border-collapse: collapse; }
+.table-demandes th, .table-demandes td { border: 1px solid #ddd; padding: 8px; }
+.table-demandes th { background: #f5f5f5; text-align: left; }
+.btn-validate { background: #28a745; color: white; border: none; padding: 6px 10px; margin-right: 6px; border-radius: 4px; }
+.btn-reject { background: #dc3545; color: white; border: none; padding: 6px 10px; border-radius: 4px; }
+.error { color: #b00020; margin-bottom: 1rem; }

@@ -7,8 +7,15 @@ import com.collecte_epargne.collecte_epargne.mappers.UtilisateurMapper;
 import com.collecte_epargne.collecte_epargne.repositories.RoleRepository;
 import com.collecte_epargne.collecte_epargne.repositories.UtilisateurRepository;
 import com.collecte_epargne.collecte_epargne.services.interfaces.UtilisateurInterface;
+import com.collecte_epargne.collecte_epargne.utils.StatutGenerique;
+import org.springframework.web.multipart.MultipartFile;
+
+import jakarta.persistence.EntityNotFoundException;
+
+import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -25,16 +32,20 @@ public class UtilisateurService implements UtilisateurInterface {
     private final RoleRepository roleRepository;
     // Injection du service d'envoi d'emails pour notifier les nouveaux utilisateurs
     private final EmailService emailService;
+    private final PasswordEncoder passwordEncoder;
+    private final FileStorageService fileStorageService;
 
     private static final Logger log = LoggerFactory.getLogger(UtilisateurService.class);
 
     // Pour la relation Role
 
-    public UtilisateurService(UtilisateurRepository utilisateurRepository, UtilisateurMapper utilisateurMapper, RoleRepository roleRepository, EmailService emailService) {
+    public UtilisateurService(UtilisateurRepository utilisateurRepository, UtilisateurMapper utilisateurMapper, RoleRepository roleRepository, EmailService emailService, PasswordEncoder passwordEncoder, FileStorageService fileStorageService) {
         this.utilisateurRepository = utilisateurRepository;
         this.utilisateurMapper = utilisateurMapper;
         this.roleRepository = roleRepository;
         this.emailService = emailService;
+        this.passwordEncoder = passwordEncoder;
+        this.fileStorageService = fileStorageService;
     }
 
     // Méthode utilitaire pour attacher l'entité Role (inchangée)
@@ -66,8 +77,7 @@ public class UtilisateurService implements UtilisateurInterface {
         Utilisateur utilisateurToSave = utilisateurMapper.toEntity(utilisateurDto);
 
         // 💥 HACHAGE DU MOT DE PASSE (SÉCURITÉ)
-        // utilisateurToSave.setPassword(passwordEncoder.encode(password));
-        utilisateurToSave.setPassword(password); // Actuellement en clair (NON SÉCURISÉ)
+        utilisateurToSave.setPassword(passwordEncoder.encode(password));
 
         utilisateurToSave.setDateCreation(Instant.now());
 
@@ -151,8 +161,7 @@ public class UtilisateurService implements UtilisateurInterface {
         }
 
         // 💥 HACHAGE DU MOT DE PASSE (SÉCURITÉ)
-        // existingUtilisateur.setPassword(passwordEncoder.encode(newPassword));
-        existingUtilisateur.setPassword(newPassword); // Actuellement en clair (NON SÉCURISÉ)
+        existingUtilisateur.setPassword(passwordEncoder.encode(newPassword));
 
         utilisateurRepository.save(existingUtilisateur);
         log.info("Mot de passe mis à jour pour l'utilisateur avec login: {}", login);
@@ -169,5 +178,33 @@ public class UtilisateurService implements UtilisateurInterface {
         // la suppression de l'utilisateur entraînera la suppression de l'Employe/Client associé.
         utilisateurRepository.deleteById(login);
         log.info("Utilisateur supprimé avec login: {}", login);
+    }
+
+    @Override
+    @Transactional
+    public UtilisateurDto updateStatut(String login, String statut) {
+        // 1. Récupération de l'entité via Repository
+        Utilisateur utilisateur = utilisateurRepository.findById(login)
+            .orElseThrow(() -> new EntityNotFoundException("Utilisateur non trouvé"));
+
+        // 2. Mise à jour via l'Enum
+        utilisateur.setStatut(StatutGenerique.valueOf(statut.toUpperCase()));
+
+        // 3. Sauvegarde et retour via Mapper
+        return utilisateurMapper.toDto(utilisateurRepository.save(utilisateur));
+    }
+
+    @Transactional
+    public UtilisateurDto updatePhoto(String login, MultipartFile photo) {
+        Utilisateur utilisateur = utilisateurRepository.findById(login)
+                .orElseThrow(() -> new EntityNotFoundException("Utilisateur non trouvé avec le login : " + login));
+
+        if (photo != null && !photo.isEmpty()) {
+            String path = fileStorageService.save(photo, "profiles/" + login);
+            utilisateur.setPhotoPath(path);
+            utilisateur = utilisateurRepository.save(utilisateur);
+        }
+
+        return utilisateurMapper.toDto(utilisateur);
     }
 }

@@ -1,0 +1,75 @@
+<div class="profile-container">
+  <div [ngClass]="isError ? 'alert-error' : 'alert-success'" *ngIf="message">
+    <i [ngClass]="isError ? 'fas fa-exclamation-circle' : 'fas fa-check-circle'"></i> 
+    {{ message }}
+  </div>
+
+  <div class="profile-layout">
+    <div class="user-mini-card">
+      <div class="avatar-big">
+        <i class="fas fa-user-circle"></i>
+      </div>
+      <h3>{{ user?.prenom }} {{ user?.nom }}</h3>
+      <span class="role-badge">{{ user?.role }}</span>
+      
+      <div class="user-info-list">
+        <div class="info-item">
+          <i class="fas fa-envelope"></i>
+          <span>{{ user?.email }}</span>
+        </div>
+        <div class="info-item">
+          <i class="fas fa-id-badge"></i>
+          <span>{{ user?.login }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="forms-column">
+      <div class="profile-card">
+        <div class="card-title"><i class="fas fa-user-edit"></i> Modifier le profil</div>
+        <form [formGroup]="profileForm" (ngSubmit)="updateProfile()">
+          <div class="form-row">
+            <div class="form-group">
+              <label>Prénom</label>
+              <input type="text" formControlName="prenom" placeholder="Votre prénom">
+            </div>
+            <div class="form-group">
+              <label>Nom</label>
+              <input type="text" formControlName="nom" placeholder="Votre nom">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Email professionnel</label>
+            <input type="email" formControlName="email" placeholder="email@domaine.com">
+          </div>
+          <button type="submit" class="btn-save" [disabled]="profileForm.invalid">
+            Enregistrer les modifications
+          </button>
+        </form>
+      </div>
+
+      <div class="profile-card">
+        <div class="card-title"><i class="fas fa-shield-alt"></i> Sécurité du compte</div>
+        <form [formGroup]="passwordForm" (ngSubmit)="$event.preventDefault(); updatePassword()">
+          <div class="form-group">
+            <label>Ancien mot de passe</label>
+            <input type="password" formControlName="oldPassword" placeholder="••••••••">
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Nouveau mot de passe</label>
+              <input type="password" formControlName="newPassword" placeholder="Minimum 6 caractères">
+            </div>
+            <div class="form-group">
+              <label>Confirmer le nouveau mot de passe</label>
+              <input type="password" formControlName="confirmPassword" placeholder="Re-tapez le mot de passe">
+            </div>
+          </div>
+          <button type="submit" class="btn-password" [disabled]="passwordForm.invalid">
+            Changer mon mot de passe
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

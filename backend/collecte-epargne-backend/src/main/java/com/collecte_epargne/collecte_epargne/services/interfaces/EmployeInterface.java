@@ -44,4 +44,5 @@ public interface EmployeInterface {
      * Liste tous les clients assignés à un collecteur spécifique.
      */
     List<ClientDto> getClientsByCollecteur(String idCollecteur);
+
 }

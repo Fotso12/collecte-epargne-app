@@ -1,6 +1,7 @@
 package com.collecte_epargne.collecte_epargne.entities;
 
 import com.collecte_epargne.collecte_epargne.utils.StatutCompte;
+import com.collecte_epargne.collecte_epargne.utils.StatusApprobation;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -53,6 +54,21 @@ public class Compte {
 
     @Column(name = "DATE_CLOTURE")
     private LocalDate dateCloture;
+
+    // COMMENT CLEF: Status approbation superviseur - EN_ATTENTE/APPROUVE/REJETE
+    @Enumerated(EnumType.STRING)
+    @Column(name = "STATUS_APPROBATION")
+    private StatusApprobation statusApprobation;
+
+    @Column(name = "DATE_APPROBATION")
+    private Instant dateApprobation;
+
+    @Column(name = "MOTIF_REJET_APPROBATION")
+    private String motifRejetApprobation;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "ID_SUPERVISEUR_APPROBATION")
+    private Employe superviseurApprobation;
 
     // Remplacer CODE_CLIENT par la relation ManyToOne vers Client
     @ManyToOne(fetch = FetchType.LAZY)
@@ -193,6 +209,39 @@ public class Compte {
 
     public void setPlansDeCotisation(Set<CompteCotisation> plansDeCotisation) {
         this.plansDeCotisation = plansDeCotisation;
+    }
+
+    // COMMENT CLEF: Getters/Setters pour approbation superviseur
+    public StatusApprobation getStatusApprobation() {
+        return statusApprobation;
+    }
+
+    public void setStatusApprobation(StatusApprobation statusApprobation) {
+        this.statusApprobation = statusApprobation;
+    }
+
+    public Instant getDateApprobation() {
+        return dateApprobation;
+    }
+
+    public void setDateApprobation(Instant dateApprobation) {
+        this.dateApprobation = dateApprobation;
+    }
+
+    public String getMotifRejetApprobation() {
+        return motifRejetApprobation;
+    }
+
+    public void setMotifRejetApprobation(String motifRejetApprobation) {
+        this.motifRejetApprobation = motifRejetApprobation;
+    }
+
+    public Employe getSuperviseurApprobation() {
+        return superviseurApprobation;
+    }
+
+    public void setSuperviseurApprobation(Employe superviseurApprobation) {
+        this.superviseurApprobation = superviseurApprobation;
     }
 
     public Compte(String idCompte, String numCompte, BigDecimal solde, BigDecimal soldeDisponible, LocalDate dateOuverture, Instant dateDerniereTransaction, BigDecimal tauxPenalite, BigDecimal tauxBonus, StatutCompte statut, String motifBlocage, LocalDate dateCloture, Client client, TypeCompte typeCompte, Set<Transaction> transactions, Set<CompteCotisation> plansDeCotisation) {

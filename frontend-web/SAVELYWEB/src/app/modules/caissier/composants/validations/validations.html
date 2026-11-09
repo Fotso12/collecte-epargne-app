@@ -1,0 +1,104 @@
+<div class="validations-container">
+  <div class="header">
+    <h1>Validations de Transactions</h1>
+  </div>
+
+  <div *ngIf="successMessage" class="alert alert-success">
+    {{ successMessage }}
+  </div>
+
+  <div *ngIf="errorMessage" class="alert alert-danger">
+    {{ errorMessage }}
+  </div>
+
+  <div *ngIf="isLoading" class="spinner">
+    <p>Chargement...</p>
+  </div>
+
+  <div *ngIf="!isLoading" class="content">
+    <div *ngIf="transactions && transactions.length > 0" class="table-responsive">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Référence</th>
+            <th>Montant</th>
+            <th>Client</th>
+            <th>Collecteur</th>
+            <th>Date</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let transaction of transactions">
+            <td>{{ transaction.reference }}</td>
+            <td>{{ formatMontant(transaction.montant) }}</td>
+            <td>{{ transaction.client }}</td>
+            <td>{{ transaction.collecteur }}</td>
+            <td>{{ transaction.date | date:'short' }}</td>
+            <td class="actions">
+              <button (click)="openValidateModal(transaction)" class="btn btn-success btn-sm">
+                Valider
+              </button>
+              <button (click)="openRejectModal(transaction)" class="btn btn-danger btn-sm">
+                Rejeter
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div *ngIf="!transactions || transactions.length === 0" class="no-data">
+      Aucune transaction en attente de validation
+    </div>
+  </div>
+
+  <!-- Modal Validation -->
+  <div *ngIf="showValidateModal" class="modal-overlay" (click)="closeModals()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>Confirmation de Validation</h2>
+        <button (click)="closeModals()" class="close-btn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p>Êtes-vous sûr de vouloir valider cette transaction ?</p>
+        <div class="transaction-details" *ngIf="selectedTransaction">
+          <p><strong>Référence:</strong> {{ selectedTransaction.reference }}</p>
+          <p><strong>Montant:</strong> {{ formatMontant(selectedTransaction.montant) }}</p>
+          <p><strong>Client:</strong> {{ selectedTransaction.client }}</p>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button (click)="closeModals()" class="btn btn-secondary">Annuler</button>
+        <button (click)="confirmValidate()" class="btn btn-success">Valider</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Rejet -->
+  <div *ngIf="showRejectModal" class="modal-overlay" (click)="closeModals()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>Rejet de Transaction</h2>
+        <button (click)="closeModals()" class="close-btn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p>Veuillez entrer le motif du rejet:</p>
+        <div class="transaction-details" *ngIf="selectedTransaction">
+          <p><strong>Référence:</strong> {{ selectedTransaction.reference }}</p>
+          <p><strong>Montant:</strong> {{ formatMontant(selectedTransaction.montant) }}</p>
+        </div>
+        <textarea 
+          [(ngModel)]="rejectMotif" 
+          class="form-control" 
+          rows="4" 
+          placeholder="Motif du rejet..."
+        ></textarea>
+      </div>
+      <div class="modal-footer">
+        <button (click)="closeModals()" class="btn btn-secondary">Annuler</button>
+        <button (click)="confirmReject()" class="btn btn-danger">Rejeter</button>
+      </div>
+    </div>
+  </div>
+</div>

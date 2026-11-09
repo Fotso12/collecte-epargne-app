@@ -1,0 +1,51 @@
+.profile-container { max-width: 1100px; margin: 0 auto; }
+
+.profile-layout {
+  display: grid;
+  grid-template-columns: 300px 1fr; /* Mini carte à gauche, formulaires à droite */
+  gap: 30px;
+  margin-top: 20px;
+}
+
+/* Mini Carte de Gauche */
+.user-mini-card {
+  background: white;
+  padding: 30px;
+  border-radius: 15px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+  text-align: center;
+  height: fit-content;
+}
+
+.avatar-big i { font-size: 80px; color: #27ae60; margin-bottom: 15px; }
+.user-mini-card h3 { margin: 10px 0 5px 0; color: #2c3e50; }
+.user-mini-card .role-badge {
+  background: #e8f5e9;
+  color: #27ae60;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+.user-info-list { margin-top: 25px; text-align: left; }
+.info-item { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; color: #7f8c8d; font-size: 0.9rem; }
+.info-item i { color: #27ae60; width: 20px; }
+
+/* Formulaires à Droite */
+.forms-column { display: flex; flex-direction: column; gap: 25px; }
+.profile-card { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+.card-title { font-weight: 600; margin-bottom: 20px; color: #2c3e50; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid #f0f0f0; padding-bottom: 15px; }
+
+.form-group { margin-bottom: 15px; }
+.form-group label { display: block; margin-bottom: 5px; font-size: 0.85rem; font-weight: 600; color: #444; }
+.form-group input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; outline: none; transition: 0.3s; background: #f9f9f9; }
+.form-group input:focus { border-color: #27ae60; background: white; box-shadow: 0 0 0 3px rgba(39, 174, 96, 0.1); }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+
+.btn-save { background: #27ae60; color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: 600; width: 100%; transition: 0.3s; }
+.btn-password { background: #34495e; color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: 600; width: 100%; transition: 0.3s; }
+.btn-save:hover, .btn-password:hover { transform: translateY(-2px); opacity: 0.9; }
+
+.alert-success { background: #27ae60; color: white; padding: 15px; border-radius: 10px; margin-bottom: 20px; text-align: center; animation: slideIn 0.3s ease; }
+@keyframes slideIn { from { transform: translateY(-10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }

@@ -5,32 +5,30 @@ import com.collecte_epargne.collecte_epargne.entities.Employe;
 import com.collecte_epargne.collecte_epargne.entities.Utilisateur;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.Named;
 
-import org.springframework.stereotype.Component;
-
-@Component
 @Mapper(componentModel = "spring")
 public interface EmployeMapper {
 
-    @Mapping(source = "utilisateur", target = "loginUtilisateur")
+    @Mapping(source = "utilisateur", target = "loginUtilisateur", qualifiedByName = "utilisateurToLogin")
     @Mapping(source = "agenceZone.idAgence", target = "idAgence")
-    @Mapping(source = "superviseur", target = "idSuperviseur")
+    @Mapping(source = "superviseur", target = "idSuperviseur", qualifiedByName = "employeToId")
+    @Mapping(source = "utilisateur.nom", target = "nom")
+    @Mapping(source = "utilisateur.prenom", target = "prenom")
+    @Mapping(source = "utilisateur.email", target = "email")
+    @Mapping(source = "utilisateur.telephone", target = "telephone")
     EmployeDto toDto(Employe employe);
 
-    // --- Conversion Helper (Entité -> ID)
+    @Named("utilisateurToLogin")
     default String utilisateurToLogin(Utilisateur utilisateur) {
-        return utilisateur != null ? utilisateur.getLogin() : null;
+        return (utilisateur != null) ? utilisateur.getLogin() : null;
     }
 
-    /*default String agenceZoneToId(AgenceZone agenceZone) {
-        return agenceZone != null ? agenceZone.getIdAgence() : null;
-    }*/
-
-    default Integer employeToId(Employe superviseur) {
-        return superviseur != null ? superviseur.getIdEmploye() : null;
+    @Named("employeToId")
+    default String employeToId(Employe superviseur) {
+        return (superviseur != null) ? String.valueOf(superviseur.getIdEmploye()) : null;
     }
 
-    // --- Conversion DTO -> Entité (Ignorer les objets relationnels et collections)
     @Mapping(target = "utilisateur", ignore = true)
     @Mapping(target = "agenceZone", ignore = true)
     @Mapping(target = "superviseur", ignore = true)

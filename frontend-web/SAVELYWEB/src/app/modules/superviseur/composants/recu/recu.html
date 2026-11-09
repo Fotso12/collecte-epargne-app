@@ -1,0 +1,14 @@
+<div class="recu-container p-4">
+  <h2>Reçu / Génération</h2>
+
+  <div class="mb-3">
+    <label class="form-label">ID Transaction</label>
+    <input class="form-control" [(ngModel)]="transactionId" placeholder="Entrez l'ID transaction" />
+  </div>
+
+  <div class="mb-3">
+    <button class="btn btn-primary" (click)="generate()" [disabled]="loading">{{ loading ? 'Génération...' : 'Générer reçu' }}</button>
+  </div>
+
+  <div *ngIf="message" class="alert alert-info">{{ message }}</div>
+</div>

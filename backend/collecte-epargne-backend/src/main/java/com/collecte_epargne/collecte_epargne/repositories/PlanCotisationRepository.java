@@ -9,6 +9,9 @@ import java.util.Optional;
 @Repository
 public interface PlanCotisationRepository extends JpaRepository<PlanCotisation, String> {
 
+    // Trouver un plan par ID
+    Optional<PlanCotisation> findById(String idPlan);
+
+    // Trouver un plan par nom
     Optional<PlanCotisation> findByNom(String nom);
 }
-

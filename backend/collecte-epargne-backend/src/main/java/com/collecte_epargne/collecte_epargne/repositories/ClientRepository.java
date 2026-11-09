@@ -1,6 +1,7 @@
 package com.collecte_epargne.collecte_epargne.repositories;
 
 import com.collecte_epargne.collecte_epargne.entities.Client;
+import com.collecte_epargne.collecte_epargne.entities.AgenceZone;
 import org.springframework.stereotype.Repository;
 
 
@@ -23,8 +24,19 @@ public interface ClientRepository extends JpaRepository<Client, Long> {
     void deleteByCodeClient(String codeClient);
     // Trouver tous les clients assignés à un collecteur spécifique (nécessaire pour la recherche des employés)
     List<Client> findByCollecteurAssigneIdEmploye(Integer idEmploye);
+    
+    // Compter les clients assignés à un collecteur
+    long countByCollecteurAssigne(com.collecte_epargne.collecte_epargne.entities.Employe collecteur);
+
 
     //Trouver les clients en fonction de leur code
     Optional<Client> findByCodeClient(String codeClient);
     boolean existsByCodeClient(String codeClient);
+
+    // COMMENT CLEF: Query methods AgenceZone - Caissier/Superviseur
+    List<Client> findByCollecteurAssigne_AgenceZone(AgenceZone agenceZone);
+
+    Optional<Client> findByUtilisateurLogin(String login);
+
+    long countByCollecteurAssigne_AgenceZone(AgenceZone agenceZone);
 }

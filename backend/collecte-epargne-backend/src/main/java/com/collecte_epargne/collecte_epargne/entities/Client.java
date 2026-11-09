@@ -27,6 +27,10 @@ public class Client {
     @Column(name = "ADRESSE")
     private String adresse;
 
+    @Size(max = 100)
+    @Column(name = "VILLE")
+    private String ville;
+
     @NotNull
     @Lob
     @Column(name = "TYPE_CNI", nullable = false)
@@ -37,19 +41,16 @@ public class Client {
     @Column(name = "NUM_CNI", nullable = false, length = 50)
     private String numCni;
 
-    @NotNull
     @Size(max = 255)
-    @Column(name = "PHOTO_PATH")
+    @Column(name = "PHOTO_PATH", nullable = true)
     private String photoPath;
 
-    @NotNull
     @Size(max = 255)
-    @Column(name = "CNI_RECTO_PATH")
+    @Column(name = "CNI_RECTO_PATH", nullable = true)
     private String cniRectoPath;
 
-    @NotNull
     @Size(max = 255)
-    @Column(name = "CNI_VERSO_PATH")
+    @Column(name = "CNI_VERSO_PATH", nullable = true)
     private String cniVersoPath;
 
     @NotNull
@@ -74,10 +75,9 @@ public class Client {
     @JoinColumn(name = "LOGIN", nullable = false, unique = true) // LOGIN est FK
     private Utilisateur utilisateur;
 
-    @NotNull
     // Remplacer COLLECTEUR_ASSIGNE par la relation ManyToOne vers Employe
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "COLLECTEUR_ASSIGNE")
+    @JoinColumn(name = "COLLECTEUR_ASSIGNE", nullable = true)
     private Employe collecteurAssigne; // Le collecteur affecté
 
     // Relation OneToMany vers Compte (un client a plusieurs comptes)
@@ -110,6 +110,14 @@ public class Client {
 
     public void setAdresse(String adresse) {
         this.adresse = adresse;
+    }
+
+    public String getVille() {
+        return ville;
+    }
+
+    public void setVille(String ville) {
+        this.ville = ville;
     }
 
     public TypeCNI getTypeCni() {

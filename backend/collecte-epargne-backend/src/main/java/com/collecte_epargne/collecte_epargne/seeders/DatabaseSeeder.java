@@ -262,7 +262,7 @@ public class DatabaseSeeder implements CommandLineRunner {
             transaction1.setSuperviseurValidateur(superviseur);
             transaction1.setTypeTransaction(TypeTransaction.DEPOT);
             transaction1.setMontant(new BigDecimal("200.00"));
-            transaction1.setStatut(StatutTransaction.TERMINEE); // Adapté selon votre enum (VALIDE/EN_ATTENTE/TERMINEE)
+            transaction1.setStatut(StatutTransaction.VALIDEE_CAISSE); // Adapté selon votre enum (VALIDE/EN_ATTENTE/TERMINEE)
             transaction1.setDateTransaction(Instant.now());
 
             transactionRepository.save(transaction1);

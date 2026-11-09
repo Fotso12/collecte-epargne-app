@@ -87,4 +87,7 @@ public class Role {
         this.utilisateurs = utilisateurs;
     }
 
+    public String getLibelle() {
+        return null;
+    }
 }

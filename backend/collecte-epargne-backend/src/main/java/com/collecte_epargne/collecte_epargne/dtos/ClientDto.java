@@ -1,60 +1,150 @@
 package com.collecte_epargne.collecte_epargne.dtos;
 
+import com.collecte_epargne.collecte_epargne.utils.StatutGenerique;
 import com.collecte_epargne.collecte_epargne.utils.TypeCNI;
+import com.opencsv.bean.CsvBindByName;
+import com.opencsv.bean.CsvDate;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
-
 import java.io.Serializable;
+import java.time.Instant;
 import java.time.LocalDate;
 
-
 public class ClientDto implements Serializable {
+
     @Size(max = 50)
+    @CsvBindByName(column = "code_client")
     String codeClient;
 
-
     @NotNull
+    @CsvBindByName(column = "numero_client")
     Long numeroClient;
 
     @Size(max = 255)
+    @CsvBindByName(column = "adresse")
     String adresse;
 
+    @Size(max = 100)
+    @CsvBindByName(column = "ville")
+    String ville;
+
+    Integer idAgence;
+
     @NotNull
+    @CsvBindByName(column = "type_cni")
     TypeCNI typeCni;
 
     @Size(max = 50)
     @NotNull
+    @CsvBindByName(column = "numero_cni")
     String numCni;
 
     @Size(max = 255)
+    @CsvBindByName(column = "photoPath")
     String photoPath;
 
     @Size(max = 255)
+    @CsvBindByName(column = "cniRectoPath")
     String cniRectoPath;
 
     @Size(max = 255)
+    @CsvBindByName(column = "cniVersoPath")
     String cniVersoPath;
 
+    @CsvBindByName(column = "date_naissance")
+    @CsvDate("yyyy-MM-dd")
     LocalDate dateNaissance;
 
     @Size(max = 100)
+    @CsvBindByName(column = "lieu_naissance")
     String lieuNaissance;
 
     @Size(max = 100)
+    @CsvBindByName(column = "profession")
     String profession;
 
+    @CsvBindByName(column = "score_epargne")
     Integer scoreEpargne;
 
     // Remplacer Utilisateur par le LOGIN
     @NotNull
+    @CsvBindByName(column = "login_utilisateur")
     String loginUtilisateur;
 
     // Remplacer Employe par l'ID du Collecteur
+    @CsvBindByName(column = "id_collecteur")
     String codeCollecteurAssigne;
 
-    // Les comptes sont généralement omis ou chargés séparément
+    private String nomCollecteur;
+    
+    @CsvBindByName(column = "nom")
+    private String nom;
+    
+    @CsvBindByName(column = "prenom")
+    private String prenom;
+    
+    @CsvBindByName(column = "telephone")
+    private String telephone;
+    
+    @CsvBindByName(column = "email")
+    private String email;
+    
+    private StatutGenerique statut;
+    private Instant dateCreation;
 
+    // --- GETTERS ET SETTERS EXISTANTS ---
+
+    public String getNom() {
+        return nom;
+    }
+
+    public void setNom(String nom) {
+        this.nom = nom;
+    }
+
+    public String getPrenom() {
+        return prenom;
+    }
+
+    public void setPrenom(String prenom) {
+        this.prenom = prenom;
+    }
+
+    public String getTelephone() {
+        return telephone;
+    }
+
+    public void setTelephone(String telephone) {
+        this.telephone = telephone;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public StatutGenerique getStatut() {
+        return statut;
+    }
+
+    public void setStatut(StatutGenerique statut) {
+        this.statut = statut;
+    }
+
+    public Instant getDateCreation() {
+        return dateCreation;
+    }
+
+    public void setDateCreation(Instant dateCreation) {
+        this.dateCreation = dateCreation;
+    }
+
+    public String getNomCollecteur() { return nomCollecteur; }
+    public void setNomCollecteur(String nomCollecteur) { this.nomCollecteur = nomCollecteur; }
 
     public String getCodeClient() {
         return codeClient;
@@ -78,6 +168,22 @@ public class ClientDto implements Serializable {
 
     public void setAdresse(String adresse) {
         this.adresse = adresse;
+    }
+
+    public String getVille() {
+        return ville;
+    }
+
+    public void setVille(String ville) {
+        this.ville = ville;
+    }
+
+    public Integer getIdAgence() {
+        return idAgence;
+    }
+
+    public void setIdAgence(Integer idAgence) {
+        this.idAgence = idAgence;
     }
 
     public TypeCNI getTypeCni() {
@@ -167,6 +273,8 @@ public class ClientDto implements Serializable {
     public void setCodeCollecteurAssigne(String codeCollecteurAssigne) {
         this.codeCollecteurAssigne = codeCollecteurAssigne;
     }
+
+    // --- CONSTRUCTEURS EXISTANTS ---
 
     public ClientDto() {
     }

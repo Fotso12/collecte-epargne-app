@@ -13,14 +13,17 @@ public interface ClientInterface {
 
     ClientDto update(Long numeroClient, ClientDto clientDto);
 
-    void delete(Long numClient);
-
-    // Ajout de fonctions de recherche spécifiques si nécessaire
-    ClientDto getByNumeroClient(Long numeroClient);
-
-    ClientDto getByCodeClient(String codeClient);
+    void delete(Long numeroClient);
 
     ClientDto updateByCodeClient(String codeClient, ClientDto clientDto);
 
     void deleteByCodeClient(String codeClient);
+
+    // Ajout de fonctions de recherche spécifiques si nécessaire
+    ClientDto getByNumeroClient(Long numeroClient);
+
+    // Récupérer un client par le login de l'utilisateur
+    ClientDto getByLogin(String login);
+
+    ClientDto getByCodeClient(String codeClient);
 }

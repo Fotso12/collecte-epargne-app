@@ -1,0 +1,109 @@
+<div class="container-fluid p-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold text-dark">Paramètres & Configurations</h2>
+            <p class="text-muted">Gérez les rôles, types de comptes, plans et notifications</p>
+        </div>
+    </div>
+
+    <ul class="nav nav-pills mb-4 gap-2">
+        <li class="nav-item">
+            <a class="nav-link" [class.active]="activeTab === 'ROLES'" (click)="setTab('ROLES')"
+                style="cursor: pointer;">
+                <i class="fas fa-user-tag me-2"></i>Rôles
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" [class.active]="activeTab === 'TYPES'" (click)="setTab('TYPES')"
+                style="cursor: pointer;">
+                <i class="fas fa-wallet me-2"></i>Types de Compte
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" [class.active]="activeTab === 'PLANS'" (click)="setTab('PLANS')"
+                style="cursor: pointer;">
+                <i class="fas fa-piggy-bank me-2"></i>Plans Cotisation
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" [class.active]="activeTab === 'NOTIFS'" (click)="setTab('NOTIFS')"
+                style="cursor: pointer;">
+                <i class="fas fa-bell me-2"></i>Notifications
+            </a>
+        </li>
+    </ul>
+
+    <!-- SUB-COMPONENTS -->
+    <app-gestion-roles *ngIf="activeTab === 'ROLES'"></app-gestion-roles>
+    <app-gestion-types-compte *ngIf="activeTab === 'TYPES'"></app-gestion-types-compte>
+    <app-gestion-plans *ngIf="activeTab === 'PLANS'"></app-gestion-plans>
+    <app-gestion-notifications *ngIf="activeTab === 'NOTIFS'"></app-gestion-notifications>
+</div>
+
+<!-- MODAL -->
+<div class="modal-backdrop-custom" *ngIf="isModalOpen"></div>
+<div class="modal-wrapper-custom" *ngIf="isModalOpen">
+    <div class="modal-content-custom p-4 shadow-lg border-0" style="max-width: 500px;">
+        <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
+            <h5 class="fw-bold m-0">{{ modalTitle }}</h5>
+            <button class="btn-close" (click)="closeModal()"></button>
+        </div>
+
+        <form [formGroup]="currentForm" (ngSubmit)="save()">
+
+            <!-- ROLES / TYPES Fields -->
+            <div *ngIf="activeTab === 'ROLES' || activeTab === 'TYPES'">
+                <div class="mb-3">
+                    <label class="form-label small text-muted">Code</label>
+                    <input type="text" class="form-control" formControlName="code">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label small text-muted">Libellé</label>
+                    <input type="text" class="form-control" formControlName="libelle">
+                </div>
+            </div>
+
+            <!-- PLAN Fields -->
+            <div *ngIf="activeTab === 'PLANS'">
+                <div class="mb-3">
+                    <label class="form-label small text-muted">Libellé</label>
+                    <input type="text" class="form-control" formControlName="libelle">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label small text-muted">Description</label>
+                    <textarea class="form-control" formControlName="description"></textarea>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label small text-muted">Montant Journalier</label>
+                    <input type="number" class="form-control" formControlName="montantJour">
+                </div>
+            </div>
+
+            <!-- NOTIFICATION Fields -->
+            <div *ngIf="activeTab === 'NOTIFS'">
+                <div class="mb-3">
+                    <label class="form-label small text-muted">Titre</label>
+                    <input type="text" class="form-control" formControlName="titre">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label small text-muted">Message</label>
+                    <textarea class="form-control" formControlName="message" rows="3"></textarea>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label small text-muted">Type</label>
+                    <select class="form-select" formControlName="type">
+                        <option value="INFO">Info</option>
+                        <option value="ALERT">Alerte</option>
+                        <option value="promo">Promo</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="d-flex gap-2 mt-4">
+                <button type="button" class="btn btn-light w-100 rounded-pill" (click)="closeModal()">Annuler</button>
+                <button type="submit" class="btn btn-primary w-100 rounded-pill"
+                    [disabled]="currentForm.invalid">Enregistrer</button>
+            </div>
+        </form>
+    </div>
+</div>

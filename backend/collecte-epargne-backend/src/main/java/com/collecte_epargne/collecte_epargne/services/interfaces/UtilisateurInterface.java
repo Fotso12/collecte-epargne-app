@@ -29,4 +29,9 @@ public interface UtilisateurInterface {
 
     // Fonction spécifique
     UtilisateurDto getByEmail(String email);
+
+
+    UtilisateurDto updateStatut(String login, String statut);
+
+
 }

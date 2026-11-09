@@ -43,6 +43,8 @@ public class UtilisateurDto implements Serializable {
 
     private Instant dateCreation;
 
+    private String photoPath;
+
     public UtilisateurDto(String login, Integer idRole, String idEmploye, String codeClient, String nom, String prenom, String telephone, String email, StatutGenerique statut, Instant dateCreation) {
         this.login = login;
         this.idRole = idRole;
@@ -137,5 +139,13 @@ public class UtilisateurDto implements Serializable {
 
     public void setDateCreation(Instant dateCreation) {
         this.dateCreation = dateCreation;
+    }
+
+    public String getPhotoPath() {
+        return photoPath;
+    }
+
+    public void setPhotoPath(String photoPath) {
+        this.photoPath = photoPath;
     }
 }

@@ -10,8 +10,10 @@ import com.collecte_epargne.collecte_epargne.repositories.EmployeRepository;
 import com.collecte_epargne.collecte_epargne.repositories.TransactionRepository;
 import com.collecte_epargne.collecte_epargne.services.interfaces.TransactionInterface;
 import com.collecte_epargne.collecte_epargne.utils.StatutTransaction;
+import com.collecte_epargne.collecte_epargne.utils.CodeGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,208 +25,162 @@ import java.util.stream.Collectors;
 @Transactional
 public class TransactionService implements TransactionInterface {
 
-    private static final Logger log =
-            LoggerFactory.getLogger(TransactionService.class);
+    private static final Logger log = LoggerFactory.getLogger(TransactionService.class);
 
     private final TransactionRepository transactionRepository;
     private final TransactionMapper transactionMapper;
     private final CompteRepository compteRepository;
     private final EmployeRepository employeRepository;
+    private final CodeGenerator codeGenerator;
 
     public TransactionService(
             TransactionRepository transactionRepository,
             TransactionMapper transactionMapper,
             CompteRepository compteRepository,
-            EmployeRepository employeRepository
+            EmployeRepository employeRepository,
+            CodeGenerator codeGenerator
     ) {
         this.transactionRepository = transactionRepository;
         this.transactionMapper = transactionMapper;
         this.compteRepository = compteRepository;
         this.employeRepository = employeRepository;
+        this.codeGenerator = codeGenerator;
     }
 
-    // ----------------------------------------------------
-    // Création d'une transaction
-    // ----------------------------------------------------
     @Override
     public TransactionDto create(TransactionDto transactionDto) {
-
-        log.info("Début création transaction ID={}", transactionDto.getIdTransaction());
-
+        log.info("Début création transaction");
         Transaction transaction = transactionMapper.toEntity(transactionDto);
+        
+        if (transactionDto.getIdTransaction() == null || transactionDto.getIdTransaction().isEmpty()) {
+            transaction.setIdTransaction(codeGenerator.generateTransactionRef());
+        } else {
+            transaction.setIdTransaction(transactionDto.getIdTransaction());
+        }
 
-        // ID + date
-        transaction.setIdTransaction(transactionDto.getIdTransaction());
         transaction.setDateTransaction(Instant.now());
-
-        // Statut initial
         transaction.setStatut(StatutTransaction.EN_ATTENTE);
 
-        // Compte
         Compte compte = compteRepository.findById(transactionDto.getIdCompte())
-                .orElseThrow(() -> {
-                    log.error(
-                            "Création transaction échouée : compte introuvable ID={}",
-                            transactionDto.getIdCompte()
-                    );
-                    return new RuntimeException("Compte introuvable");
-                });
-
+                .orElseThrow(() -> new RuntimeException("Compte introuvable"));
         transaction.setCompte(compte);
 
-        // Employé initiateur (collecteur)
         if (transactionDto.getIdEmployeInitiateur() != null) {
-
-            Employe initiateur = employeRepository
-                    .findById(Integer.valueOf(transactionDto.getIdEmployeInitiateur()))
-                    .orElseThrow(() -> {
-                        log.error(
-                                "Employé initiateur introuvable ID={}",
-                                transactionDto.getIdEmployeInitiateur()
-                        );
-                        return new RuntimeException("Employé initiateur introuvable");
-                    });
-
-            transaction.setInitiateur(initiateur);
+            try {
+                Employe initiateur = employeRepository.findById(Integer.valueOf(transactionDto.getIdEmployeInitiateur()))
+                        .orElseThrow(() -> new RuntimeException("Employé initiateur introuvable"));
+                transaction.setInitiateur(initiateur);
+            } catch (NumberFormatException e) {
+                log.warn("L'ID initiateur n'est pas numérique : {}", transactionDto.getIdEmployeInitiateur());
+            }
         }
 
         Transaction saved = transactionRepository.save(transaction);
-
-        log.info(
-                "Transaction créée avec succès ID={} | Statut={}",
-                saved.getIdTransaction(),
-                saved.getStatut()
-        );
-
         return transactionMapper.toDto(saved);
     }
 
-    // ----------------------------------------------------
-    // Récupération par ID
-    // ----------------------------------------------------
-    @Override
-    public TransactionDto getById(String idTransaction) {
-
-        log.info("Recherche transaction ID={}", idTransaction);
-
-        Transaction transaction = transactionRepository.findById(idTransaction)
-                .orElseThrow(() -> {
-                    log.error("Transaction introuvable ID={}", idTransaction);
-                    return new RuntimeException("Transaction introuvable");
-                });
-
-        return transactionMapper.toDto(transaction);
-    }
-
-    // ----------------------------------------------------
-    // Liste de toutes les transactions
-    // ----------------------------------------------------
     @Override
     public List<TransactionDto> getAll() {
-
-        log.info("Récupération de toutes les transactions");
-
-        return transactionRepository.findAll()
-                .stream()
+        return transactionRepository.findAll().stream()
                 .map(transactionMapper::toDto)
                 .collect(Collectors.toList());
     }
 
-    // ----------------------------------------------------
-    // Validation par le caissier
-    // ----------------------------------------------------
+    @Override
+    public TransactionDto getById(String idTransaction) {
+        Transaction transaction = transactionRepository.findById(idTransaction)
+                .orElseThrow(() -> new RuntimeException("Transaction introuvable"));
+        return transactionMapper.toDto(transaction);
+    }
+
     @Override
     public TransactionDto validerParCaissier(String idTransaction, String idCaissier) {
-
-        log.info(
-                "Validation caisse demandée | Transaction={} | Caissier={}",
-                idTransaction, idCaissier
-        );
-
         Transaction transaction = transactionRepository.findById(idTransaction)
-                .orElseThrow(() -> {
-                    log.error("Transaction introuvable ID={}", idTransaction);
-                    return new RuntimeException("Transaction introuvable");
-                });
+                .orElseThrow(() -> new RuntimeException("Transaction introuvable"));
 
-        Employe caissier = employeRepository.findById(Integer.valueOf(idCaissier))
-                .orElseThrow(() -> {
-                    log.error("Caissier introuvable ID={}", idCaissier);
-                    return new RuntimeException("Caissier introuvable");
-                });
+        Employe caissier = findEmployeByAnyIdentifier(idCaissier);
 
         transaction.setCaissierValidateur(caissier);
         transaction.setDateValidationCaisse(Instant.now());
         transaction.setStatut(StatutTransaction.VALIDEE_CAISSE);
 
-        log.info(
-                "Transaction validée par caissier | Transaction={} | Caissier={}",
-                idTransaction, idCaissier
-        );
-
-        return transactionMapper.toDto(transaction);
+        return transactionMapper.toDto(transactionRepository.save(transaction));
     }
 
-    // ----------------------------------------------------
-    // Validation par le superviseur
-    // ----------------------------------------------------
     @Override
     public TransactionDto validerParSuperviseur(String idTransaction, String idSuperviseur) {
-
-        log.info(
-                "Validation superviseur demandée | Transaction={} | Superviseur={}",
-                idTransaction, idSuperviseur
-        );
+        log.info("Tentative de validation superviseur pour TX: {} par ID: {}", idTransaction, idSuperviseur);
 
         Transaction transaction = transactionRepository.findById(idTransaction)
-                .orElseThrow(() -> {
-                    log.error("Transaction introuvable ID={}", idTransaction);
-                    return new RuntimeException("Transaction introuvable");
-                });
+                .orElseThrow(() -> new RuntimeException("Transaction introuvable"));
 
-        Employe superviseur = employeRepository.findById(Integer.valueOf(idSuperviseur))
-                .orElseThrow(() -> {
-                    log.error("Superviseur introuvable ID={}", idSuperviseur);
-                    return new RuntimeException("Superviseur introuvable");
-                });
+        Employe superviseur = findEmployeByAnyIdentifier(idSuperviseur);
 
         transaction.setSuperviseurValidateur(superviseur);
         transaction.setDateValidationSuperviseur(Instant.now());
         transaction.setStatut(StatutTransaction.VALIDEE_SUPERVISEUR);
+        
+        Transaction saved = transactionRepository.save(transaction);
+        
+        // Lancer l'auto-complétion asynchrone après 5 secondes
+        autoCompleteTransactionAfterDelay(idTransaction);
 
-        log.info(
-                "Transaction validée par superviseur | Transaction={} | Superviseur={}",
-                idTransaction, idSuperviseur
-        );
-
-        return transactionMapper.toDto(transaction);
+        log.info("Validation réussie pour la transaction {}", idTransaction);
+        return transactionMapper.toDto(saved);
+    }
+    
+    /**
+     * Méthode asynchrone pour passer automatiquement une transaction
+     * de VALIDEE_SUPERVISEUR à TERMINEE après 5 secondes
+     */
+    @Async
+    public void autoCompleteTransactionAfterDelay(String idTransaction) {
+        try {
+            // Attendre 1 seconde
+            Thread.sleep(1000);
+            
+            log.info("Auto-complétion de la transaction {} après validation superviseur", idTransaction);
+            
+            Transaction transaction = transactionRepository.findById(idTransaction)
+                    .orElse(null);
+            
+            if (transaction != null && transaction.getStatut() == StatutTransaction.VALIDEE_SUPERVISEUR) {
+                transaction.setStatut(StatutTransaction.TERMINEE);
+                transactionRepository.save(transaction);
+                log.info("Transaction {} passée à TERMINEE automatiquement", idTransaction);
+            }
+        } catch (InterruptedException e) {
+            log.error("Erreur lors de l'auto-complétion de la transaction {}", idTransaction, e);
+            Thread.currentThread().interrupt();
+        }
     }
 
-    // ----------------------------------------------------
-    // Rejet d'une transaction
-    // ----------------------------------------------------
+    /**
+     * Recherche manuelle pour éviter les erreurs de génération de requêtes SQL incorrectes
+     */
+    private Employe findEmployeByAnyIdentifier(String identifier) {
+        log.info("Recherche de l'employé pour l'identifiant: {}", identifier);
+
+        // On force la récupération de la liste pour filtrer en mémoire Java
+        // afin de contourner le problème de colonne 'login' vs 'email' en SQL
+        return employeRepository.findAll().stream()
+                .filter(e -> e.getUtilisateur() != null && (
+                        identifier.equalsIgnoreCase(e.getUtilisateur().getEmail()) ||
+                                identifier.equalsIgnoreCase(e.getUtilisateur().getLogin())
+                ))
+                .findFirst()
+                .orElseThrow(() -> {
+                    log.error("ERREUR : Aucun employé trouvé avec le login ou l'email: {}", identifier);
+                    return new RuntimeException("Employé introuvable : " + identifier);
+                });
+    }
+
     @Override
     public void rejeterTransaction(String idTransaction, String motifRejet) {
-
-        log.info(
-                "Rejet transaction demandé | Transaction={} | Motif={}",
-                idTransaction, motifRejet
-        );
-
         Transaction transaction = transactionRepository.findById(idTransaction)
-                .orElseThrow(() -> {
-                    log.error("Transaction introuvable ID={}", idTransaction);
-                    return new RuntimeException("Transaction introuvable");
-                });
-
+                .orElseThrow(() -> new RuntimeException("Transaction introuvable"));
         transaction.setMotifRejet(motifRejet);
         transaction.setStatut(StatutTransaction.REJETEE);
-
         transactionRepository.save(transaction);
-
-        log.info(
-                "Transaction rejetée avec succès | Transaction={}",
-                idTransaction
-        );
     }
 }

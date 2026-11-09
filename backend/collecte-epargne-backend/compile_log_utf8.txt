@@ -1,0 +1,99 @@
+﻿[INFO] Scanning for projects...
+[INFO] 
+[INFO] ---------------< com.collecte-epargne:collecte-epargne >----------------
+[INFO] Building collecte-epargne 0.0.1-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- clean:3.3.2:clean (default-clean) @ collecte-epargne ---
+[INFO] Deleting C:\Users\Darryl\Documents\Cours_EADL\DÚveloppement_avancÚes\Projet2\collecte-epargne-app\backend\collecte-epargne-backend\target
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ collecte-epargne ---
+[INFO] Copying 2 resources from src\main\resources to target\classes
+[INFO] Copying 1 resource from src\main\resources to target\classes
+[INFO] 
+[INFO] --- compiler:3.13.0:compile (default-compile) @ collecte-epargne ---
+[INFO] Recompiling the module because of changed source code.
+[INFO] Compiling 145 source files with javac [debug parameters release 17] to target\classes
+[INFO] Some messages have been simplified; recompile with -Xdiags:verbose to get full output
+[INFO] -------------------------------------------------------------
+[WARNING] COMPILATION WARNING : 
+[INFO] -------------------------------------------------------------
+[WARNING] /C:/Users/Darryl/Documents/Cours_EADL/DÚveloppement_avancÚes/Projet2/collecte-epargne-app/backend/collecte-epargne-backend/src/main/java/com/collecte_epargne/collecte_epargne/mappers/ClientMapper.java:[26,15] Unmapped target property: "email".
+[INFO] 1 warning
+[INFO] -------------------------------------------------------------
+[INFO] -------------------------------------------------------------
+[ERROR] COMPILATION ERROR : 
+[INFO] -------------------------------------------------------------
+[ERROR] /C:/Users/Darryl/Documents/Cours_EADL/DÚveloppement_avancÚes/Projet2/collecte-epargne-app/backend/collecte-epargne-backend/src/main/java/com/collecte_epargne/collecte_epargne/controllers/ClientController.java:[92,63] incompatible types: java.lang.String cannot be converted to java.lang.Long
+[ERROR] /C:/Users/Darryl/Documents/Cours_EADL/DÚveloppement_avancÚes/Projet2/collecte-epargne-app/backend/collecte-epargne-backend/src/main/java/com/collecte_epargne/collecte_epargne/controllers/ClientController.java:[101,73] incompatible types: java.lang.String cannot be converted to java.lang.Long
+[ERROR] /C:/Users/Darryl/Documents/Cours_EADL/DÚveloppement_avancÚes/Projet2/collecte-epargne-app/backend/collecte-epargne-backend/src/main/java/com/collecte_epargne/collecte_epargne/controllers/ClientController.java:[119,62] incompatible types: java.lang.String cannot be converted to java.lang.Long
+[ERROR] /C:/Users/Darryl/Documents/Cours_EADL/DÚveloppement_avancÚes/Projet2/collecte-epargne-app/backend/collecte-epargne-backend/src/main/java/com/collecte_epargne/collecte_epargne/controllers/ClientController.java:[128,34] incompatible types: java.lang.String cannot be converted to java.lang.Long
+[ERROR] /C:/Users/Darryl/Documents/Cours_EADL/DÚveloppement_avancÚes/Projet2/collecte-epargne-app/backend/collecte-epargne-backend/src/main/java/com/collecte_epargne/collecte_epargne/services/implementations/ClientService.java:[30,8] com.collecte_epargne.collecte_epargne.services.implementations.ClientService is not abstract and does not override abstract method getByNumeroClient(java.lang.String) in com.collecte_epargne.collecte_epargne.services.interfaces.ClientInterface
+[ERROR] /C:/Users/Darryl/Documents/Cours_EADL/DÚveloppement_avancÚes/Projet2/collecte-epargne-app/backend/collecte-epargne-backend/src/main/java/com/collecte_epargne/collecte_epargne/services/implementations/ClientService.java:[154,5] method does not override or implement a method from a supertype
+[ERROR] /C:/Users/Darryl/Documents/Cours_EADL/DÚveloppement_avancÚes/Projet2/collecte-epargne-app/backend/collecte-epargne-backend/src/main/java/com/collecte_epargne/collecte_epargne/services/implementations/ClientService.java:[165,5] method does not override or implement a method from a supertype
+[ERROR] /C:/Users/Darryl/Documents/Cours_EADL/DÚveloppement_avancÚes/Projet2/collecte-epargne-app/backend/collecte-epargne-backend/src/main/java/com/collecte_epargne/collecte_epargne/services/implementations/ClientService.java:[176,5] method does not override or implement a method from a supertype
+[ERROR] /C:/Users/Darryl/Documents/Cours_EADL/DÚveloppement_avancÚes/Projet2/collecte-epargne-app/backend/collecte-epargne-backend/src/main/java/com/collecte_epargne/collecte_epargne/services/implementations/ClientService.java:[186,23] cannot find symbol
+  symbol:   method setAddress(java.lang.String)
+  location: variable existingClient of type com.collecte_epargne.collecte_epargne.entities.Client
+[ERROR] /C:/Users/Darryl/Documents/Cours_EADL/DÚveloppement_avancÚes/Projet2/collecte-epargne-app/backend/collecte-epargne-backend/src/main/java/com/collecte_epargne/collecte_epargne/services/implementations/ClientService.java:[189,23] cannot find symbol
+  symbol:   method setIdentityType(clientDto.[...] null)
+  location: variable existingClient of type com.collecte_epargne.collecte_epargne.entities.Client
+[ERROR] /C:/Users/Darryl/Documents/Cours_EADL/DÚveloppement_avancÚes/Projet2/collecte-epargne-app/backend/collecte-epargne-backend/src/main/java/com/collecte_epargne/collecte_epargne/services/implementations/ClientService.java:[190,23] cannot find symbol
+  symbol:   method setIdentityNumber(java.lang.String)
+  location: variable existingClient of type com.collecte_epargne.collecte_epargne.entities.Client
+[ERROR] /C:/Users/Darryl/Documents/Cours_EADL/DÚveloppement_avancÚes/Projet2/collecte-epargne-app/backend/collecte-epargne-backend/src/main/java/com/collecte_epargne/collecte_epargne/services/implementations/ClientService.java:[208,5] method does not override or implement a method from a supertype
+[ERROR] /C:/Users/Darryl/Documents/Cours_EADL/DÚveloppement_avancÚes/Projet2/collecte-epargne-app/backend/collecte-epargne-backend/src/main/java/com/collecte_epargne/collecte_epargne/services/implementations/ClientService.java:[224,5] method does not override or implement a method from a supertype
+[ERROR] /C:/Users/Darryl/Documents/Cours_EADL/DÚveloppement_avancÚes/Projet2/collecte-epargne-app/backend/collecte-epargne-backend/src/main/java/com/collecte_epargne/collecte_epargne/services/implementations/ClientService.java:[229,5] method does not override or implement a method from a supertype
+[ERROR] /C:/Users/Darryl/Documents/Cours_EADL/DÚveloppement_avancÚes/Projet2/collecte-epargne-app/backend/collecte-epargne-backend/src/main/java/com/collecte_epargne/collecte_epargne/services/implementations/ClientService.java:[237,5] method does not override or implement a method from a supertype
+[ERROR] /C:/Users/Darryl/Documents/Cours_EADL/DÚveloppement_avancÚes/Projet2/collecte-epargne-app/backend/collecte-epargne-backend/src/main/java/com/collecte_epargne/collecte_epargne/services/implementations/ClientService.java:[316,41] cannot find symbol
+  symbol:   method findByUtilisateurLogin(java.lang.String)
+  location: variable clientRepository of type com.collecte_epargne.collecte_epargne.repositories.ClientRepository
+[ERROR] /C:/Users/Darryl/Documents/Cours_EADL/DÚveloppement_avancÚes/Projet2/collecte-epargne-app/backend/collecte-epargne-backend/src/main/java/com/collecte_epargne/collecte_epargne/services/implementations/DemandeOuvertureCompteService.java:[45,75] incompatible types: java.lang.String cannot be converted to java.lang.Long
+[ERROR] /C:/Users/Darryl/Documents/Cours_EADL/DÚveloppement_avancÚes/Projet2/collecte-epargne-app/backend/collecte-epargne-backend/src/main/java/com/collecte_epargne/collecte_epargne/controllers/RegistrationController.java:[106,46] incompatible types: java.lang.String cannot be converted to java.lang.Long
+[ERROR] /C:/Users/Darryl/Documents/Cours_EADL/DÚveloppement_avancÚes/Projet2/collecte-epargne-app/backend/collecte-epargne-backend/src/main/java/com/collecte_epargne/collecte_epargne/controllers/RegistrationController.java:[112,56] incompatible types: java.lang.String cannot be converted to java.lang.Long
+[ERROR] /C:/Users/Darryl/Documents/Cours_EADL/DÚveloppement_avancÚes/Projet2/collecte-epargne-app/backend/collecte-epargne-backend/src/main/java/com/collecte_epargne/collecte_epargne/controllers/RegistrationController.java:[119,36] incompatible types: java.lang.String cannot be converted to java.lang.Long
+[INFO] 20 errors 
+[INFO] -------------------------------------------------------------
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  24.282 s
+[INFO] Finished at: 2026-01-12T20:07:12+01:00
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-compiler-plugin:3.13.0:compile (default-compile) on project collecte-epargne: Compilation failure: Compilation failure: 
+[ERROR] /C:/Users/Darryl/Documents/Cours_EADL/DÚveloppement_avancÚes/Projet2/collecte-epargne-app/backend/collecte-epargne-backend/src/main/java/com/collecte_epargne/collecte_epargne/controllers/ClientController.java:[92,63] incompatible types: java.lang.String cannot be converted to java.lang.Long
+[ERROR] /C:/Users/Darryl/Documents/Cours_EADL/DÚveloppement_avancÚes/Projet2/collecte-epargne-app/backend/collecte-epargne-backend/src/main/java/com/collecte_epargne/collecte_epargne/controllers/ClientController.java:[101,73] incompatible types: java.lang.String cannot be converted to java.lang.Long
+[ERROR] /C:/Users/Darryl/Documents/Cours_EADL/DÚveloppement_avancÚes/Projet2/collecte-epargne-app/backend/collecte-epargne-backend/src/main/java/com/collecte_epargne/collecte_epargne/controllers/ClientController.java:[119,62] incompatible types: java.lang.String cannot be converted to java.lang.Long
+[ERROR] /C:/Users/Darryl/Documents/Cours_EADL/DÚveloppement_avancÚes/Projet2/collecte-epargne-app/backend/collecte-epargne-backend/src/main/java/com/collecte_epargne/collecte_epargne/controllers/ClientController.java:[128,34] incompatible types: java.lang.String cannot be converted to java.lang.Long
+[ERROR] /C:/Users/Darryl/Documents/Cours_EADL/DÚveloppement_avancÚes/Projet2/collecte-epargne-app/backend/collecte-epargne-backend/src/main/java/com/collecte_epargne/collecte_epargne/services/implementations/ClientService.java:[30,8] com.collecte_epargne.collecte_epargne.services.implementations.ClientService is not abstract and does not override abstract method getByNumeroClient(java.lang.String) in com.collecte_epargne.collecte_epargne.services.interfaces.ClientInterface
+[ERROR] /C:/Users/Darryl/Documents/Cours_EADL/DÚveloppement_avancÚes/Projet2/collecte-epargne-app/backend/collecte-epargne-backend/src/main/java/com/collecte_epargne/collecte_epargne/services/implementations/ClientService.java:[154,5] method does not override or implement a method from a supertype
+[ERROR] /C:/Users/Darryl/Documents/Cours_EADL/DÚveloppement_avancÚes/Projet2/collecte-epargne-app/backend/collecte-epargne-backend/src/main/java/com/collecte_epargne/collecte_epargne/services/implementations/ClientService.java:[165,5] method does not override or implement a method from a supertype
+[ERROR] /C:/Users/Darryl/Documents/Cours_EADL/DÚveloppement_avancÚes/Projet2/collecte-epargne-app/backend/collecte-epargne-backend/src/main/java/com/collecte_epargne/collecte_epargne/services/implementations/ClientService.java:[176,5] method does not override or implement a method from a supertype
+[ERROR] /C:/Users/Darryl/Documents/Cours_EADL/DÚveloppement_avancÚes/Projet2/collecte-epargne-app/backend/collecte-epargne-backend/src/main/java/com/collecte_epargne/collecte_epargne/services/implementations/ClientService.java:[186,23] cannot find symbol
+[ERROR]   symbol:   method setAddress(java.lang.String)
+[ERROR]   location: variable existingClient of type com.collecte_epargne.collecte_epargne.entities.Client
+[ERROR] /C:/Users/Darryl/Documents/Cours_EADL/DÚveloppement_avancÚes/Projet2/collecte-epargne-app/backend/collecte-epargne-backend/src/main/java/com/collecte_epargne/collecte_epargne/services/implementations/ClientService.java:[189,23] cannot find symbol
+[ERROR]   symbol:   method setIdentityType(clientDto.[...] null)
+[ERROR]   location: variable existingClient of type com.collecte_epargne.collecte_epargne.entities.Client
+[ERROR] /C:/Users/Darryl/Documents/Cours_EADL/DÚveloppement_avancÚes/Projet2/collecte-epargne-app/backend/collecte-epargne-backend/src/main/java/com/collecte_epargne/collecte_epargne/services/implementations/ClientService.java:[190,23] cannot find symbol
+[ERROR]   symbol:   method setIdentityNumber(java.lang.String)
+[ERROR]   location: variable existingClient of type com.collecte_epargne.collecte_epargne.entities.Client
+[ERROR] /C:/Users/Darryl/Documents/Cours_EADL/DÚveloppement_avancÚes/Projet2/collecte-epargne-app/backend/collecte-epargne-backend/src/main/java/com/collecte_epargne/collecte_epargne/services/implementations/ClientService.java:[208,5] method does not override or implement a method from a supertype
+[ERROR] /C:/Users/Darryl/Documents/Cours_EADL/DÚveloppement_avancÚes/Projet2/collecte-epargne-app/backend/collecte-epargne-backend/src/main/java/com/collecte_epargne/collecte_epargne/services/implementations/ClientService.java:[224,5] method does not override or implement a method from a supertype
+[ERROR] /C:/Users/Darryl/Documents/Cours_EADL/DÚveloppement_avancÚes/Projet2/collecte-epargne-app/backend/collecte-epargne-backend/src/main/java/com/collecte_epargne/collecte_epargne/services/implementations/ClientService.java:[229,5] method does not override or implement a method from a supertype
+[ERROR] /C:/Users/Darryl/Documents/Cours_EADL/DÚveloppement_avancÚes/Projet2/collecte-epargne-app/backend/collecte-epargne-backend/src/main/java/com/collecte_epargne/collecte_epargne/services/implementations/ClientService.java:[237,5] method does not override or implement a method from a supertype
+[ERROR] /C:/Users/Darryl/Documents/Cours_EADL/DÚveloppement_avancÚes/Projet2/collecte-epargne-app/backend/collecte-epargne-backend/src/main/java/com/collecte_epargne/collecte_epargne/services/implementations/ClientService.java:[316,41] cannot find symbol
+[ERROR]   symbol:   method findByUtilisateurLogin(java.lang.String)
+[ERROR]   location: variable clientRepository of type com.collecte_epargne.collecte_epargne.repositories.ClientRepository
+[ERROR] /C:/Users/Darryl/Documents/Cours_EADL/DÚveloppement_avancÚes/Projet2/collecte-epargne-app/backend/collecte-epargne-backend/src/main/java/com/collecte_epargne/collecte_epargne/services/implementations/DemandeOuvertureCompteService.java:[45,75] incompatible types: java.lang.String cannot be converted to java.lang.Long
+[ERROR] /C:/Users/Darryl/Documents/Cours_EADL/DÚveloppement_avancÚes/Projet2/collecte-epargne-app/backend/collecte-epargne-backend/src/main/java/com/collecte_epargne/collecte_epargne/controllers/RegistrationController.java:[106,46] incompatible types: java.lang.String cannot be converted to java.lang.Long
+[ERROR] /C:/Users/Darryl/Documents/Cours_EADL/DÚveloppement_avancÚes/Projet2/collecte-epargne-app/backend/collecte-epargne-backend/src/main/java/com/collecte_epargne/collecte_epargne/controllers/RegistrationController.java:[112,56] incompatible types: java.lang.String cannot be converted to java.lang.Long
+[ERROR] /C:/Users/Darryl/Documents/Cours_EADL/DÚveloppement_avancÚes/Projet2/collecte-epargne-app/backend/collecte-epargne-backend/src/main/java/com/collecte_epargne/collecte_epargne/controllers/RegistrationController.java:[119,36] incompatible types: java.lang.String cannot be converted to java.lang.Long
+[ERROR] -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoFailureException

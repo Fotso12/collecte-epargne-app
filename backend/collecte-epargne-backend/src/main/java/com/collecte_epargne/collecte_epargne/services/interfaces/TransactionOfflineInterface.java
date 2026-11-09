@@ -17,6 +17,8 @@ public interface TransactionOfflineInterface {
 
     List<TransactionOfflineDto> getByEmploye(Integer idEmploye);
 
+    List<TransactionOfflineDto> getByEmployeToday(Integer idEmploye);
+
     TransactionOfflineDto markAsSynced(
             String idOffline,
             String idTransactionFinale

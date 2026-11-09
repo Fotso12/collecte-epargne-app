@@ -1,0 +1,57 @@
+import { Component, OnInit } from '@angular/core';
+import { RouterLink, RouterLinkActive, RouterOutlet, Router } from '@angular/router';
+import { CommonModule } from '@angular/common'; 
+import { AuthService } from '../../core/services/auth.service';
+
+@Component({
+  selector: 'app-sidebar',
+  standalone: true,
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, CommonModule],
+  templateUrl: './sidebar.html',
+  styleUrl: './sidebar.css',
+})
+export class Sidebar implements OnInit {
+  showLogoutModal = false;
+  currentUser: any = null;
+
+  constructor(
+    private authService: AuthService,
+    private router: Router
+  ) {}
+
+  hasRole(role: string): boolean {
+    return this.authService.hasRole(role);
+  }
+
+  getHomeRoute(): string {
+    return this.hasRole('CAISSIER') ? '/caissier/accueil' : '/accueil';
+  }
+
+  getHomeLabel(): string {
+    return this.hasRole('CAISSIER') ? 'Accueil Caissier' : 'Accueil';
+  }
+
+  ngOnInit(): void {
+    // S'abonne aux infos de l'utilisateur connecté
+    this.authService.currentUser$.subscribe(user => {
+      this.currentUser = user;
+    });
+  }
+
+  goToProfile(): void {
+    this.router.navigate(['/profil']);
+  }
+
+  openLogoutModal(): void {
+    this.showLogoutModal = true;
+  }
+
+  closeLogoutModal(): void {
+    this.showLogoutModal = false;
+  }
+
+  confirmLogout(): void {
+    this.showLogoutModal = false;
+    this.authService.logout();
+  }
+}

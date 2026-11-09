@@ -27,7 +27,7 @@ public class Utilisateur {
     private Employe employe;
 
     // Relation OneToOne vers Client (un client est un utilisateur du système)
-    @OneToOne(mappedBy = "utilisateur", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToOne(mappedBy = "utilisateur", fetch = FetchType.LAZY)
     private Client client;
 
     @Size(max = 50)
@@ -64,8 +64,11 @@ public class Utilisateur {
     @Column(name = "DATE_CREATION")
     private Instant dateCreation;
 
-    public Utilisateur() {
+    @Size(max = 255)
+    @Column(name = "PHOTO_PATH")
+    private String photoPath;
 
+    public Utilisateur() {
     }
 
     public String getLogin() {
@@ -156,6 +159,14 @@ public class Utilisateur {
         this.dateCreation = dateCreation;
     }
 
+    public String getPhotoPath() {
+        return photoPath;
+    }
+
+    public void setPhotoPath(String photoPath) {
+        this.photoPath = photoPath;
+    }
+
     public Utilisateur(String login, Role role, Employe employe, Client client, String nom, String prenom, String telephone, String email, String password, StatutGenerique statut, Instant dateCreation) {
         this.login = login;
         this.role = role;
@@ -169,6 +180,4 @@ public class Utilisateur {
         this.statut = statut;
         this.dateCreation = dateCreation;
     }
-
-
 }

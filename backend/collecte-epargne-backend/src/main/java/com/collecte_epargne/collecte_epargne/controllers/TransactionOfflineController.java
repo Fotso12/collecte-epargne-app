@@ -76,6 +76,28 @@ public class TransactionOfflineController {
     }
 
     // ----------------------------------------------------
+    // Alias pour /collecteur/{id} (Mapping mobile)
+    // ----------------------------------------------------
+    @GetMapping("/collecteur/{id}")
+    public ResponseEntity<List<TransactionOfflineDto>> getByCollecteur(
+            @PathVariable Integer id
+    ) {
+        log.info("Récupération transactions offline par collecteur ID={} (Endpoint Alias)", id);
+        return ResponseEntity.ok(service.getByEmploye(id));
+    }
+
+    // ----------------------------------------------------
+    // Transactions d'aujourd'hui pour un collecteur
+    // ----------------------------------------------------
+    @GetMapping("/collecteur/{id}/today")
+    public ResponseEntity<List<TransactionOfflineDto>> getByCollecteurToday(
+            @PathVariable Integer id
+    ) {
+        log.info("Récupération transactions offline par collecteur ID={} pour TODAY", id);
+        return ResponseEntity.ok(service.getByEmployeToday(id));
+    }
+
+    // ----------------------------------------------------
     // Synchronisation avec transaction finale
     // ----------------------------------------------------
     @PutMapping("/{id}/synchroniser/{idTransaction}")

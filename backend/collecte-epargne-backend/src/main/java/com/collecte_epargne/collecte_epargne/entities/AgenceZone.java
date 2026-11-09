@@ -58,6 +58,10 @@ public class AgenceZone {
     @Column(name = "DATE_CREATION")
     private Instant dateCreation;
 
+    @Size(max = 255)
+    @Column(name = "POSITION")
+    private String position;
+
     public Integer getIdAgence() {
         return idAgence;
     }
@@ -138,6 +142,14 @@ public class AgenceZone {
         this.dateCreation = dateCreation;
     }
 
+    public String getPosition() {
+        return position;
+    }
+
+    public void setPosition(String position) {
+        this.position = position;
+    }
+
     public AgenceZone(Integer idAgence, String code, String nom, String ville, String quartier, String adresse, String telephone, String description, StatutGenerique statut, Instant dateCreation) {
         this.idAgence = idAgence;
         this.code = code;
@@ -154,7 +166,7 @@ public class AgenceZone {
     public AgenceZone() {
     }
 
-    public Throwable getId() {
-        return null;
+    public Integer getId() {
+        return idAgence;
     }
 }

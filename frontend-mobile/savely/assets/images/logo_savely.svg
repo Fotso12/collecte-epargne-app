@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="512" height="512" fill="#FFFFFF"/>
+  
+  <!-- Green Heart Shape -->
+  <g transform="translate(256, 220)">
+    <!-- Left lobe of heart -->
+    <ellipse cx="-70" cy="-80" rx="85" ry="90" fill="#0D8A5F"/>
+    <!-- Right lobe of heart -->
+    <ellipse cx="70" cy="-80" rx="85" ry="90" fill="#0D8A5F"/>
+    <!-- Bottom point of heart -->
+    <path d="M -140 -10 Q -140 80 0 150 Q 140 80 140 -10 Z" fill="#0D8A5F"/>
+  </g>
+  
+  <!-- SAVELY Text -->
+  <text x="256" y="420" font-family="Arial, sans-serif" font-size="72" font-weight="bold" 
+        text-anchor="middle" fill="#0D8A5F">SAVELY</text>
+  
+  <!-- Tagline (optional) -->
+  <text x="256" y="460" font-family="Arial, sans-serif" font-size="24" 
+        text-anchor="middle" fill="#666666">Savings Collector</text>
+</svg>
